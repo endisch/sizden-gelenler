@@ -967,12 +967,10 @@ const html = `<!DOCTYPE html>
 
       
       const ib = document.getElementById('inbox-body');
-      const rb = document.getElementById('reviewed-body');
-      ib.innerHTML = ''; rb.innerHTML = '';
-      currentInboxList.length = 0; currentReviewedList.length = 0;
+      ib.innerHTML = '';
+      currentInboxList.length = 0;
       data.submissions.forEach(function(s) {
         if(s.status === 'pending') currentInboxList.push(s);
-        else currentReviewedList.push(s);
       });
 
       if (currentInboxList.length === 0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
@@ -985,19 +983,6 @@ const html = `<!DOCTYPE html>
                       '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
           ib.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
-        });
-      }
-
-      if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
-      else {
-        currentReviewedList.forEach(function(s, idx) {
-          let link = '<a href="#" onclick="playFromList(\\\'reviewed\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
-          let action = '<button class="action-btn red" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'pending\\\')">Geri Al</button>';
-          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
-          rb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
         });
       }
 
@@ -1070,7 +1055,6 @@ const html = `<!DOCTYPE html>
 
     // ═══ MISSING FUNCTION DEFINITIONS (AUTO-PATCHED) ════════════════════════
     let currentInboxList = [];
-    let currentReviewedList = [];
     let currentSpecialList = [];
 
     function esc(str) {
@@ -1168,7 +1152,7 @@ const html = `<!DOCTYPE html>
     var playlistIndex = -1;
 
     function playFromList(listName, idx) {
-      var srcList = listName === 'inbox' ? currentInboxList : listName === 'reviewed' ? currentReviewedList : currentSpecialList;
+      var srcList = listName === 'inbox' ? currentInboxList : currentSpecialList;
       playlist = srcList.map(function(s) {
         return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || '\u2014', aiTool: s.aiTool || '' };
       });
