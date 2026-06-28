@@ -4,1060 +4,1063 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sizden Gelenler — MAIS Studio</title>
-  <script src="https://accounts.google.com/gsi/client" onload="onGoogleLibraryLoad()" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-body: #080706;
-      --bg-card: #12100e;
-      --border-color: #24211b;
-      --text-primary: #f5f4f2;
-      --text-secondary: #a3a19d;
-      --text-muted: #615f5a;
-      --accent-gold: #fbbf24;
-      --accent-gold-hover: #f59e0b;
-      --accent-glow: rgba(251, 191, 36, 0.05);
-      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --bg: #080706;
+      --card: #0f0e0c;
+      --border: #1e1c17;
+      --border2: #2a271f;
+      --txt: #f5f4f2;
+      --txt2: #9e9b96;
+      --txt3: #5e5b55;
+      --gold: #fbbf24;
+      --gold2: #f59e0b;
+      --glow: rgba(251,191,36,0.06);
+      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --radius: 16px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg-body);
-      color: var(--text-primary);
-      font-family: var(--font-family);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 30px 24px 60px;
-    }
+    body { background: var(--bg); color: var(--txt); font-family: var(--font); min-height: 100vh; padding: 24px 20px 80px; display: flex; flex-direction: column; align-items: center; }
 
-    .container { width: 100%; max-width: 540px; position: relative; transition: max-width 0.3s ease; }
+    /* ── NAVBAR ── */
+    .navbar {
+      width: 100%; max-width: 960px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4px; margin-bottom: 24px;
+    }
+    .navbar-brand { font-size: 0.72rem; font-weight: 800; color: var(--txt3); letter-spacing: 0.18em; text-transform: uppercase; }
+    .navbar-actions { display: flex; align-items: center; gap: 10px; }
+
+    .nav-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+      color: var(--txt2); padding: 8px 16px; border-radius: 10px;
+      font-weight: 600; font-size: 0.78rem; cursor: pointer;
+      transition: all 0.2s ease; white-space: nowrap;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.07); border-color: var(--txt3); color: var(--txt); }
+    .nav-btn.gold { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); color: var(--gold); }
+    .nav-btn.gold:hover { background: rgba(251,191,36,0.15); border-color: var(--gold); }
+    .nav-btn.gold.active { background: var(--gold); color: #080706; border-color: var(--gold); }
+
+    /* ── CONTAINER ── */
+    .wrap { width: 100%; max-width: 540px; }
+
+    /* ── LOGO ── */
     .logo-wrap { text-align: center; margin-bottom: 24px; }
-    .logo-wrap img { width: 100%; max-width: 440px; border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-    
-    .card { 
-      background: var(--bg-card); 
-      border: 1.5px solid var(--border-color); 
-      border-radius: 20px; 
-      overflow: hidden; 
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 80px var(--accent-glow);
-    }
+    .logo-wrap img { width: 100%; max-width: 440px; border-radius: 14px; border: 1.5px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 
-    .host-bar {
-      display: flex; align-items: center; gap: 16px;
-      padding: 20px 28px; border-bottom: 1.5px solid var(--border-color); background: rgba(8, 7, 6, 0.3);
-    }
-    .host-bar img { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--accent-gold); box-shadow: 0 0 12px rgba(251, 191, 36, 0.2); }
-    .host-name { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.02em; }
-    .host-sub { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
-    .host-season {
-      margin-left: auto; background: var(--border-color); color: var(--accent-gold);
-      font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-radius: 8px;
-      letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(251, 191, 36, 0.1);
-    }
+    /* ── CARD ── */
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 60px var(--glow); }
 
-    .body { padding: 32px 28px; }
-    .progress-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-color); transition: all 0.3s ease; }
-    .dot.active { background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold); transform: scale(1.2); }
-    .dot.done { background: var(--text-muted); }
+    /* ── HOST BAR ── */
+    .host-bar { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border-bottom: 1.5px solid var(--border); background: rgba(0,0,0,0.2); }
+    .host-bar img { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--gold); box-shadow: 0 0 10px rgba(251,191,36,0.18); }
+    .host-name { font-size: 0.92rem; font-weight: 700; color: var(--txt); }
+    .host-sub { font-size: 0.7rem; color: var(--txt2); margin-top: 2px; }
+    .host-badge { margin-left: auto; background: var(--border); color: var(--gold); font-size: 0.62rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(251,191,36,0.12); }
 
-    .step-label { font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: var(--text-secondary); text-align: center; margin-bottom: 24px; letter-spacing: 0.12em; }
+    /* ── BODY ── */
+    .body { padding: 28px 24px; }
+    .dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 20px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); transition: all 0.3s; }
+    .dot.active { background: var(--gold); box-shadow: 0 0 6px var(--gold); transform: scale(1.3); }
+    .dot.done { background: var(--txt3); }
+    .step-lbl { font-size: 0.68rem; text-transform: uppercase; font-weight: 800; color: var(--txt2); text-align: center; margin-bottom: 20px; letter-spacing: 0.12em; }
 
-    .error-box { background: rgba(239, 68, 68, 0.07); border: 1px dashed rgba(239, 68, 68, 0.2); border-radius: 10px; color: #f87171; padding: 12px 16px; font-size: 0.8rem; margin-bottom: 20px; line-height: 1.5; display: none; }
+    /* ── ERROR BOX ── */
+    .err { background: rgba(239,68,68,0.07); border: 1px dashed rgba(239,68,68,0.25); border-radius: 10px; color: #f87171; padding: 10px 14px; font-size: 0.78rem; margin-bottom: 16px; line-height: 1.5; display: none; }
 
-    .field { margin-bottom: 20px; }
-    .field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: 0.02em; }
-    .field label .req { color: var(--accent-gold); margin-left: 2px; }
-    .field label .hint { font-size: 0.68rem; color: var(--text-muted); font-weight: 400; float: right; }
-    
+    /* ── FIELDS ── */
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 0.73rem; font-weight: 700; color: var(--txt); margin-bottom: 7px; }
+    .field label .req { color: var(--gold); margin-left: 2px; }
+    .field label .hint { font-size: 0.65rem; color: var(--txt3); font-weight: 400; float: right; }
     .field input, .field textarea, .field select {
-      width: 100%; background: #0c0b0a; border: 1.5px solid var(--border-color); border-radius: 12px;
-      padding: 14px 16px; color: var(--text-primary); font-family: var(--font-family); font-size: 0.88rem;
-      outline: none; transition: all 0.2s ease;
+      width: 100%; background: #0a0908; border: 1.5px solid var(--border); border-radius: 11px;
+      padding: 12px 14px; color: var(--txt); font-family: var(--font); font-size: 0.86rem;
+      outline: none; transition: all 0.2s;
     }
-    .field input:focus, .field textarea:focus, .field select:focus {
-      border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(251, 191, 36, 0.08); background: #0f0e0d;
-    }
-    .field textarea { height: 100px; resize: none; line-height: 1.6; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.07); }
+    .field textarea { height: 96px; resize: none; line-height: 1.6; }
     .field select { appearance: none; cursor: pointer; }
 
+    /* ── UPLOAD ZONE ── */
     .upload-zone {
-      border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 24px; text-align: center;
-      background: rgba(12, 11, 10, 0.4); cursor: pointer; position: relative; transition: all 0.2s ease;
+      border: 1.5px dashed var(--border2); border-radius: 11px; padding: 22px; text-align: center;
+      background: rgba(10,9,8,0.4); cursor: pointer; position: relative; transition: all 0.2s;
     }
-    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent-gold); background: rgba(251, 191, 36, 0.01); }
-    .upload-zone input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-    .upload-zone .icon { font-size: 1.6rem; color: var(--text-muted); margin-bottom: 8px; }
-    .upload-zone .hint { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-    .upload-zone .sub-hint { font-size: 0.68rem; color: var(--text-muted); }
-    .upload-zone .file-name { font-size: 0.82rem; font-weight: 600; color: var(--accent-gold); margin-top: 10px; word-break: break-all; }
+    .upload-zone:hover, .upload-zone.over { border-color: var(--gold); background: rgba(251,191,36,0.01); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-zone .uz-icon { font-size: 1.5rem; color: var(--txt3); margin-bottom: 6px; }
+    .upload-zone .uz-title { font-size: 0.8rem; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
+    .upload-zone .uz-sub { font-size: 0.65rem; color: var(--txt3); }
+    .upload-zone .uz-name { font-size: 0.8rem; font-weight: 600; color: var(--gold); margin-top: 8px; word-break: break-all; }
 
-    .consent-box { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin-top: 24px; padding: 4px 0; }
-    .consent-box .checkbox {
-      width: 18px; height: 18px; border: 1.5px solid var(--border-color); border-radius: 6px;
-      display: flex; align-items: center; justify-content: center; background: #0c0b0a;
-      transition: all 0.2s ease; flex-shrink: 0; margin-top: 2px;
-    }
-    .consent-box .checkbox .tick { font-size: 0.75rem; color: #080706; display: none; font-weight: 900; }
-    .consent-box .checkbox.checked { background: var(--accent-gold); border-color: var(--accent-gold); }
-    .consent-box .checkbox.checked .tick { display: block; }
-    .consent-box p { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; user-select: none; }
+    /* ── CONSENT ── */
+    .consent { display: flex; align-items: flex-start; gap: 11px; cursor: pointer; margin-top: 22px; }
+    .check-box { width: 17px; height: 17px; border: 1.5px solid var(--border2); border-radius: 5px; display: flex; align-items: center; justify-content: center; background: #0a0908; transition: all 0.2s; flex-shrink: 0; margin-top: 2px; }
+    .check-box .tick { font-size: 0.7rem; color: #080706; display: none; font-weight: 900; }
+    .check-box.checked { background: var(--gold); border-color: var(--gold); }
+    .check-box.checked .tick { display: block; }
+    .consent p { font-size: 0.73rem; color: var(--txt2); line-height: 1.6; user-select: none; }
 
+    /* ── BUTTONS ── */
     .btn {
-      width: 100%; background: var(--accent-gold); color: #080706; border: none;
-      border-radius: 12px; padding: 16px; font-weight: 800; font-size: 0.9rem;
-      cursor: pointer; transition: all 0.2s ease; margin-top: 28px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
+      width: 100%; background: var(--gold); color: #080706; border: none;
+      border-radius: 11px; padding: 14px; font-weight: 800; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.2s; margin-top: 24px;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      box-shadow: 0 4px 18px rgba(251,191,36,0.14);
     }
-    .btn:hover:not(:disabled) {
-      background: var(--accent-gold-hover); transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(251, 191, 36, 0.25);
-    }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); box-shadow: 0 6px 22px rgba(251,191,36,0.22); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-back { background: transparent; border: 1.5px solid var(--border2); border-radius: 8px; color: var(--txt2); font-size: 0.72rem; font-weight: 600; padding: 8px 16px; cursor: pointer; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--txt2); color: var(--txt); }
 
-    .loading-spinner {
-      display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(8, 7, 6, 0.2);
-      border-top-color: #080706; border-radius: 50%; animation: spin 0.6s linear infinite;
-      vertical-align: middle; margin-right: 8px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* ── SPINNER ── */
+    .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(8,7,6,0.2); border-top-color: #080706; border-radius: 50%; animation: rotate 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes rotate { to { transform: rotate(360deg); } }
 
-    .blocked { text-align: center; padding: 16px 0; }
-    .blocked .big { font-size: 2.5rem; margin-bottom: 16px; }
-    .blocked h2 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
-    .blocked p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
-    
-    .countdown {
-      display: inline-block; background: #0c0b0a; border: 1.5px solid var(--accent-gold);
-      border-radius: 10px; padding: 10px 24px; font-size: 1rem; color: var(--accent-gold);
-      font-weight: 700; letter-spacing: 0.05em; margin-bottom: 24px;
-      box-shadow: inset 0 0 10px rgba(251,191,36,0.05);
-    }
+    /* ── BLOCKED ── */
+    .blocked { text-align: center; padding: 12px 0; }
+    .blocked .big { font-size: 2.4rem; margin-bottom: 14px; }
+    .blocked h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .blocked p { font-size: 0.8rem; color: var(--txt2); line-height: 1.7; margin-bottom: 16px; }
+    .countdown { display: inline-block; background: #0a0908; border: 1.5px solid var(--gold); border-radius: 9px; padding: 9px 22px; font-size: 0.96rem; color: var(--gold); font-weight: 700; margin-bottom: 20px; box-shadow: inset 0 0 8px rgba(251,191,36,0.04); }
 
-    .btn-back {
-      background: transparent; border: 1.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px; color: var(--text-secondary); font-size: 0.72rem;
-      font-weight: 600; padding: 8px 18px; cursor: pointer; transition: all 0.2s ease;
-    }
-    .btn-back:hover { border-color: var(--text-secondary); color: var(--text-primary); background: rgba(255,255,255,0.02); }
-
-    .footer { text-align: center; margin-top: 24px; font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; opacity: 0.7; }
-
+    /* ── STEP ANIMATION ── */
     .step { display: none; }
-    .step.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .step.active { display: block; animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    /* Responsive Grid Layout */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 32px;
-      width: 100%;
-      margin-top: 10px;
-    }
+    /* ── FOOTER ── */
+    .footer { margin-top: 28px; font-size: 0.58rem; color: var(--txt3); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; opacity: 0.6; }
 
-    @media (min-width: 768px) {
-      .main-grid {
-        grid-template-columns: 1.15fr 0.85fr;
-      }
-      .container {
-        max-width: 1000px;
-      }
-    }
+    /* ════ MODALS ════ */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(8,7,6,0.88); backdrop-filter: blur(10px); z-index: 9000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .modal-box { background: var(--card); border: 1.5px solid var(--border2); border-radius: 22px; width: 100%; box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 80px var(--glow); animation: scaleUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes scaleUp { from { transform:scale(0.92); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; border-bottom: 1.5px solid var(--border); }
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+    .modal-close { background: none; border: none; color: var(--txt2); font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; transition: color 0.2s; }
+    .modal-close:hover { color: var(--txt); }
+    .modal-body { padding: 24px 28px; }
 
-    /* Admin Panel Glassmorphism Modal */
-    .admin-dialog {
-      background: rgba(18, 16, 14, 0.95) !important;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(251, 191, 36, 0.15) !important;
-    }
+    /* ── Staff Login Modal ── */
+    #login-modal .modal-box { max-width: 400px; }
+    .login-field { margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 0.73rem; font-weight: 700; color: var(--txt); margin-bottom: 7px; }
+    .login-field input { width: 100%; background: #0a0908; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--txt); font-family: var(--font); font-size: 0.86rem; outline: none; transition: all 0.2s; }
+    .login-field input:focus { border-color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.07); }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--txt3); cursor: pointer; font-size: 1rem; padding: 0; }
+    .login-err { background: rgba(239,68,68,0.08); border: 1px dashed rgba(239,68,68,0.25); border-radius: 8px; color: #f87171; padding: 9px 13px; font-size: 0.78rem; margin-bottom: 14px; display: none; }
+    .login-btn { width: 100%; background: var(--gold); color: #080706; border: none; border-radius: 10px; padding: 13px; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+    .login-btn:hover { background: var(--gold2); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Tab Buttons Premium Styles */
-    .tab-bar { display: flex; border-bottom: 1.5px solid var(--border-color); margin-bottom: 20px; gap: 8px; overflow-x: auto; }
-    .tab-btn { background: none; border: none; color: var(--text-secondary); padding: 10px 14px; font-weight: 600; font-size: 0.8rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s ease; }
-    .tab-btn:hover { color: var(--text-primary); }
-    .tab-btn.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); text-shadow: 0 0 10px rgba(251, 191, 36, 0.15); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    /* ── Staff Panel Modal ── */
+    #panel-modal .modal-box { max-width: 780px; max-height: 88vh; overflow-y: auto; }
+    .tab-bar { display: flex; gap: 4px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
+    .tab-btn { background: none; border: none; color: var(--txt2); padding: 10px 14px; font-weight: 600; font-size: 0.78rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--txt); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeUp 0.25s ease; }
+    .pane-desc { font-size: 0.78rem; color: var(--txt2); margin-bottom: 14px; line-height: 1.6; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .data-table th { padding: 9px 10px; color: var(--txt3); font-weight: 600; text-align: left; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.015); }
+    .table-wrap { border: 1px solid var(--border); border-radius: 12px; background: #0a0a0a; overflow: hidden; max-height: 380px; overflow-y: auto; }
+    .tag { font-size: 0.65rem; background: rgba(251,191,36,0.1); color: var(--gold); padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .action-btn { background: none; border: 1px solid; border-radius: 6px; padding: 4px 9px; font-size: 0.7rem; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+    .action-btn.approve { border-color: var(--gold); color: var(--gold); }
+    .action-btn.approve:hover { background: var(--gold); color: #080706; }
+    .action-btn.reject { border-color: #f87171; color: #f87171; }
+    .action-btn.reject:hover { background: #f87171; color: #080706; }
+    .action-btn.danger { border-color: #f87171; color: #f87171; }
+    .action-btn.danger:hover { background: rgba(248,113,113,0.12); }
+    .action-btn.neutral { border-color: var(--border2); color: var(--txt2); }
+    .action-btn.neutral:hover { border-color: var(--txt2); color: var(--txt); }
+    .panel-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .panel-input { flex: 1; background: #0a0908; border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px; color: var(--txt); font-family: var(--font); font-size: 0.83rem; outline: none; }
+    .panel-input:focus { border-color: var(--gold); }
+    .panel-btn { background: var(--gold); color: #080706; border: none; border-radius: 9px; padding: 0 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+    .panel-btn:hover { background: var(--gold2); }
+    .empty-state { color: var(--txt3); text-align: center; padding: 24px; font-size: 0.82rem; }
+
+    /* ── Playlist Modal ── */
+    #playlist-modal .modal-box { max-width: 680px; max-height: 90vh; overflow-y: auto; }
+    .playlist-item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 10px; background: #0e0d0b; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+    .playlist-item:hover { background: #121110; border-color: rgba(251,191,36,0.2); transform: translateY(-1px); }
+    .playlist-item:last-child { margin-bottom: 0; }
+    .pl-num { font-size: 0.82rem; color: var(--txt3); font-weight: 600; width: 20px; text-align: right; flex-shrink: 0; }
+    .pl-info { flex: 1; overflow: hidden; }
+    .pl-title { font-size: 0.86rem; font-weight: 600; color: var(--txt); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-artist { font-size: 0.73rem; color: var(--txt2); }
+    .pl-play { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: #080808; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; box-shadow: 0 0 8px rgba(251,191,36,0.2); }
+
+    /* ── Success Modal ── */
+    #success-modal .modal-box { max-width: 420px; text-align: center; padding: 40px 32px; }
+    .success-icon { width: 68px; height: 68px; border-radius: 50%; border: 2.5px solid var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: var(--gold); box-shadow: 0 0 20px rgba(251,191,36,0.25); }
+    .success-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 14px; }
+    .success-text { font-size: 0.84rem; color: var(--txt2); line-height: 1.8; margin-bottom: 24px; }
+
+    /* ── Global Audio Player ── */
+    #audio-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,7,6,0.92); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 12px 24px; z-index: 9998; align-items: center; gap: 16px; box-shadow: 0 -8px 32px rgba(0,0,0,0.7); }
+    #audio-bar.visible { display: flex; }
+    .ab-art { width: 44px; height: 44px; background: var(--border2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .ab-info { flex: 1; min-width: 0; }
+    .ab-title { font-size: 0.84rem; font-weight: 600; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ab-artist { font-size: 0.72rem; color: var(--txt2); }
+    .ab-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 2; max-width: 440px; }
+    .ab-play { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: none; color: #080808; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+    .ab-play:hover { transform: scale(1.08); }
+    .ab-seek-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+    .ab-time { font-size: 0.68rem; color: var(--txt3); width: 32px; text-align: right; }
+    .ab-dur { font-size: 0.68rem; color: var(--txt3); width: 32px; }
+    .ab-seek { flex: 1; accent-color: var(--gold); height: 3px; cursor: pointer; }
+    .ab-close { background: none; border: none; color: var(--txt3); font-size: 1.3rem; cursor: pointer; padding: 0; flex-shrink: 0; }
+    .ab-close:hover { color: var(--txt); }
+
+    /* ── Setup Page ── */
+    #setup-overlay { display: none; position: fixed; inset: 0; background: rgba(8,7,6,0.96); backdrop-filter: blur(12px); z-index: 10000; align-items: center; justify-content: center; padding: 24px; }
+    #setup-overlay.open { display: flex; }
+    .setup-box { background: var(--card); border: 1.5px solid var(--border2); border-radius: 22px; max-width: 420px; width: 100%; padding: 40px 32px; text-align: center; box-shadow: 0 30px 70px rgba(0,0,0,0.8); }
+    .setup-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .setup-title { font-size: 1.3rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; }
+    .setup-desc { font-size: 0.82rem; color: var(--txt2); line-height: 1.7; margin-bottom: 28px; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    
-    <!-- Sleek Top Header Bar -->
-    <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:20px; padding:0 4px;">
-      <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); letter-spacing:0.15em; text-transform:uppercase;">MAIS STUDIO</div>
-      <button id="admin-panel-btn" style="display:flex; background:rgba(251, 191, 36, 0.08); border:1px solid rgba(251, 191, 36, 0.3); color:var(--accent-gold); padding:8px 16px; border-radius:10px; font-weight:600; font-size:0.78rem; cursor:pointer; backdrop-filter:blur(10px); transition:all 0.2s ease; align-items:center; gap:6px;" onmouseover="this.style.background='rgba(251,191,36,0.15)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)'; this.style.borderColor='rgba(251, 191, 36, 0.3)';" onclick="userGoogleToken ? openAdminPanel() : promptGoogleLogin()">
-        🔑 Yetkili Girişi
-      </button>
+  <!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════ -->
+  <div class="navbar">
+    <div class="navbar-brand">MAIS Studio</div>
+    <div class="navbar-actions">
+      <button class="nav-btn" id="playlist-btn" onclick="openPlaylistModal()">🎵 Haftanın Parçaları</button>
+      <button class="nav-btn gold" id="staff-btn" onclick="handleStaffBtnClick()">🔑 Yetkili Girişi</button>
     </div>
+  </div>
 
+  <!-- ═══ MAIN CONTENT ══════════════════════════════════════════════════════ -->
+  <div class="wrap">
     <div class="logo-wrap">
       <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAEsAcIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5UooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK6XVfBWs6Z4O0jxRPAraPqbOkM0bbtjKxXa4/hJ2kj1Armx1r6m8MeK9G0P4IeANH8WWcdz4b177baXrEHdBiYlJV/3ScnuOo6YKYHyxUtrbzXdzFb20TyzyuI440GWdicAAdyTXZ/Fj4f3ngHxH9kkkF3pd0vn2F8nKXER6HI43DIyPoehFeg/DvTrP4XW2i67rttHP4w1qWNNKsJhn7FA7BWuZB1DEEhR/8AXwXA8h8Y+GdR8Ia/Po2srGl/AsbSJG+8LvQOBn1AbB96xK9W/agGPjZ4gGMYEA/8gpXlNMArqNe8C65oXhPRPEeo2yx6Zq+77OwbLDHI3DtuGSPUCrPwm8Inxn43sdMlPl2CZuL6bOBFbpy7E9uOB7kV7f4f8Y2nxf1Hxj4FvDFb2F8nmeHAwwLZoFwij0yqhiP98d6TYHy/RVjULSewvri0vImhuYJGiljYcoynBB+hFV6YHU+HfBGq6/4W17xBYm2Fhoqq90JJCrkNnG0Y56eorlzwa91+Dn/JBfix/wBcYP5NXhTfeNAF7QtH1DXtVt9N0e0lvL64bbHDEMsx/oMckngCvUX+AXiK2Aj1LWvC2nXhAP2S61NVl+mACP1q3+ylrOl6X47v4dSuorG7v7B7WxupcBY5SwOMngEgceuMd65vx98JvHXhu+uZ9X0q7v4mcu1/bZuEkzyXJGWGevzAUgMLx14B8Q+B57dPEFkIYrnJt545FlimAxnayn3HvzXK1anvrySzhsprmd7WBmaOF3JSNjjJA6AnAzj0qrTAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAUV7B8QTj9n34X+vnah/6Nrx6uq1zxlc6v4H8O+GZbWCO20Vp2imUnfJ5rbjuzxx7UAd58N/i1p+meEn0HxvpC67a6awvNFEgyYZ1PyxsT/yzyc98DIwQRjiB4j1LxV8SbLWdbuDPe3N/Czt2UeYuFUdl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" alt="MAIS Studio Sizden Gelenler Sezon 2" />
     </div>
 
-    <!-- SIDE BY SIDE GRID -->
-    <div class="main-grid">
-      
-      <!-- SUBMISSION CARD -->
-      <div class="card">
-        <div class="host-bar">
-          <img src="data:image/jpeg;base64,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" alt="Mustafa İnce" />
-          <div>
-            <div class="host-name">Mustafa İnce</div>
-            <div class="host-sub">MAIS Studio · Sizden Gelenler</div>
-          </div>
-          <div class="host-season">Sezon 2</div>
+    <div class="card">
+      <div class="host-bar">
+        <img src="data:image/jpeg;base64,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" alt="Mustafa İnce" />
+        <div>
+          <div class="host-name">Mustafa İnce</div>
+          <div class="host-sub">MAIS Studio · Sizden Gelenler</div>
         </div>
-        <div class="body">
-          <div class="progress-dots" id="dots">
-            <div class="dot active" id="dot-email"></div>
-            <div class="dot" id="dot-form"></div>
-          </div>
-
-          <!-- STEP 1 -->
-          <div class="step active" id="step-email">
-            <div class="step-label">Adım 1 / 3 — Kimlik Kontrolü</div>
-            <div class="error-box" id="err-email" style="display:none;"></div>
-            <div class="field" style="text-align: center; margin: 32px 0 20px;">
-              <div id="google-signin-btn" style="display: inline-block;"></div>
-              <div id="loading-auth" style="display:none; font-size:0.82rem; color:var(--accent-gold); margin-top:14px; font-weight:600;">
-                <span class="loading-spinner"></span>Kimlik doğrulanıyor...
-              </div>
-            </div>
-            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:20px;line-height:1.7;text-align:center;">
-              Her e-posta adresinden haftalık yalnızca 1 başvuru kabul edilmektedir. Google ile giriş yaparak kimliğinizi doğrulayabilirsiniz.
-            </div>
-          </div>
-
-          <!-- BLOCKED -->
-          <div class="step" id="step-blocked">
-            <div class="blocked">
-              <div class="big">⏳</div>
-              <h2>Bu hafta zaten bir parça gönderdiniz</h2>
-              <p>Her e-posta adresinden haftalık yalnızca 1 başvuru kabul edilmektedir.</p>
-              <div class="countdown" id="countdown">— gün — saat kaldı</div>
-              <p>Süre dolduğunda yeni bir parçayla tekrar başvuruda bulunabilirsiniz.</p>
-              <br/>
-              <button class="btn-back" onclick="goBack()">←  Geri Dön</button>
-            </div>
-          </div>
-
-          <!-- STEP 2 -->
-          <div class="step" id="step-form">
-            <div class="step-label">Adım 2 / 3 — Parça Bilgileri</div>
-            <div class="error-box" id="err-form" style="display:none;"></div>
-            <div class="field">
-              <label>Ad Soyad <span class="req">*</span></label>
-              <input type="text" id="fullName" placeholder="Adınız ve soyadınız" />
-            </div>
-            <div class="field">
-              <label>Sosyal Medya Hesabı <span class="req">*</span></label>
-              <input type="text" id="social" placeholder="@kullaniciadiniz (Instagram, YouTube, TikTok...)" />
-            </div>
-            <div class="field">
-              <label>Kullanılan Yapay Zeka Aracı <span class="req">*</span></label>
-              <select id="aiTool">
-                <option value="">Seçiniz</option>
-                <option value="Suno">Suno</option>
-                <option value="Udio">Udio</option>
-                <option value="AIVA">AIVA</option>
-                <option value="Boomy">Boomy</option>
-                <option value="Mureka">Mureka</option>
-                <option value="Stable Audio">Stable Audio</option>
-                <option value="ElevenLabs Music">ElevenLabs Music</option>
-                <option value="Soundraw">Soundraw</option>
-                <option value="Beatoven.ai">Beatoven.ai</option>
-                <option value="Minimax Music">Minimax Music</option>
-                <option value="Google Lyria">Google Lyria</option>
-                <option value="Sonauto">Sonauto</option>
-                <option value="Diğer">Diğer</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Parça Adı <span class="req">*</span></label>
-              <input type="text" id="trackName" placeholder="Parçanın adı" />
-            </div>
-            <div class="field">
-              <label>Parça Hakkında Kısa Not <span class="req">*</span></label>
-              <textarea id="note" placeholder="Bu parçayı nasıl ürettiniz? Ne anlatmak istediniz? (En az 30 karakter)"></textarea>
-            </div>
-            <div class="field">
-              <label>MP3 Dosyası <span class="req">*</span> <span class="hint">— maks. 20 MB</span></label>
-              <div class="upload-zone" id="upload-zone">
-                <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)" />
-                <div class="icon">🎵</div>
-                <div class="hint">MP3 dosyanı buraya sürükle veya tıkla</div>
-                <div class="sub-hint">Sadece .mp3 formatı desteklenir — maksimum 20 MB</div>
-                <div class="file-name" id="file-name"></div>
-              </div>
-            </div>
-            <div class="field">
-              <div class="consent-box" onclick="toggleConsent()">
-                <div class="checkbox" id="checkbox"><span class="tick">✓</span></div>
-                <p>Bu parçanın tüm telif ve kullanım haklarının şahsıma ait olduğunu beyan ederim. Parçamın <strong>"Sizden Gelenler"</strong> serisinde yayınlanmasını onaylıyorum.</p>
-              </div>
-            </div>
-            <button class="btn" id="btn-submit" onclick="submitForm()">Başvuruyu Tamamla</button>
-          </div>
-        </div>
+        <div class="host-badge">Sezon 2</div>
       </div>
 
-      <!-- WEEKLY PLAYLIST WIDGET -->
-      <div class="card" style="border-radius:16px; padding:28px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); height: fit-content;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #141414; padding-bottom:12px;">
-          <h2 style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-            <span>🎵</span> Haftanın Yayınlanan Parçaları
-          </h2>
-          <span style="font-size:0.75rem; background:rgba(245, 197, 24, 0.1); color:var(--accent-gold); padding:4px 10px; border-radius:20px; font-weight:600;">Playlist</span>
+      <div class="body">
+        <div class="dots" id="dots">
+          <div class="dot active" id="dot-email"></div>
+          <div class="dot" id="dot-form"></div>
         </div>
-        <div id="public-playlist-container" style="display:flex; flex-direction:column; gap:10px;">
-          <!-- Playlist items will load here -->
+
+        <!-- Step 1: Google Sign-In -->
+        <div class="step active" id="step-email">
+          <div class="step-lbl">Adım 1 / 2 — Kimlik Doğrulama</div>
+          <div class="err" id="err-email"></div>
+          <div style="text-align:center; margin: 28px 0 18px;">
+            <div id="gsi-btn" style="display:inline-block;"></div>
+            <div id="gsi-loading" style="display:none; font-size:0.8rem; color:var(--gold); margin-top:12px; font-weight:600;">
+              <span class="spin"></span>Doğrulanıyor...
+            </div>
+          </div>
+          <div style="font-size:0.73rem; color:var(--txt3); text-align:center; line-height:1.7;">
+            Her e-posta adresinden haftalık yalnızca 1 başvuru kabul edilmektedir.<br>Devam etmek için Google hesabınızla giriş yapın.
+          </div>
+        </div>
+
+        <!-- Blocked -->
+        <div class="step" id="step-blocked">
+          <div class="blocked">
+            <div class="big">⏳</div>
+            <h2>Bu hafta zaten bir parça gönderdiniz</h2>
+            <p>Her hesaptan haftalık yalnızca 1 başvuru kabul edilmektedir.</p>
+            <div class="countdown" id="countdown">— gün — saat kaldı</div>
+            <p>Süre dolduğunda yeni bir parçayla tekrar başvurabilirsiniz.</p>
+            <br>
+            <button class="btn-back" onclick="goBack()">← Geri Dön</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Form -->
+        <div class="step" id="step-form">
+          <div class="step-lbl">Adım 2 / 2 — Parça Bilgileri</div>
+          <div class="err" id="err-form"></div>
+          <div class="field">
+            <label>Ad Soyad <span class="req">*</span></label>
+            <input type="text" id="fullName" placeholder="Adınız ve soyadınız" />
+          </div>
+          <div class="field">
+            <label>Sosyal Medya Hesabı <span class="req">*</span></label>
+            <input type="text" id="social" placeholder="@kullaniciadiniz" />
+          </div>
+          <div class="field">
+            <label>Kullanılan Yapay Zeka Aracı <span class="req">*</span></label>
+            <select id="aiTool">
+              <option value="">Seçiniz</option>
+              <option>Suno</option><option>Udio</option><option>AIVA</option>
+              <option>Boomy</option><option>Mureka</option><option>Stable Audio</option>
+              <option>ElevenLabs Music</option><option>Soundraw</option>
+              <option>Beatoven.ai</option><option>Minimax Music</option>
+              <option>Google Lyria</option><option>Sonauto</option><option>Diğer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Parça Adı <span class="req">*</span></label>
+            <input type="text" id="trackName" placeholder="Parçanın adı" />
+          </div>
+          <div class="field">
+            <label>Parça Hakkında Not <span class="req">*</span></label>
+            <textarea id="note" placeholder="Bu parçayı nasıl ürettiniz? Ne anlatmak istediniz? (En az 30 karakter)"></textarea>
+          </div>
+          <div class="field">
+            <label>MP3 Dosyası <span class="req">*</span><span class="hint">maks. 20 MB</span></label>
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)" />
+              <div class="uz-icon">🎵</div>
+              <div class="uz-title">MP3 dosyanı sürükle veya tıkla</div>
+              <div class="uz-sub">Yalnızca .mp3 — maks. 20 MB</div>
+              <div class="uz-name" id="file-name"></div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="consent" onclick="toggleConsent()">
+              <div class="check-box" id="chk"><span class="tick">✓</span></div>
+              <p>Bu parçanın tüm telif ve kullanım haklarının şahsıma ait olduğunu beyan ederim. <strong>"Sizden Gelenler"</strong> serisinde yayınlanmasını onaylıyorum.</p>
+            </div>
+          </div>
+          <button class="btn" id="btn-submit" onclick="submitForm()">Başvuruyu Tamamla</button>
         </div>
       </div>
-
     </div>
 
-    <div class="footer" style="margin-top: 32px;">MAIS Studio · Sizden Gelenler Sezon 2</div>
+    <div class="footer">MAIS Studio · Sizden Gelenler Sezon 2</div>
   </div>
 
-  <!-- GLOBAL AUDIO PLAYER BAR -->
-  <div id="audio-player-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:rgba(10,10,10,0.85); backdrop-filter:blur(20px); border-top:1px solid var(--border-color); padding:16px 24px; z-index:9998; align-items:center; justify-content:space-between; box-shadow:0 -10px 40px rgba(0,0,0,0.8);">
-    <div style="display:flex; align-items:center; gap:16px; width:30%; min-width:180px;">
-      <div style="width:48px; height:48px; background:#1a1a1a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; border:1px solid #242424; box-shadow:0 0 10px rgba(245,197,24,0.1);" id="player-art-icon">🎵</div>
-      <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
-        <div style="font-size:0.88rem; font-weight:600; color:var(--text-primary); margin-bottom:2px;" id="player-track-title">Parça Adı</div>
-        <div style="font-size:0.75rem; color:var(--text-secondary);" id="player-track-artist">Sanatçı</div>
+  <!-- ═══ FIRST-TIME SETUP OVERLAY ═══════════════════════════════════════ -->
+  <div id="setup-overlay">
+    <div class="setup-box">
+      <div class="setup-icon">🔐</div>
+      <div class="setup-title">Yetkili Hesabı Oluştur</div>
+      <div class="setup-desc">
+        Sistem ilk kez yapılandırılıyor. Lütfen kendiniz için bir kullanıcı adı ve şifre belirleyin.
+        Bu bilgileri not alın — kayıp halinde sıfırlama seçeneği yoktur.
       </div>
-    </div>
-
-    <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:40%; max-width:500px;">
-      <div style="display:flex; align-items:center; gap:20px;">
-        <button id="player-play-btn" onclick="togglePlayerPlay()" style="background:var(--accent-gold); border:none; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; color:#080808; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">▶</button>
+      <div class="login-field" style="text-align:left;">
+        <label>Kullanıcı Adı</label>
+        <input type="text" id="setup-username" placeholder="kullaniciadiniz" autocomplete="off" />
       </div>
-      <div style="display:flex; align-items:center; gap:10px; width:100%;">
-        <span style="font-size:0.7rem; color:var(--text-secondary); width:35px; text-align:right;" id="player-current-time">0:00</span>
-        <input type="range" id="player-seek" min="0" max="100" value="0" style="flex:1; accent-color:var(--accent-gold); height:4px; border-radius:2px; cursor:pointer;" oninput="seekAudio(this.value)">
-        <span style="font-size:0.7rem; color:var(--text-secondary); width:35px;" id="player-duration">0:00</span>
+      <div class="login-field" style="text-align:left; margin-top:12px;">
+        <label>Şifre</label>
+        <div class="pw-wrap">
+          <input type="password" id="setup-password" placeholder="En az 6 karakter" />
+          <button class="pw-toggle" onclick="togglePw('setup-password', this)" type="button">👁</button>
+        </div>
       </div>
-    </div>
-
-    <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; width:30%; min-width:150px;">
-      <span style="font-size:0.8rem; color:var(--text-muted);" id="player-badge-ai">Suno</span>
-      <button onclick="closePlayerBar()" style="background:none; border:none; color:var(--text-secondary); font-size:1.3rem; cursor:pointer; padding:4px;">&times;</button>
-    </div>
-    <audio id="global-audio-element" style="display:none;"></audio>
-  </div>
-
-  <!-- SUCCESS MODAL -->
-  <div id="success-modal" style="display:none; position:fixed; inset:0; background:rgba(8,7,6,0.85); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; padding:24px;">
-    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:24px; max-width:440px; width:100%; padding:40px 32px; text-align:center; box-shadow:0 30px 60px rgba(0,0,0,0.8), 0 0 100px rgba(245, 197, 24, 0.05); animation:scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
-      <div style="width:72px; height:72px; border-radius:50%; border:2.5px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; margin:0 auto 28px; font-size:2.2rem; color:var(--accent-gold); box-shadow:0 0 25px rgba(245, 197, 24, 0.3); animation:pulse 2s infinite alternate;">✓</div>
-      <h2 style="font-size:1.4rem; font-weight:700; color:var(--text-primary); margin-bottom:16px; letter-spacing:0.01em;">Başvurunuz Başarıyla Alındı!</h2>
-      <p style="font-size:0.88rem; color:var(--text-secondary); line-height:1.8; margin-bottom:28px;">
-        Teşekkür ederiz. Gönderdiğiniz parça değerlendirme listemize eklenmiştir. Tüm başvuruları titizlikle dinliyoruz.<br><br>
-        <span style="color:var(--text-muted); font-size:0.8rem;">Bir sonraki haftadan itibaren yeni bir parça ile tekrar başvuruda bulunabilirsiniz.</span>
-      </p>
-      <button class="btn" style="margin-top:0;" onclick="closeSuccessModal()">Kapat</button>
+      <div class="login-field" style="text-align:left; margin-top:12px;">
+        <label>Şifre Tekrar</label>
+        <div class="pw-wrap">
+          <input type="password" id="setup-password2" placeholder="Şifreyi tekrar girin" />
+        </div>
+      </div>
+      <div class="login-err" id="setup-err"></div>
+      <button class="login-btn" style="margin-top:20px;" onclick="doSetup()" id="setup-btn">Hesabı Oluştur</button>
     </div>
   </div>
 
-  <!-- STÜDYO ÇALIŞANLARI YETKİLİ PANELİ MODAL -->
-  <div id="admin-modal" style="display:none; position:fixed; inset:0; background:rgba(8,7,6,0.9); backdrop-filter:blur(10px); z-index:10000; align-items:center; justify-content:center; padding:24px;">
-    <div class="card admin-dialog" style="max-width:740px; width:100%; max-height:85vh; overflow-y:auto; padding:36px; box-shadow:0 30px 60px rgba(0,0,0,0.8);">
-      
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px; margin-bottom:24px;">
-        <h2 style="font-size:1.3rem; font-weight:700; color:var(--accent-gold); margin:0;">🔑 Stüdyo Çalışanları Yetkili Paneli</h2>
-        <button onclick="closeAdminPanel()" style="background:none; border:none; color:var(--text-secondary); font-size:1.5rem; cursor:pointer; padding:0; line-height:1;">&times;</button>
+  <!-- ═══ STAFF LOGIN MODAL ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🔑 Yetkili Girişi</div>
+        <button class="modal-close" onclick="closeModal('login-modal')">×</button>
       </div>
-
-      <!-- Tab Buttons -->
-      <div class="tab-bar">
-        <button class="tab-btn active" id="tab-inbox-btn" onclick="switchAdminTab('inbox')">📥 Gelen Kutusu</button>
-        <button class="tab-btn" id="tab-playlist-btn" onclick="switchAdminTab('playlist')">🎵 Playlist Yönetimi</button>
-        <button class="tab-btn" id="tab-limits-btn" onclick="switchAdminTab('limits')">⏳ Bekleme Süreleri</button>
-        <button class="tab-btn" id="tab-staff-btn" onclick="switchAdminTab('staff')">👥 Stüdyo Çalışanları</button>
-      </div>
-
-      <!-- Tab Content 1: Inbox -->
-      <div class="tab-content active" id="tab-inbox">
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:16px;">Gelen tüm başvurular. Dinlemek için parçaya tıklayın; onaylayarak sitede yayınlayabilirsiniz.</p>
-        <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border-color); border-radius:12px; background:#0a0a0a; padding:8px;">
-          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
-            <thead>
-              <tr style="border-bottom:1px solid #1c1c1c; color:var(--text-muted);">
-                <th style="padding:10px;">Sanatçı & Parça</th>
-                <th style="padding:10px;">Araç</th>
-                <th style="padding:10px; text-align:right;">İşlemler</th>
-              </tr>
-            </thead>
-            <tbody id="inbox-list-container">
-              <!-- Pending Submissions load here -->
-            </tbody>
-          </table>
+      <div class="modal-body">
+        <div class="login-err" id="login-err"></div>
+        <div class="login-field">
+          <label>Kullanıcı Adı</label>
+          <input type="text" id="login-username" placeholder="kullaniciadiniz" autocomplete="username" onkeydown="if(event.key==='Enter') doLogin()" />
         </div>
-      </div>
-
-      <!-- Tab Content 2: Playlist -->
-      <div class="tab-content" id="tab-playlist">
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:16px;">Sitede aktif olarak yayınlanan parçalar. Dinleyebilir ve dilediğinizi yayından kaldırabilirsiniz.</p>
-        <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border-color); border-radius:12px; background:#0a0a0a; padding:8px;">
-          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
-            <thead>
-              <tr style="border-bottom:1px solid #1c1c1c; color:var(--text-muted);">
-                <th style="padding:10px;">Parça</th>
-                <th style="padding:10px;">Sanatçı</th>
-                <th style="padding:10px; text-align:right;">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="playlist-list-container">
-              <!-- Published playlist loaded here -->
-            </tbody>
-          </table>
+        <div class="login-field" style="margin-top:14px;">
+          <label>Şifre</label>
+          <div class="pw-wrap">
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()" />
+            <button class="pw-toggle" onclick="togglePw('login-password', this)" type="button">👁</button>
+          </div>
         </div>
+        <button class="login-btn" id="login-btn" onclick="doLogin()" style="margin-top:20px;">Giriş Yap</button>
       </div>
-
-      <!-- Tab Content 3: Limits -->
-      <div class="tab-content" id="tab-limits">
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:16px;">Sistemde aktif bekleme süresi bulunan kullanıcılar. Bireysel sıfırlama yapabilirsiniz.</p>
-        <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border-color); border-radius:12px; background:#0a0a0a; padding:8px;">
-          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
-            <thead>
-              <tr style="border-bottom:1px solid #1c1c1c; color:var(--text-muted);">
-                <th style="padding:10px;">E-posta</th>
-                <th style="padding:10px;">Son Başvuru</th>
-                <th style="padding:10px; text-align:right;">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="limits-list-container">
-              <!-- Rate limited users -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tab Content 4: Staff Whitelist -->
-      <div class="tab-content" id="tab-staff">
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">Sisteme yetkili stüdyo çalışanı ekleyebilir veya yetkilerini kaldırabilirsiniz (Yalnızca kurucu yönetici yetkisine sahiptir).</p>
-        <div id="staff-add-container" style="display:flex; gap:10px; margin-bottom:16px;">
-          <input type="email" id="staff-email-input" placeholder="calisan-gmail@gmail.com" style="flex:1; background:#0c0b0a; border:1px solid var(--border-color); border-radius:10px; padding:12px; color:var(--text-primary); font-size:0.85rem; outline:none;">
-          <button class="btn" style="margin:0; width:auto; padding:0 24px;" onclick="addStaffUser()">Yetki Ekle</button>
-        </div>
-        <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-color); border-radius:12px; background:#0a0a0a; padding:8px;">
-          <ul id="staff-list-container" style="list-style:none; padding:0; margin:0; font-size:0.85rem;">
-            <!-- Staff whitelisted emails -->
-          </ul>
-        </div>
-      </div>
-
     </div>
   </div>
+
+  <!-- ═══ STAFF PANEL MODAL ═════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="panel-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ Stüdyo Yetkili Paneli — <span id="panel-username" style="font-weight:400; font-size:0.85rem; color:var(--txt2);"></span></div>
+        <button class="modal-close" onclick="closeModal('panel-modal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
+          <button class="tab-btn" onclick="switchTab('published')">🎵 Yayında</button>
+          <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
+          <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
+        </div>
+
+        <!-- INBOX -->
+        <div class="tab-pane active" id="tab-inbox">
+          <p class="pane-desc">Gelen başvurular. Parçayı dinlemek için satıra tıklayın. Yayın tarihi seçip onaylayabilirsiniz.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="min-width:130px;">Yayın Tarihi</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="inbox-body"><tr><td colspan="4" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PUBLISHED -->
+        <div class="tab-pane" id="tab-published">
+          <p class="pane-desc">Sitede aktif yayınlanan parçalar. Dinleyebilir ya da yayından kaldırabilirsiniz.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Parça</th><th>Sanatçı</th><th>Yayın Tarihi</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="published-body"><tr><td colspan="4" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LIMITS -->
+        <div class="tab-pane" id="tab-limits">
+          <p class="pane-desc">Aktif bekleme süresi olan kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>E-posta</th><th>Son Başvuru</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="limits-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ACCOUNTS -->
+        <div class="tab-pane" id="tab-accounts">
+          <p class="pane-desc">Yetkili personel hesapları. Yeni çalışan eklemek veya hesabını kaldırmak için bu sekmeyi kullanın.</p>
+          <div id="accounts-owner-section">
+            <div class="panel-input-row">
+              <input type="text" class="panel-input" id="new-username" placeholder="Kullanıcı adı" />
+              <input type="password" class="panel-input" id="new-password" placeholder="Şifre (min. 6 karakter)" />
+              <button class="panel-btn" onclick="addAccount()">Ekle</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Kullanıcı Adı</th><th>Yetki</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="accounts-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+          <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+            <p style="font-size:0.75rem; color:var(--txt2); margin-bottom:10px; font-weight:600;">Şifremi Değiştir</p>
+            <div class="panel-input-row" style="flex-wrap:wrap; gap:8px;">
+              <input type="password" class="panel-input" id="cur-pw" placeholder="Mevcut şifre" style="min-width:160px;" />
+              <input type="password" class="panel-input" id="new-pw" placeholder="Yeni şifre" style="min-width:160px;" />
+              <button class="panel-btn" onclick="changePassword()">Güncelle</button>
+            </div>
+            <div class="login-err" id="pw-change-err" style="margin-top:8px;"></div>
+            <div id="pw-change-ok" style="display:none; color:#4ade80; font-size:0.78rem; margin-top:8px;">✓ Şifre başarıyla güncellendi.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PLAYLIST MODAL ════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="playlist-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🎵 Haftanın Yayınlanan Parçaları</div>
+        <button class="modal-close" onclick="closeModal('playlist-modal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="playlist-container">
+          <div class="empty-state">Yükleniyor...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUCCESS MODAL ═════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="success-modal">
+    <div class="modal-box">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Başvurunuz Alındı!</div>
+      <div class="success-text">
+        Teşekkür ederiz. Parçanız değerlendirme listemize eklendi.<br>
+        Tüm başvuruları titizlikle dinliyoruz.<br><br>
+        <span style="font-size:0.78rem; color:var(--txt3);">Bir sonraki haftadan itibaren yeni başvuru yapabilirsiniz.</span>
+      </div>
+      <button class="btn" style="margin-top:0;" onclick="closeModal('success-modal'); goBack()">Kapat</button>
+    </div>
+  </div>
+
+  <!-- ═══ GLOBAL AUDIO BAR ══════════════════════════════════════════════ -->
+  <div id="audio-bar">
+    <div class="ab-art" id="ab-art">🎵</div>
+    <div class="ab-info">
+      <div class="ab-title" id="ab-title">—</div>
+      <div class="ab-artist" id="ab-artist">—</div>
+    </div>
+    <div class="ab-controls">
+      <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
+      <div class="ab-seek-row">
+        <span class="ab-time" id="ab-cur">0:00</span>
+        <input type="range" class="ab-seek" id="ab-seek" min="0" max="100" value="0" oninput="seek(this.value)" />
+        <span class="ab-dur" id="ab-dur">0:00</span>
+      </div>
+    </div>
+    <span class="tag" id="ab-tag">—</span>
+    <button class="ab-close" onclick="closePlayer()">×</button>
+  </div>
+  <audio id="player" style="display:none;"></audio>
 
   <script>
-    let userGoogleToken = '';
+    // ═══ STATE ═══════════════════════════════════════════════════════════════
+    let googleToken = '';
     let consentChecked = false;
     let googleClientId = '';
-    let adminEmailAddress = '';
-    let isStaffUser = false;
-    let localPlaylist = [];
-    let currentPlayingTrack = null;
-    let gsiInitialized = false;
-    let gsiInitInterval = null;
+    let gsiReady = false;
+    let staffToken = localStorage.getItem('staff_token') || '';
+    let staffUsername = localStorage.getItem('staff_username') || '';
+    let staffRole = localStorage.getItem('staff_role') || '';
 
-    // Always-visible admin button — no login required to see it
-    // (login will be prompted when clicked)
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('admin-panel-btn').style.display = 'flex';
-    });
-
-    // Fetch config first, then start polling for GSI library
-    fetch('/config')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.googleClientId) {
-          googleClientId = data.googleClientId;
-          adminEmailAddress = data.adminEmail;
-          startGSIPoller();
-        } else {
-          showErr('err-email', 'Google Client ID sunucuda yapılandırılmamış.');
+    // ═══ INIT ════════════════════════════════════════════════════════════════
+    (async function init() {
+      // Load config
+      try {
+        const cfg = await fetch('/config').then(r => r.json());
+        googleClientId = cfg.googleClientId;
+        if (cfg.setupRequired) {
+          document.getElementById('setup-overlay').classList.add('open');
+          return;
         }
-      })
-      .catch(function() {
-        showErr('err-email', 'Sunucu yapılandırması yüklenemedi. Sayfayı yenileyin.');
-      });
+      } catch(e) {
+        showErr('err-email', 'Sunucu bağlantısı kurulamadı.');
+        return;
+      }
 
-    function startGSIPoller() {
-      // Try immediately
-      if (tryInitGSI()) return;
-      // Then poll every 200ms until ready (max 15 seconds)
-      let attempts = 0;
-      gsiInitInterval = setInterval(function() {
-        attempts++;
-        if (tryInitGSI() || attempts > 75) {
-          clearInterval(gsiInitInterval);
-          if (attempts > 75) {
-            showErr('err-email', 'Google giriş kütüphanesi yüklenemedi. Sayfayı yenileyin.');
+      // Verify staff session
+      if (staffToken) {
+        try {
+          const vr = await authFetch('/api/staff/verify', {});
+          if (vr.valid) {
+            setStaffLoggedIn(vr.username, staffRole);
+          } else {
+            clearStaff();
           }
-        }
+        } catch(e) { clearStaff(); }
+      }
+
+      // Start GSI polling
+      startGSI();
+    })();
+
+    // ═══ GSI (Google Sign-In) ════════════════════════════════════════════════
+    function startGSI() {
+      if (tryGSI()) return;
+      let n = 0;
+      const iv = setInterval(() => {
+        n++;
+        if (tryGSI() || n > 80) clearInterval(iv);
       }, 200);
     }
 
-    function tryInitGSI() {
-      if (gsiInitialized) return true;
-      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) return false;
-      if (!googleClientId) return false;
-
-      gsiInitialized = true;
-      google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: handleCredentialResponse
-      });
+    function tryGSI() {
+      if (gsiReady) return true;
+      if (!googleClientId || typeof google === 'undefined' || !google.accounts) return false;
+      gsiReady = true;
+      google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleLogin });
       google.accounts.id.renderButton(
-        document.getElementById('google-signin-btn'),
-        { theme: 'filled_black', size: 'large', width: 280, text: 'signin_with', locale: 'tr' }
+        document.getElementById('gsi-btn'),
+        { theme: 'filled_black', size: 'large', width: 280, locale: 'tr' }
       );
       return true;
     }
 
-    // Called when admin button is clicked (before login)
-    function promptGoogleLogin() {
-      if (!googleClientId) {
-        alert('Sistem henüz yüklenmedi. Lütfen bekleyin.');
-        return;
-      }
-      if (!gsiInitialized) {
-        alert('Google giriş sistemi hazırlanıyor. Lütfen birkaç saniye bekleyin ve tekrar deneyin.');
-        return;
-      }
-      // Trigger One Tap prompt
-      google.accounts.id.prompt(function(notification) {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // One tap couldn't show - scroll to sign in button and highlight it
-          document.getElementById('step-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
-          const btn = document.getElementById('google-signin-btn');
-          btn.style.outline = '2px solid #fbbf24';
-          btn.style.borderRadius = '8px';
-          setTimeout(function() { btn.style.outline = ''; }, 3000);
-          alert('Lütfen sayfadaki "Google ile Giriş Yap" butonunu kullanın.');
-        }
-      });
-    }
-
-    function handleCredentialResponse(response) {
-      userGoogleToken = response.credential;
-      const payload = parseJwt(userGoogleToken);
-      checkAdminVisibility(payload.email);
-      checkGoogleLimit(userGoogleToken);
-    }
-
-    function checkGoogleLimit(token) {
-      hideErr('err-email');
-      document.getElementById('loading-auth').style.display = 'block';
-      document.getElementById('google-signin-btn').style.pointerEvents = 'none';
-      document.getElementById('google-signin-btn').style.opacity = '0.5';
-
+    function onGoogleLogin(resp) {
+      googleToken = resp.credential;
+      document.getElementById('gsi-loading').style.display = 'block';
+      document.getElementById('gsi-btn').style.opacity = '0.5';
+      document.getElementById('gsi-btn').style.pointerEvents = 'none';
       fetch('/check-limit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: googleToken })
       })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.error) {
-          showErr('err-email', data.error);
-          return;
-        }
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('gsi-loading').style.display = 'none';
+        document.getElementById('gsi-btn').style.opacity = '1';
+        document.getElementById('gsi-btn').style.pointerEvents = 'auto';
+        if (data.error) { showErr('err-email', data.error); return; }
         if (!data.allowed) {
           document.getElementById('countdown').textContent = data.days + ' gün ' + data.hours + ' saat kaldı';
           showStep('step-blocked');
         } else {
-          if (data.name) {
-            document.getElementById('fullName').value = data.name;
-          }
+          if (data.name) document.getElementById('fullName').value = data.name;
           showStep('step-form');
         }
       })
-      .catch(function() {
-        showErr('err-email', 'Bağlantı hatası, lütfen tekrar dene.');
-      })
-      .finally(function() {
-        document.getElementById('loading-auth').style.display = 'none';
-        document.getElementById('google-signin-btn').style.pointerEvents = 'auto';
-        document.getElementById('google-signin-btn').style.opacity = '1';
-      });
+      .catch(() => { showErr('err-email', 'Bağlantı hatası.'); });
     }
 
+    // ═══ STEP NAVIGATION ════════════════════════════════════════════════════
     function showStep(id) {
-      document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      const map = {'step-email':0,'step-form':1};
-      const cur = map[id];
-      ['email','form'].forEach(function(stepName){
-        const d = document.getElementById('dot-' + stepName);
-        if(!d) return;
-        d.classList.remove('active','done');
-        const i = map['step-' + stepName];
-        if(i < cur) d.classList.add('done');
-        else if(i === cur) d.classList.add('active');
+      const map = { 'step-email': 0, 'step-form': 1 };
+      const cur = map[id] ?? -1;
+      ['email', 'form'].forEach((name, i) => {
+        const d = document.getElementById('dot-' + name);
+        if (!d) return;
+        d.classList.remove('active', 'done');
+        if (i < cur) d.classList.add('done');
+        else if (i === cur) d.classList.add('active');
       });
-      if(id==='step-blocked') document.getElementById('dots').style.display='none';
+      if (id === 'step-blocked') document.getElementById('dots').style.display = 'none';
+      else document.getElementById('dots').style.display = 'flex';
     }
 
-    function showErr(id, msg){ var el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
-    function hideErr(id){ document.getElementById(id).style.display='none'; }
+    function goBack() { googleToken = ''; showStep('step-email'); }
+    function showErr(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.style.display = 'block'; }
+    function hideErr(id) { document.getElementById(id).style.display = 'none'; }
 
-    function goBack() { 
-      document.getElementById('dots').style.display = 'flex';
-      userGoogleToken = '';
-      showStep('step-email'); 
-    }
-
+    // ═══ UPLOAD / FORM ══════════════════════════════════════════════════════
     function handleFile(input) {
       const file = input.files[0];
-      if(!file) return;
-      if(file.size > 20*1024*1024){ showErr('err-form','Dosya boyutu 20 MB'ı geçemez.'); input.value=''; document.getElementById('file-name').textContent=''; return; }
+      if (!file) return;
+      if (file.size > 20 * 1024 * 1024) { showErr('err-form', 'Dosya 20 MB sınırını aşıyor.'); input.value = ''; return; }
       hideErr('err-form');
-      document.getElementById('file-name').textContent = '✓ '+file.name;
-      const zone = document.getElementById('upload-zone');
-      zone.style.borderColor='#f5c518';
+      document.getElementById('file-name').textContent = '✓ ' + file.name;
+      document.getElementById('upload-zone').style.borderColor = 'var(--gold)';
     }
 
-    function toggleConsent(){
+    const uz = document.getElementById('upload-zone');
+    uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('over'); });
+    uz.addEventListener('dragleave', () => uz.classList.remove('over'));
+    uz.addEventListener('drop', e => {
+      e.preventDefault(); uz.classList.remove('over');
+      const f = e.dataTransfer.files[0];
+      if (f) { document.getElementById('mp3file').files = e.dataTransfer.files; handleFile(document.getElementById('mp3file')); }
+    });
+
+    function toggleConsent() {
       consentChecked = !consentChecked;
-      const cb = document.getElementById('checkbox');
-      if(consentChecked) cb.classList.add('checked'); else cb.classList.remove('checked');
+      document.getElementById('chk').classList.toggle('checked', consentChecked);
     }
-
-    const zone = document.getElementById('upload-zone');
-    zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('dragover'); });
-    zone.addEventListener('dragleave', function(){ zone.classList.remove('dragover'); });
-    zone.addEventListener('drop', function(e){
-      e.preventDefault(); 
-      zone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if(file){
-        document.getElementById('mp3file').files = e.dataTransfer.files;
-        handleFile(document.getElementById('mp3file'));
-      }
-    });
-
-    function closeSuccessModal() {
-      document.getElementById('success-modal').style.display = 'none';
-      goBack();
-    }
-
-    // Google JWT Parsing helper
-    function parseJwt(token) {
-      try {
-        var base64Url = token.split('.')[1];
-        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-      } catch(e) {
-        return {};
-      }
-    }
-
-    // Check visibility of Yetkili Paneli
-    async function checkAdminVisibility(email) {
-      const isOwner = email.toLowerCase() === adminEmailAddress.toLowerCase();
-      const res = await fetch('/config');
-      const data = await res.json();
-      const staffEmails = (data.staffList || []).map(e => e.toLowerCase());
-      
-      isStaffUser = isOwner || staffEmails.includes(email.toLowerCase());
-      // Button is always visible - but update its appearance based on access level
-      const btn = document.getElementById('admin-panel-btn');
-      if (isStaffUser) {
-        btn.style.background = 'rgba(251, 191, 36, 0.12)';
-        btn.title = 'Yetkili Paneli Aç';
-        if (isOwner) {
-          document.getElementById('staff-add-container').style.display = 'flex';
-        } else {
-          document.getElementById('staff-add-container').style.display = 'none';
-        }
-      } else {
-        // Not staff - show toast style message instead of hiding
-        btn.title = 'Bu hesabın yetkili paneli erişimi yok';
-        setTimeout(function() {
-          alert('Bu Google hesabının yetkili paneli erişimi bulunmamaktadır. Lütfen yetkili hesabınızla giriş yapın.');
-        }, 500);
-      }
-    }
-
-    function openAdminPanel() {
-      if (!userGoogleToken) {
-        promptGoogleLogin();
-        return;
-      }
-      document.getElementById('admin-modal').style.display = 'flex';
-      loadAdminData();
-    }
-
-    function closeAdminPanel() {
-      document.getElementById('admin-modal').style.display = 'none';
-    }
-
-    function switchAdminTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      
-      document.getElementById('tab-' + tabName + '-btn').classList.add('active');
-      document.getElementById('tab-' + tabName).classList.add('active');
-    }
-
-    async function loadAdminData() {
-      try {
-        const res = await fetch('/api/admin/submissions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: userGoogleToken })
-        });
-        if (!res.ok) throw new Error('Yönetici verileri yüklenemedi.');
-        const data = await res.json();
-        
-        // 1. Render Tab Content: Inbox (Pending submissions)
-        const inboxContainer = document.getElementById('inbox-list-container');
-        inboxContainer.innerHTML = '';
-        const pendingItems = data.submissions.filter(s => s.status === 'pending');
-        if (pendingItems.length === 0) {
-          inboxContainer.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted); padding:20px; text-align:center;">Gelen kutusu boş. Yeni başvuru yok.</td></tr>';
-        } else {
-          pendingItems.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.style = 'border-bottom:1px solid #141414; cursor:pointer;';
-            tr.innerHTML = '<td style="padding:10px; color:var(--text-primary);" onclick="playTrackById(\'' + item.fileId + '\', \'' + item.trackName + '\', \'' + item.fullName + '\', \'' + item.aiTool + '\')"><div style="font-weight:600;">' + item.trackName + '</div><div style="font-size:0.75rem; color:var(--text-secondary);">Gönderen: ' + item.fullName + ' (' + item.social + ')</div></td><td style="padding:10px; color:var(--text-secondary);">' + item.aiTool + '</td><td style="padding:10px; text-align:right; white-space:nowrap;"><button onclick="updateSubmissionStatus(\'' + item.id + '\', \'published\')" style="background:rgba(251, 191, 36, 0.1); border:1px solid var(--accent-gold); color:var(--accent-gold); padding:4px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer; font-weight:600; margin-right:4px;">Yayınla</button><button onclick="updateSubmissionStatus(\'' + item.id + '\', \'rejected\')" style="background:rgba(239, 68, 68, 0.1); border:1px solid #f87171; color:#f87171; padding:4px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer; font-weight:600;">Reddet</button></td>';
-            inboxContainer.appendChild(tr);
-          });
-        }
-
-        // 2. Render Tab Content: Playlist (Published tracks)
-        const playlistContainer = document.getElementById('playlist-list-container');
-        playlistContainer.innerHTML = '';
-        const publishedItems = data.submissions.filter(s => s.status === 'published');
-        if (publishedItems.length === 0) {
-          playlistContainer.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted); padding:20px; text-align:center;">Yayında şarkı bulunmuyor.</td></tr>';
-        } else {
-          publishedItems.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.style = 'border-bottom:1px solid #141414;';
-            tr.innerHTML = '<td style="padding:10px; color:var(--text-primary); font-weight:600;">' + item.trackName + '</td><td style="padding:10px; color:var(--text-secondary);">' + item.fullName + '</td><td style="padding:10px; text-align:right;"><button onclick="updateSubmissionStatus(\'' + item.id + '\', \'rejected\')" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:0.78rem;">Yayından Kaldır</button></td>';
-            playlistContainer.appendChild(tr);
-          });
-        }
-
-        // 3. Render Tab Content: Limits
-        const limitsContainer = document.getElementById('limits-list-container');
-        limitsContainer.innerHTML = '';
-        
-        const limitMap = {};
-        data.submissions.forEach(s => {
-          const t = new Date(s.timestamp).getTime();
-          if (!limitMap[s.email] || limitMap[s.email] < t) {
-            limitMap[s.email] = t;
-          }
-        });
-        
-        const activeLimits = [];
-        const sevenDays = 7 * 24 * 60 * 60 * 1000;
-        for (const [email, time] of Object.entries(limitMap)) {
-          if (Date.now() - time < sevenDays) {
-            activeLimits.push({ email, timestamp: time });
-          }
-        }
-
-        if (activeLimits.length === 0) {
-          limitsContainer.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted); padding:20px; text-align:center;">Limitli kullanıcı bulunmuyor.</td></tr>';
-        } else {
-          activeLimits.forEach(sub => {
-            const tr = document.createElement('tr');
-            tr.style = 'border-bottom:1px solid #141414;';
-            const dateStr = new Date(sub.timestamp).toLocaleString('tr-TR');
-            tr.innerHTML = '<td style="padding:10px; color:var(--text-primary);">' + sub.email + '</td><td style="padding:10px; color:var(--text-secondary);">' + dateStr + '</td><td style="padding:10px; text-align:right;"><button onclick="resetUserLimit(\'' + sub.email + '\')" style="background:rgba(251, 191, 36, 0.1); border:1px solid var(--accent-gold); color:var(--accent-gold); padding:4px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;">Sıfırla</button></td>';
-            limitsContainer.appendChild(tr);
-          });
-        }
-
-        // 4. Render Tab Content: Staff List
-        const staffContainer = document.getElementById('staff-list-container');
-        staffContainer.innerHTML = '';
-        
-        const superLi = document.createElement('li');
-        superLi.style = 'display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid #141414; background:rgba(251,191,36,0.02); border-radius:8px;';
-        superLi.innerHTML = '<span style="font-weight:600; color:var(--accent-gold);">' + adminEmailAddress + ' (Kurucu)</span><span style="font-size:0.75rem; color:var(--text-muted);">Sahip</span>';
-        staffContainer.appendChild(superLi);
-
-        if (data.staffList && data.staffList.length > 0) {
-          data.staffList.forEach(email => {
-            const li = document.createElement('li');
-            li.style = 'display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid #141414;';
-            const isOwner = parseJwt(userGoogleToken).email.toLowerCase() === adminEmailAddress.toLowerCase();
-            const actionHtml = isOwner 
-              ? '<button onclick="removeStaffUser(\'' + email + '\')" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:0.78rem;">Yetkiyi Kaldır</button>'
-              : '<span style="font-size:0.75rem; color:var(--text-secondary);">Çalışan</span>';
-            li.innerHTML = '<span>' + email + '</span>' + actionHtml;
-            staffContainer.appendChild(li);
-          });
-        }
-
-        loadPublicPlaylist();
-      } catch (err) {
-        alert('Hata: ' + err.message);
-      }
-    }
-
-    async function updateSubmissionStatus(id, status) {
-      try {
-        const res = await fetch('/api/admin/update-status', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: userGoogleToken, id, status })
-        });
-        if (!res.ok) throw new Error('Durum güncellenemedi.');
-        loadAdminData();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    async function addStaffUser() {
-      const emailInput = document.getElementById('staff-email-input');
-      const targetEmail = emailInput.value.trim();
-      if (!targetEmail) return;
-      try {
-        const res = await fetch('/api/admin/add-staff', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: userGoogleToken, targetEmail })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Yetki eklenemedi.');
-        emailInput.value = '';
-        loadAdminData();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    async function removeStaffUser(targetEmail) {
-      if (!confirm(targetEmail + ' çalışanının yetkisini almak istediğinize emin misiniz?')) return;
-      try {
-        const res = await fetch('/api/admin/remove-staff', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: userGoogleToken, targetEmail })
-        });
-        if (!res.ok) throw new Error('Çalışan yetkisi kaldırılamadı.');
-        loadAdminData();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    async function resetUserLimit(targetEmail) {
-      if (!confirm(targetEmail + ' kullanıcısının bekleme süresini sıfırlamak istediğinize emin misiniz?')) return;
-      try {
-        const res = await fetch('/api/admin/reset-user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: userGoogleToken, targetEmail })
-        });
-        if (!res.ok) throw new Error('Limit sıfırlanamadı.');
-        loadAdminData();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    // Public Playlist Rendering
-    async function loadPublicPlaylist() {
-      try {
-        const res = await fetch('/api/playlist');
-        if (!res.ok) throw new Error('Playlist yüklenemedi.');
-        localPlaylist = await res.json();
-        
-        const container = document.getElementById('public-playlist-container');
-        container.innerHTML = '';
-        
-        if (localPlaylist.length === 0) {
-          container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:12px; font-size:0.85rem;">Şu an aktif yayınlanan şarkı bulunmuyor.</div>';
-          return;
-        }
-
-        localPlaylist.forEach((item, index) => {
-          const row = document.createElement('div');
-          row.style = 'display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-radius:10px; background:#0e0e0e; border:1px solid #141414; transition:all 0.2s ease; cursor:pointer;';
-          row.onmouseover = function() {
-            this.style.background = '#121212';
-            this.style.borderColor = 'rgba(251,191,36,0.2)';
-            this.style.transform = 'translateY(-1px)';
-          };
-          row.onmouseout = function() {
-            this.style.background = '#0e0e0e';
-            this.style.borderColor = '#141414';
-            this.style.transform = 'translateY(0)';
-          };
-          row.onclick = () => playTrack(item);
-
-          row.innerHTML = '<div style="display:flex; align-items:center; gap:16px;"><span style="font-size:0.85rem; color:var(--text-muted); font-weight:600; width:16px; text-align:right;">' + (index + 1) + '</span><div><div style="font-size:0.88rem; font-weight:600; color:var(--text-primary); margin-bottom:2px;">' + item.title + '</div><div style="font-size:0.75rem; color:var(--text-secondary);">' + item.artist + '</div></div></div><div style="display:flex; align-items:center; gap:12px;"><span style="font-size:0.68rem; background:rgba(251, 191, 36, 0.1); color:var(--accent-gold); padding:2px 8px; border-radius:4px; font-weight:600;">' + item.aiTool + '</span><div style="width:30px; height:30px; border-radius:50%; background:var(--accent-gold); color:#080808; display:flex; align-items:center; justify-content:center; font-size:0.75rem; box-shadow:0 0 10px rgba(251,191,36,0.2);">▶</div></div>';
-          container.appendChild(row);
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    // HTML5 Global Player Operations
-    const audio = document.getElementById('global-audio-element');
-    const playBtn = document.getElementById('player-play-btn');
-    const seek = document.getElementById('player-seek');
-    const curTime = document.getElementById('player-current-time');
-    const duration = document.getElementById('player-duration');
-
-    function playTrack(item) {
-      currentPlayingTrack = item;
-      document.getElementById('player-track-title').textContent = item.title;
-      document.getElementById('player-track-artist').textContent = item.artist;
-      document.getElementById('player-badge-ai').textContent = item.aiTool;
-      audio.src = item.audioUrl;
-      audio.load();
-      audio.play().then(() => {
-        playBtn.textContent = '⏸';
-        document.getElementById('audio-player-bar').style.display = 'flex';
-      }).catch(e => {
-        alert('Şarkı yüklenemedi.');
-      });
-    }
-
-    function playTrackById(fileId, trackName, artistName, aiTool) {
-      const item = {
-        title: trackName,
-        artist: artistName,
-        aiTool: aiTool,
-        audioUrl: '/api/stream-audio?fileId=' + fileId
-      };
-      playTrack(item);
-    }
-
-    function togglePlayerPlay() {
-      if (audio.paused) {
-        audio.play();
-        playBtn.textContent = '⏸';
-      } else {
-        audio.pause();
-        playBtn.textContent = '▶';
-      }
-    }
-
-    function seekAudio(value) {
-      if (audio.duration) {
-        audio.currentTime = (value / 100) * audio.duration;
-      }
-    }
-
-    function closePlayerBar() {
-      audio.pause();
-      document.getElementById('audio-player-bar').style.display = 'none';
-      currentPlayingTrack = null;
-    }
-
-    audio.addEventListener('timeupdate', () => {
-      if (audio.duration) {
-        seek.value = (audio.currentTime / audio.duration) * 100;
-        
-        const curMins = Math.floor(audio.currentTime / 60);
-        const curSecs = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
-        curTime.innerHTML = curMins + ':' + curSecs;
-        
-        const durMins = Math.floor(audio.duration / 60);
-        const durSecs = Math.floor(audio.duration % 60).toString().padStart(2, '0');
-        duration.textContent = durMins + ':' + durSecs;
-      }
-    });
-
-    audio.addEventListener('ended', () => {
-      playBtn.textContent = '▶';
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadPublicPlaylist();
-    });
 
     async function submitForm() {
-      hideErr('err-form');
-
       const fullName = document.getElementById('fullName').value.trim();
       const social = document.getElementById('social').value.trim();
       const aiTool = document.getElementById('aiTool').value;
       const trackName = document.getElementById('trackName').value.trim();
       const note = document.getElementById('note').value.trim();
-      const consent = consentChecked;
       const mp3 = document.getElementById('mp3file').files[0];
+      hideErr('err-form');
 
-      if (!fullName || !social || !aiTool || !trackName || !note) {
-        showErr('err-form', 'Lütfen tüm alanları doldur.');
-        return;
-      }
-      if (note.length < 30) {
-        showErr('err-form', 'Parça hakkında daha fazla bilgi verin (en az 2-3 cümle).');
-        return;
-      }
-      if (!mp3) {
-        showErr('err-form', 'MP3 dosyası seçilmedi.');
-        return;
-      }
-      if (!consent) {
-        showErr('err-form', 'Telif beyanını onaylamadan devam edemezsin.');
-        return;
-      }
+      if (!fullName || !social || !aiTool || !trackName || !note) return showErr('err-form', 'Lütfen tüm alanları doldurun.');
+      if (note.length < 30) return showErr('err-form', 'Parça notu en az 30 karakter olmalıdır.');
+      if (!mp3) return showErr('err-form', 'Lütfen bir MP3 dosyası seçin.');
+      if (!consentChecked) return showErr('err-form', 'Telif beyanını onaylamanız gerekmektedir.');
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.innerHTML = '<span class="loading-spinner"></span>Gönderiliyor...';
+      btn.innerHTML = '<span class="spin"></span>Gönderiliyor...';
 
-      const formData = new FormData();
-      formData.append('token', userGoogleToken);
-      formData.append('fullName', fullName);
-      formData.append('social', social);
-      formData.append('aiTool', aiTool);
-      formData.append('trackName', trackName);
-      formData.append('note', note);
-      formData.append('consent', 'true');
-      formData.append('mp3', mp3);
+      const fd = new FormData();
+      fd.append('token', googleToken);
+      fd.append('fullName', fullName);
+      fd.append('social', social);
+      fd.append('aiTool', aiTool);
+      fd.append('trackName', trackName);
+      fd.append('note', note);
+      fd.append('consent', 'true');
+      fd.append('mp3', mp3);
 
       try {
-        const res = await fetch('/submit', { method: 'POST', body: formData });
+        const res = await fetch('/submit', { method: 'POST', body: fd });
         const data = await res.json();
-
         if (res.status === 429) {
-          document.getElementById('countdown').textContent =
-            data.days + ' gün ' + data.hours + ' saat kaldı';
-          showStep('step-blocked');
-          return;
+          document.getElementById('countdown').textContent = data.days + ' gün ' + data.hours + ' saat kaldı';
+          showStep('step-blocked'); return;
         }
+        if (!res.ok) { showErr('err-form', data.error || 'Bir hata oluştu.'); return; }
+        openModal('success-modal');
+      } catch(e) { showErr('err-form', 'Bağlantı hatası. Tekrar deneyin.'); }
+      finally { btn.disabled = false; btn.textContent = 'Başvuruyu Tamamla'; }
+    }
 
-        if (!res.ok) {
-          showErr('err-form', data.error || 'Bir hata oluştu.');
-          return;
-        }
+    // ═══ MODAL HELPERS ══════════════════════════════════════════════════════
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-        document.getElementById('success-modal').style.display = 'flex';
-      } catch (e) {
-        showErr('err-form', 'Bağlantı hatası. Lütfen tekrar dene.');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Parçamı Gönder';
+    // ═══ STAFF AUTH ══════════════════════════════════════════════════════════
+    function handleStaffBtnClick() {
+      if (staffToken) {
+        openPanelModal();
+      } else {
+        document.getElementById('login-err').style.display = 'none';
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+        openModal('login-modal');
+        setTimeout(() => document.getElementById('login-username').focus(), 100);
       }
     }
+
+    async function doLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('login-err');
+      err.style.display = 'none';
+      if (!username || !password) { err.textContent = 'Kullanıcı adı ve şifre gereklidir.'; err.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
+      try {
+        const res = await fetch('/api/staff/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.error || 'Giriş başarısız.'; err.style.display = 'block'; return; }
+        staffToken = data.token;
+        staffUsername = data.username;
+        staffRole = data.role;
+        localStorage.setItem('staff_token', staffToken);
+        localStorage.setItem('staff_username', staffUsername);
+        localStorage.setItem('staff_role', staffRole);
+        setStaffLoggedIn(staffUsername, staffRole);
+        closeModal('login-modal');
+        openPanelModal();
+      } catch(e) { err.textContent = 'Bağlantı hatası.'; err.style.display = 'block'; }
+      finally { btn.disabled = false; btn.textContent = 'Giriş Yap'; }
+    }
+
+    function setStaffLoggedIn(username, role) {
+      const btn = document.getElementById('staff-btn');
+      btn.textContent = '⚙️ ' + username;
+      btn.classList.add('active');
+    }
+
+    function clearStaff() {
+      staffToken = ''; staffUsername = ''; staffRole = '';
+      localStorage.removeItem('staff_token');
+      localStorage.removeItem('staff_username');
+      localStorage.removeItem('staff_role');
+      const btn = document.getElementById('staff-btn');
+      btn.textContent = '🔑 Yetkili Girişi';
+      btn.classList.remove('active');
+    }
+
+    // ═══ SETUP ═══════════════════════════════════════════════════════════════
+    async function doSetup() {
+      const username = document.getElementById('setup-username').value.trim();
+      const password = document.getElementById('setup-password').value;
+      const password2 = document.getElementById('setup-password2').value;
+      const err = document.getElementById('setup-err');
+      err.style.display = 'none';
+      if (!username || !password) { err.textContent = 'Tüm alanlar zorunludur.'; err.style.display = 'block'; return; }
+      if (password.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalıdır.'; err.style.display = 'block'; return; }
+      if (password !== password2) { err.textContent = 'Şifreler eşleşmiyor.'; err.style.display = 'block'; return; }
+      const btn = document.getElementById('setup-btn');
+      btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
+      try {
+        const res = await fetch('/api/staff/setup', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.error; err.style.display = 'block'; return; }
+        staffToken = data.token; staffUsername = data.username; staffRole = data.role;
+        localStorage.setItem('staff_token', staffToken);
+        localStorage.setItem('staff_username', staffUsername);
+        localStorage.setItem('staff_role', staffRole);
+        setStaffLoggedIn(staffUsername, staffRole);
+        document.getElementById('setup-overlay').classList.remove('open');
+        startGSI();
+        openPanelModal();
+      } catch(e) { err.textContent = 'Bağlantı hatası.'; err.style.display = 'block'; }
+      finally { btn.disabled = false; btn.textContent = 'Hesabı Oluştur'; }
+    }
+
+    // ═══ STAFF PANEL ═════════════════════════════════════════════════════════
+    async function authFetch(url, body) {
+      const res = await fetch(url, {
+        method: body !== null ? 'POST' : 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffToken },
+        body: body !== null ? JSON.stringify(body) : undefined
+      });
+      if (res.status === 401) { clearStaff(); throw new Error('Oturum sona erdi.'); }
+      return res.json();
+    }
+
+    function openPanelModal() {
+      document.getElementById('panel-username').textContent = staffUsername + (staffRole === 'owner' ? ' (Kurucu)' : '');
+      document.getElementById('accounts-owner-section').style.display = staffRole === 'owner' ? 'block' : 'none';
+      openModal('panel-modal');
+      loadPanelData();
+    }
+
+    let panelData = { submissions: [], accounts: [] };
+
+    async function loadPanelData() {
+      try {
+        const data = await authFetch('/api/admin/submissions', null);
+        panelData = data;
+        renderInbox();
+        renderPublished();
+        renderLimits();
+        renderAccounts();
+      } catch(e) { alert(e.message); }
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['inbox','published','limits','accounts'][i] === name));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    function fmt(dateStr) {
+      if (!dateStr) return '—';
+      return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function renderInbox() {
+      const tbody = document.getElementById('inbox-body');
+      const items = panelData.submissions.filter(s => s.status === 'pending');
+      if (!items.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Bekleyen başvuru yok.</td></tr>'; return; }
+      tbody.innerHTML = items.map(item => `
+        <tr style="cursor:pointer;" onclick="playTrackById('${item.fileId}','${esc(item.trackName)}','${esc(item.fullName)}','${esc(item.aiTool)}')">
+          <td>
+            <div style="font-weight:600; color:var(--txt);">${esc(item.trackName)}</div>
+            <div style="font-size:0.73rem; color:var(--txt2);">${esc(item.fullName)} · ${esc(item.social)}</div>
+          </td>
+          <td><span class="tag">${esc(item.aiTool)}</span></td>
+          <td onclick="event.stopPropagation()">
+            <input type="date" class="panel-input" id="pd-${item.id}" style="padding:6px 8px; font-size:0.75rem;" value="${new Date().toISOString().slice(0,10)}" />
+          </td>
+          <td style="text-align:right; white-space:nowrap;" onclick="event.stopPropagation()">
+            <button class="action-btn approve" onclick="updateStatus('${item.id}','published')" style="margin-right:4px;">Yayınla</button>
+            <button class="action-btn reject" onclick="updateStatus('${item.id}','rejected')">Reddet</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPublished() {
+      const tbody = document.getElementById('published-body');
+      const items = panelData.submissions.filter(s => s.status === 'published');
+      if (!items.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Yayında parça yok.</td></tr>'; return; }
+      tbody.innerHTML = items.sort((a,b)=>new Date(b.publishDate||b.timestamp)-new Date(a.publishDate||a.timestamp)).map(item => `
+        <tr>
+          <td style="font-weight:600; color:var(--txt); cursor:pointer;" onclick="playTrackById('${item.fileId}','${esc(item.trackName)}','${esc(item.fullName)}','${esc(item.aiTool)}')">${esc(item.trackName)} ▶</td>
+          <td style="color:var(--txt2);">${esc(item.fullName)}</td>
+          <td style="color:var(--txt3);">${fmt(item.publishDate||item.timestamp)}</td>
+          <td style="text-align:right;"><button class="action-btn reject" onclick="updateStatus('${item.id}','rejected')">Kaldır</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderLimits() {
+      const tbody = document.getElementById('limits-body');
+      const sevenDays = 7*24*60*60*1000;
+      const limitMap = {};
+      panelData.submissions.forEach(s => {
+        const t = new Date(s.timestamp).getTime();
+        if (!limitMap[s.email] || limitMap[s.email] < t) limitMap[s.email] = t;
+      });
+      const active = Object.entries(limitMap).filter(([,t]) => Date.now()-t < sevenDays);
+      if (!active.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Limitli kullanıcı yok.</td></tr>'; return; }
+      tbody.innerHTML = active.map(([email, ts]) => `
+        <tr>
+          <td style="color:var(--txt);">${esc(email)}</td>
+          <td style="color:var(--txt3);">${new Date(ts).toLocaleString('tr-TR')}</td>
+          <td style="text-align:right;"><button class="action-btn approve" onclick="resetLimit('${esc(email)}')">Sıfırla</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAccounts() {
+      const tbody = document.getElementById('accounts-body');
+      if (!panelData.accounts || !panelData.accounts.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>'; return; }
+      tbody.innerHTML = panelData.accounts.map(acc => `
+        <tr>
+          <td style="font-weight:600; color:var(--txt);">${esc(acc.username)}</td>
+          <td><span class="tag" style="${acc.role==='owner' ? 'background:rgba(251,191,36,0.15);' : ''}">${acc.role === 'owner' ? 'Kurucu' : 'Çalışan'}</span></td>
+          <td style="text-align:right;">
+            ${acc.username !== staffUsername && staffRole === 'owner' && acc.role !== 'owner'
+              ? `<button class="action-btn danger" onclick="removeAccount('${esc(acc.username)}')">Kaldır</button>`
+              : '<span style="color:var(--txt3); font-size:0.75rem;">—</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    async function updateStatus(id, status) {
+      const dateInput = document.getElementById('pd-' + id);
+      const publishDate = dateInput ? dateInput.value : null;
+      try {
+        await authFetch('/api/admin/update-status', { id, status, publishDate: publishDate || undefined });
+        loadPanelData();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function resetLimit(email) {
+      if (!confirm(email + ' kullanıcısının bekleme süresi sıfırlansın mı?')) return;
+      try { await authFetch('/api/admin/reset-user', { targetEmail: email }); loadPanelData(); }
+      catch(e) { alert(e.message); }
+    }
+
+    async function addAccount() {
+      const username = document.getElementById('new-username').value.trim();
+      const password = document.getElementById('new-password').value;
+      if (!username || !password) { alert('Kullanıcı adı ve şifre gereklidir.'); return; }
+      try {
+        const data = await authFetch('/api/staff/add-account', { username, password });
+        if (data.error) { alert(data.error); return; }
+        panelData.accounts = data.accounts;
+        document.getElementById('new-username').value = '';
+        document.getElementById('new-password').value = '';
+        renderAccounts();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function removeAccount(username) {
+      if (!confirm(username + ' hesabını kaldırmak istediğinize emin misiniz?')) return;
+      try {
+        const data = await authFetch('/api/staff/remove-account', { username });
+        if (data.error) { alert(data.error); return; }
+        panelData.accounts = data.accounts;
+        renderAccounts();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function changePassword() {
+      const cur = document.getElementById('cur-pw').value;
+      const nw = document.getElementById('new-pw').value;
+      const err = document.getElementById('pw-change-err');
+      const ok = document.getElementById('pw-change-ok');
+      err.style.display = 'none'; ok.style.display = 'none';
+      if (!cur || !nw) { err.textContent = 'Her iki alanı da doldurun.'; err.style.display = 'block'; return; }
+      try {
+        const data = await authFetch('/api/staff/change-password', { currentPassword: cur, newPassword: nw });
+        if (data.error) { err.textContent = data.error; err.style.display = 'block'; return; }
+        ok.style.display = 'block';
+        document.getElementById('cur-pw').value = '';
+        document.getElementById('new-pw').value = '';
+      } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
+    }
+
+    // ═══ PLAYLIST MODAL ══════════════════════════════════════════════════════
+    async function openPlaylistModal() {
+      openModal('playlist-modal');
+      const container = document.getElementById('playlist-container');
+      container.innerHTML = '<div class="empty-state">Yükleniyor...</div>';
+      try {
+        const tracks = await fetch('/api/playlist').then(r => r.json());
+        if (!tracks.length) { container.innerHTML = '<div class="empty-state">Şu an yayında parça bulunmuyor.</div>'; return; }
+        container.innerHTML = tracks.map((t, i) => `
+          <div class="playlist-item" onclick="playTrack('${esc(t.audioUrl)}','${esc(t.title)}','${esc(t.artist)}','${esc(t.aiTool)}')">
+            <div class="pl-num">${i+1}</div>
+            <div class="pl-info">
+              <div class="pl-title">${esc(t.title)}</div>
+              <div class="pl-artist">${esc(t.artist)} · <span style="color:var(--gold);">${esc(t.aiTool)}</span></div>
+            </div>
+            <div style="font-size:0.7rem; color:var(--txt3); margin-right:6px;">${fmt(t.publishDate)}</div>
+            <div class="pl-play">▶</div>
+          </div>
+        `).join('');
+      } catch(e) { container.innerHTML = '<div class="empty-state">Playlist yüklenemedi.</div>'; }
+    }
+
+    // ═══ AUDIO PLAYER ════════════════════════════════════════════════════════
+    const playerEl = document.getElementById('player');
+
+    function playTrack(url, title, artist, aiTool) {
+      document.getElementById('ab-title').textContent = title;
+      document.getElementById('ab-artist').textContent = artist;
+      document.getElementById('ab-tag').textContent = aiTool;
+      playerEl.src = url;
+      playerEl.load();
+      playerEl.play().then(() => {
+        document.getElementById('ab-play').textContent = '⏸';
+        document.getElementById('audio-bar').classList.add('visible');
+      }).catch(() => alert('Ses dosyası oynatılamadı.'));
+    }
+
+    function playTrackById(fileId, title, artist, aiTool) {
+      playTrack('/api/stream-audio?fileId=' + fileId, title, artist, aiTool);
+    }
+
+    function togglePlay() {
+      if (playerEl.paused) { playerEl.play(); document.getElementById('ab-play').textContent = '⏸'; }
+      else { playerEl.pause(); document.getElementById('ab-play').textContent = '▶'; }
+    }
+
+    function seek(val) {
+      if (playerEl.duration) playerEl.currentTime = (val / 100) * playerEl.duration;
+    }
+
+    function closePlayer() {
+      playerEl.pause();
+      document.getElementById('audio-bar').classList.remove('visible');
+    }
+
+    function fmtTime(s) {
+      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+
+    playerEl.addEventListener('timeupdate', () => {
+      if (playerEl.duration) {
+        document.getElementById('ab-seek').value = (playerEl.currentTime / playerEl.duration) * 100;
+        document.getElementById('ab-cur').textContent = fmtTime(playerEl.currentTime);
+        document.getElementById('ab-dur').textContent = fmtTime(playerEl.duration);
+      }
+    });
+    playerEl.addEventListener('ended', () => { document.getElementById('ab-play').textContent = '▶'; });
+
+    // ═══ MISC ════════════════════════════════════════════════════════════════
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    }
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('open');
+      });
+    });
   </script>
 </body>
 </html>
