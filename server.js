@@ -1,32 +1,15 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const { google } = require('googleapis');
-const path = require('path');
-const fs = require('fs');
 const { OAuth2Client } = require('google-auth-library');
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-const submissions = {};
-
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const oauthClient = googleClientId ? new OAuth2Client(googleClientId) : null;
-
-async function verifyGoogleToken(token) {
-  if (!oauthClient) {
-    throw new Error('Google Client ID configuration is missing on the server.');
-  }
-  const ticket = await oauthClient.verifyIdToken({
-    idToken: token,
-    audience: googleClientId,
-  });
-  return ticket.getPayload();
-}
-
-// Ensure local uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -44,11 +27,33 @@ const upload = multer({
   }
 });
 
+// Load persistences
+const staffFile = path.join(__dirname, 'staff_list.json');
+let staffList = [];
+if (fs.existsSync(staffFile)) {
+  try { staffList = JSON.parse(fs.readFileSync(staffFile, 'utf8')); } catch(e) {}
+}
+function saveStaffList() {
+  fs.writeFileSync(staffFile, JSON.stringify(staffList, null, 2), 'utf8');
+}
 
-function isAuthorizedStaff(email) {
-  const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
-  const checkEmail = email.toLowerCase();
-  return checkEmail === superAdmin || staffList.includes(checkEmail);
+const submissionsFile = path.join(__dirname, 'submissions_data.json');
+let submissionsData = [];
+if (fs.existsSync(submissionsFile)) {
+  try { submissionsData = JSON.parse(fs.readFileSync(submissionsFile, 'utf8')); } catch(e) {}
+}
+function saveSubmissionsData() {
+  fs.writeFileSync(submissionsFile, JSON.stringify(submissionsData, null, 2), 'utf8');
+}
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function verifyGoogleToken(token) {
+  const ticket = await googleClient.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  return ticket.getPayload();
 }
 
 function getDriveClient() {
@@ -61,7 +66,6 @@ function getDriveClient() {
     auth.setCredentials({ refresh_token });
     return google.drive({ version: 'v3', auth });
   }
-
   const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
   const auth = new google.auth.GoogleAuth({
     credentials,
@@ -99,18 +103,23 @@ async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', descri
           emailAddress: ownerEmail,
         },
       });
-      console.log(`Ownership transferred to: ${ownerEmail}`);
-    } catch (e) {
-      console.log('Ownership transfer skipped or failed:', e.message);
-    }
+    } catch (e) {}
   }
   return fileId;
 }
 
+function isAuthorizedStaff(email) {
+  const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
+  const checkEmail = email.toLowerCase();
+  return checkEmail === superAdmin || staffList.includes(checkEmail);
+}
+
 function checkRateLimit(email) {
-  const last = submissions[email];
-  if (!last) return { allowed: true };
-  const diff = Date.now() - last;
+  const emailLower = email.toLowerCase();
+  const userSubs = submissionsData.filter(s => s.email.toLowerCase() === emailLower);
+  if (userSubs.length === 0) return { allowed: true };
+  const latestSub = Math.max(...userSubs.map(s => new Date(s.timestamp).getTime()));
+  const diff = Date.now() - latestSub;
   const sevenDays = 7 * 24 * 60 * 60 * 1000;
   if (diff < sevenDays) {
     const remaining = sevenDays - diff;
@@ -121,6 +130,36 @@ function checkRateLimit(email) {
   return { allowed: true };
 }
 
+// REST endpoints
+app.get('/api/playlist', (req, res) => {
+  const published = submissionsData.filter(s => s.status === 'published').map(s => ({
+    id: s.id,
+    title: s.trackName,
+    artist: s.fullName,
+    aiTool: s.aiTool,
+    audioUrl: '/api/stream-audio?fileId=' + s.fileId
+  }));
+  res.json(published);
+});
+
+app.get('/api/stream-audio', async (req, res) => {
+  const { fileId } = req.query;
+  if (!fileId) return res.status(400).send('File ID missing');
+  try {
+    const drive = getDriveClient();
+    const file = await drive.files.get({
+      fileId: fileId,
+      alt: 'media'
+    }, {
+      responseType: 'stream'
+    });
+    res.setHeader('Content-Type', 'audio/mpeg');
+    file.data.pipe(res);
+  } catch (err) {
+    res.status(500).send('Error streaming audio');
+  }
+});
+
 app.post('/submit', upload.single('mp3'), async (req, res) => {
   try {
     const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
@@ -130,8 +169,6 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
     }
-    
-    // Verify token and extract email
     const payload = await verifyGoogleToken(token);
     const email = payload.email.toLowerCase();
     
@@ -142,8 +179,6 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     }
     
     const date = new Date().toISOString().slice(0, 10);
-    
-    // Human-readable clean names (Capitalize words, preserve Turkish characters)
     const cleanStr = (str) => {
       return str
         .replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s-]/g, '')
@@ -155,48 +190,46 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     
     const formattedFullName = cleanStr(fullName);
     const formattedTrackName = cleanStr(trackName);
-    const fileName = `${date} - ${formattedFullName} - ${formattedTrackName}.mp3`;
-    
-    // Compile detailed metadata for the file description field in Google Drive
-    const description = `Gönderen: ${fullName}
-E-posta: ${email}
-Sosyal Medya: ${social}
-Yapay Zeka Aracı: ${aiTool}
-Parça Adı: ${trackName}
-Tarih: ${date}
+    const fileName = date + ' - ' + formattedFullName + ' - ' + formattedTrackName + '.mp3';
+    const description = 'Gönderen: ' + fullName + '\nE-posta: ' + email + '\nSosyal Medya: ' + social + '\nYapay Zeka Aracı: ' + aiTool + '\nParça Adı: ' + trackName + '\nTarih: ' + date + '\n\nParça Notu:\n' + note;
 
-Parça Notu:
-${note}`;
-
-    // Upload MP3 with embedded description
-    await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
-    
-    // Clean up local temp file
+    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
     if (fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
     
-    submissions[email] = Date.now();
+    // Add to submission_data
+    submissionsData.push({
+      id: Date.now().toString(),
+      fullName,
+      email,
+      social,
+      aiTool,
+      trackName,
+      note,
+      fileId,
+      timestamp: new Date().toISOString(),
+      status: 'pending' // requires review
+    });
+    saveSubmissionsData();
+    
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    res.status(500).json({ error: err.message || 'Bir hata oluştu, lütfen tekrar dene.' });
+    res.status(500).json({ error: err.message || 'Bir hata oluştu.' });
   }
 });
 
 app.post('/check-limit', async (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).json({ error: 'Token zorunludur.' });
   try {
+    const { token } = req.body;
     const payload = await verifyGoogleToken(token);
     const email = payload.email.toLowerCase();
     const limit = checkRateLimit(email);
     res.json({ ...limit, email, name: payload.name });
   } catch (err) {
-    console.error(err);
     res.status(401).json({ error: 'Google kimlik doğrulaması başarısız: ' + err.message });
   }
 });
@@ -213,16 +246,13 @@ app.get('/auth', (req, res) => {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `https://${req.headers.host}/oauth2callback`
+    'https://' + req.headers.host + '/oauth2callback'
   );
-  
-  const authorizeUrl = oauth2Client.generateAuthUrl({
+  res.redirect(oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['https://www.googleapis.com/auth/drive'],
     prompt: 'consent'
-  });
-  
-  res.redirect(authorizeUrl);
+  }));
 });
 
 app.get('/oauth2callback', async (req, res) => {
@@ -232,58 +262,20 @@ app.get('/oauth2callback', async (req, res) => {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      `https://${req.headers.host}/oauth2callback`
+      'https://' + req.headers.host + '/oauth2callback'
     );
     const { tokens } = await oauth2Client.getToken(code);
-    
     if (tokens.refresh_token) {
-      res.send(`
-        <html>
-          <body style="font-family:sans-serif; background:#080706; color:#f5f4f2; padding:40px; text-align:center;">
-            <h1 style="color:#f5c518;">Google Yetkilendirme Başarılı!</h1>
-            <p>Lütfen bu Refresh Token değerini kopyalayıp Railway üzerinde <b>GOOGLE_REFRESH_TOKEN</b> olarak tanımlayın:</p>
-            <textarea style="width:100%; max-width:600px; height:80px; background:#12100e; color:#fbbf24; border:1px solid #5e5c58; border-radius:8px; padding:10px; font-family:monospace; font-size:1rem;" readonly>${tokens.refresh_token}</textarea>
-            <p style="margin-top:20px; color:#a3a19d;">Ayrıca Railway'de <b>GOOGLE_CLIENT_SECRET</b> değerini de girdiğinizden emin olun.</p>
-          </body>
-        </html>
-      `);
+      res.send('<html><body style="font-family:sans-serif; background:#080706; color:#f5f4f2; padding:40px; text-align:center;"><h1 style="color:#f5c518;">Google Yetkilendirme Başarılı!</h1><p>Lütfen bu Refresh Token değerini kopyalayıp Railway üzerinde <b>GOOGLE_REFRESH_TOKEN</b> olarak tanımlayın:</p><textarea style="width:100%; max-width:600px; height:80px; background:#12100e; color:#fbbf24; border:1px solid #5e5c58; border-radius:8px; padding:10px; font-family:monospace; font-size:1rem;" readonly>' + tokens.refresh_token + '</textarea><p style="margin-top:20px; color:#a3a19d;">Ayrıca Railway' + "'" + 'de <b>GOOGLE_CLIENT_SECRET</b> değerini de girdiğinizden emin olun.</p></body></html>');
     } else {
-      res.send('Kimlik doğrulama başarılı fakat refresh_token dönmedi. Lütfen tekrar /auth sayfasına gidip deneyin.');
+      res.send('Kimlik doğrulama başarılı fakat refresh_token dönmedi.');
     }
   } catch (err) {
-    console.error(err);
     res.status(500).send('Kod çevrim hatası: ' + err.message);
   }
 });
 
-
-
-// Public API to get current playlist
-app.get('/api/playlist', (req, res) => {
-  res.json(playlist);
-});
-
-// Proxy streaming from Google Drive so we can stream files in custom HTML audio player
-app.get('/api/stream-audio', async (req, res) => {
-  const { fileId } = req.query;
-  if (!fileId) return res.status(400).send('File ID missing');
-  try {
-    const drive = getDriveClient();
-    const file = await drive.files.get({
-      fileId: fileId,
-      alt: 'media'
-    }, {
-      responseType: 'stream'
-    });
-    
-    res.setHeader('Content-Type', 'audio/mpeg');
-    file.data.pipe(res);
-  } catch (err) {
-    console.error('Error streaming from Drive:', err);
-    res.status(500).send('Error streaming audio');
-  }
-});
-
+// Admin management APIs
 app.post('/api/admin/submissions', async (req, res) => {
   const { token } = req.body;
   try {
@@ -291,18 +283,25 @@ app.post('/api/admin/submissions', async (req, res) => {
     if (!isAuthorizedStaff(payload.email)) {
       return res.status(403).json({ error: 'Yetkisiz erişim.' });
     }
-    
-    // Map active submissions
-    const activeSubmissions = [];
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
-    for (const [email, timestamp] of Object.entries(submissions)) {
-      const diff = Date.now() - timestamp;
-      if (diff < sevenDays) {
-        activeSubmissions.push({ email, timestamp });
-      }
+    res.json({ submissions: submissionsData, staffList });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/update-status', async (req, res) => {
+  const { token, id, status } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    if (!isAuthorizedStaff(payload.email)) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
     }
-    
-    res.json({ submissions: activeSubmissions, staffList, playlist });
+    const item = submissionsData.find(s => s.id === id);
+    if (item) {
+      item.status = status;
+      saveSubmissionsData();
+    }
+    res.json({ success: true });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
@@ -315,7 +314,9 @@ app.post('/api/admin/reset-user', async (req, res) => {
     if (!isAuthorizedStaff(payload.email)) {
       return res.status(403).json({ error: 'Yetkisiz erişim.' });
     }
-    delete submissions[targetEmail.toLowerCase()];
+    const emailLower = targetEmail.toLowerCase();
+    submissionsData = submissionsData.filter(s => s.email.toLowerCase() !== emailLower);
+    saveSubmissionsData();
     res.json({ success: true });
   } catch (err) {
     res.status(401).json({ error: err.message });
@@ -326,10 +327,9 @@ app.post('/api/admin/add-staff', async (req, res) => {
   const { token, targetEmail } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    // Only superAdmin can add other staff members
     const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
     if (payload.email.toLowerCase() !== superAdmin) {
-      return res.status(403).json({ error: 'Yalnızca ana yönetici stüdyo çalışanı ekleyebilir.' });
+      return res.status(403).json({ error: 'Yalnızca kurucu yönetici stüdyo çalışanı ekleyebilir.' });
     }
     const emailLower = targetEmail.toLowerCase().trim();
     if (emailLower && !staffList.includes(emailLower)) {
@@ -346,10 +346,9 @@ app.post('/api/admin/remove-staff', async (req, res) => {
   const { token, targetEmail } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    // Only superAdmin can remove staff members
     const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
     if (payload.email.toLowerCase() !== superAdmin) {
-      return res.status(403).json({ error: 'Yalnızca ana yönetici stüdyo çalışanı kaldırabilir.' });
+      return res.status(403).json({ error: 'Yalnızca kurucu yönetici stüdyo çalışanı kaldırabilir.' });
     }
     const emailLower = targetEmail.toLowerCase().trim();
     staffList = staffList.filter(e => e !== emailLower);
@@ -360,63 +359,16 @@ app.post('/api/admin/remove-staff', async (req, res) => {
   }
 });
 
-app.post('/api/admin/add-playlist', async (req, res) => {
-  const { token, title, artist, aiTool, audioUrl } = req.body;
-  try {
-    const payload = await verifyGoogleToken(token);
-    if (!isAuthorizedStaff(payload.email)) {
-      return res.status(403).json({ error: 'Yetkisiz erişim.' });
-    }
-    
-    let finalUrl = audioUrl.trim();
-    // Google Drive URL Parser: extract file ID
-    const driveRegex = /\/file\/d\/([a-zA-Z0-9_-]+)/;
-    const match = finalUrl.match(driveRegex);
-    if (match && match[1]) {
-      finalUrl = `/api/stream-audio?fileId=${match[1]}`;
-    }
-    
-    const newItem = {
-      id: Date.now().toString(),
-      title: title.trim(),
-      artist: artist.trim(),
-      aiTool: aiTool.trim(),
-      audioUrl: finalUrl
-    };
-    
-    playlist.push(newItem);
-    savePlaylist();
-    res.json({ success: true, playlist });
-  } catch (err) {
-    res.status(401).json({ error: err.message });
-  }
-});
-
-app.post('/api/admin/remove-playlist', async (req, res) => {
-  const { token, itemId } = req.body;
-  try {
-    const payload = await verifyGoogleToken(token);
-    if (!isAuthorizedStaff(payload.email)) {
-      return res.status(403).json({ error: 'Yetkisiz erişim.' });
-    }
-    playlist = playlist.filter(item => item.id !== itemId);
-    savePlaylist();
-    res.json({ success: true, playlist });
-  } catch (err) {
-    res.status(401).json({ error: err.message });
-  }
-});
 app.get('/reset-submissions', (req, res) => {
   const secret = req.query.secret;
   const adminSecret = process.env.ADMIN_SECRET || 'mais-studio-reset-secret-2026';
   if (secret === adminSecret) {
-    for (const key in submissions) {
-      delete submissions[key];
-    }
-    return res.send('Tüm başvuru limitleri başarıyla sıfırlandı!');
+    submissionsData = [];
+    saveSubmissionsData();
+    return res.send('Tüm başvuru limitleri ve kayıtları başarıyla sıfırlandı!');
   }
   return res.status(403).send('Yetkisiz erişim.');
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log('Server running on port ' + PORT));
