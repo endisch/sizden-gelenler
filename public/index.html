@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sizden Gelenler — Parça Gönder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .header p {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #666;
+      letter-spacing: 0.05em;
+    }
+
+    .card {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .step-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #555;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 7px;
+      letter-spacing: 0.05em;
+    }
+
+    label span.req {
+      color: #c0392b;
+      margin-left: 3px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #e8e8e8;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #555;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    select option {
+      background: #1c1c1c;
+    }
+
+    .upload-zone {
+      border: 1.5px dashed #2a2a2a;
+      border-radius: 8px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #555;
+      background: #1a1a1a;
+    }
+
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-zone .icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .upload-zone .hint {
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    .upload-zone .file-name {
+      color: #aaa;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .consent-box {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+    }
+
+    .consent-box input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      accent-color: #e8e8e8;
+      cursor: pointer;
+    }
+
+    .consent-box p {
+      font-size: 0.8rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 24px;
+    }
+
+    .btn-primary {
+      background: #e8e8e8;
+      color: #0a0a0a;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .error-box {
+      background: #1e0e0e;
+      border: 1px solid #5c1a1a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #e07070;
+      line-height: 1.5;
+    }
+
+    .blocked-screen {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .blocked-screen .icon-large {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .blocked-screen h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #e8e8e8;
+      margin-bottom: 12px;
+    }
+
+    .blocked-screen p {
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    .countdown {
+      display: inline-block;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 12px 24px;
+      margin: 16px 0;
+      font-size: 1.2rem;
+      color: #aaa;
+      letter-spacing: 0.1em;
+    }
+
+    .success-screen {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .success-screen .icon-large {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .success-screen h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #e8e8e8;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2a2a2a;
+      transition: background 0.3s;
+    }
+
+    .dot.active { background: #e8e8e8; }
+    .dot.done { background: #555; }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #333;
+      border-top-color: #0a0a0a;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Sizden Gelenler</h1>
+      <p>Yapay zeka ile ürettiğin parçayı gönder</p>
+    </div>
+
+    <div class="card">
+      <!-- Progress dots -->
+      <div class="progress-dots" id="dots">
+        <div class="dot active" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+      </div>
+
+      <!-- STEP 1: E-posta kontrolü -->
+      <div class="step active" id="step-1">
+        <div class="step-label">Adım 1 / 3 — Kimlik Doğrulama</div>
+        <div id="step1-error" class="error-box" style="display:none;"></div>
+        <div class="field">
+          <label>E-posta adresin <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="ornek@email.com" />
+        </div>
+        <button class="btn btn-primary" id="btn-check-email" onclick="checkEmail()">Devam Et</button>
+      </div>
+
+      <!-- BLOCKED: 7 gün dolmamış -->
+      <div class="step" id="step-blocked">
+        <div class="blocked-screen">
+          <div class="icon-large">⏳</div>
+          <h2>Bu hafta zaten bir parça gönderdin</h2>
+          <p>Her e-posta adresiyle haftada yalnızca 1 parça kabul ediyoruz.</p>
+          <div class="countdown" id="countdown-display">— gün — saat kaldı</div>
+          <p>Süre dolduğunda tekrar gönderebilirsin.</p>
+        </div>
+      </div>
+
+      <!-- STEP 2: Form -->
+      <div class="step" id="step-2">
+        <div class="step-label">Adım 2 / 3 — Parça Bilgileri</div>
+        <div id="step2-error" class="error-box" style="display:none;"></div>
+
+        <div class="field">
+          <label>Ad Soyad <span class="req">*</span></label>
+          <input type="text" id="fullName" placeholder="Adın ve soyadın" />
+        </div>
+
+        <div class="field">
+          <label>Sosyal medya hesabın <span class="req">*</span></label>
+          <input type="text" id="social" placeholder="@kullaniciadiniz (Instagram, YouTube, TikTok...)" />
+        </div>
+
+        <div class="field">
+          <label>Kullandığın yapay zeka aracı <span class="req">*</span></label>
+          <select id="aiTool">
+            <option value="">Seçiniz</option>
+            <option value="Suno">Suno</option>
+            <option value="Udio">Udio</option>
+            <option value="AIVA">AIVA</option>
+            <option value="Boomy">Boomy</option>
+            <option value="Mureka">Mureka</option>
+            <option value="Stable Audio">Stable Audio</option>
+            <option value="ElevenLabs Music">ElevenLabs Music</option>
+            <option value="Soundraw">Soundraw</option>
+            <option value="Beatoven.ai">Beatoven.ai</option>
+            <option value="Minimax Music">Minimax Music</option>
+            <option value="Google Lyria">Google Lyria</option>
+            <option value="Sonauto">Sonauto</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Parça adı <span class="req">*</span></label>
+          <input type="text" id="trackName" placeholder="Parçanın adı" />
+        </div>
+
+        <div class="field">
+          <label>Parça hakkında kısa not <span class="req">*</span></label>
+          <textarea id="note" placeholder="Bu parçayı nasıl ürettin? Ne anlatmak istedin? (En az 2-3 cümle)"></textarea>
+        </div>
+
+        <div class="field">
+          <label>MP3 Dosyası <span class="req">*</span> <span style="color:#555;font-size:0.75rem;">— maks. 20 MB</span></label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFileChange(this)" />
+            <div class="icon">🎵</div>
+            <div>MP3 dosyanı buraya sürükle veya tıkla</div>
+            <div class="hint">Sadece .mp3 — maksimum 20 MB</div>
+            <div class="file-name" id="file-name-display"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="consent-box" onclick="toggleConsent()">
+            <input type="checkbox" id="consent" onclick="event.stopPropagation()" />
+            <p>Bu parçanın tüm telif ve kullanım haklarının bana ait olduğunu, üçüncü şahıslara ait herhangi bir ses, melodi veya söz içermediğini beyan ederim. Parçamın <strong>"Sizden Gelenler"</strong> serisinde yayınlanmasına izin veriyorum.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-submit" onclick="submitForm()">Parçamı Gönder</button>
+      </div>
+
+      <!-- STEP 3: Başarı -->
+      <div class="step" id="step-success">
+        <div class="success-screen">
+          <div class="icon-large">✓</div>
+          <h2>Parçan bize ulaştı</h2>
+          <p>Teşekkürler. Her parçayı dinliyoruz.<br />Bir sonraki haftadan itibaren tekrar parça gönderebilirsin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let userEmail = '';
+
+    function showStep(stepId) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(stepId).classList.add('active');
+
+      const dotMap = { 'step-1': 1, 'step-2': 2, 'step-success': 3 };
+      const current = dotMap[stepId] || 0;
+      [1, 2, 3].forEach(i => {
+        const dot = document.getElementById(`dot-${i}`);
+        if (!dot) return;
+        dot.classList.remove('active', 'done');
+        if (i < current) dot.classList.add('done');
+        else if (i === current) dot.classList.add('active');
+      });
+
+      if (stepId === 'step-blocked' || stepId === 'step-success') {
+        document.getElementById('dots').style.display = 'none';
+      }
+    }
+
+    function showError(stepId, msg) {
+      const el = document.getElementById(stepId);
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError(stepId) {
+      document.getElementById(stepId).style.display = 'none';
+    }
+
+    async function checkEmail() {
+      const email = document.getElementById('email').value.trim();
+      if (!email || !email.includes('@')) {
+        showError('step1-error', 'Geçerli bir e-posta adresi gir.');
+        return;
+      }
+      hideError('step1-error');
+      userEmail = email;
+
+      const btn = document.getElementById('btn-check-email');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span>Kontrol ediliyor...';
+
+      try {
+        const res = await fetch('/check-limit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (!data.allowed) {
+          document.getElementById('countdown-display').textContent =
+            `${data.days} gün ${data.hours} saat kaldı`;
+          showStep('step-blocked');
+        } else {
+          showStep('step-2');
+        }
+      } catch (e) {
+        showError('step1-error', 'Bağlantı hatası, lütfen tekrar dene.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Devam Et';
+      }
+    }
+
+    function handleFileChange(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 20 * 1024 * 1024) {
+        showError('step2-error', 'Dosya boyutu 20 MB\'ı geçemez.');
+        input.value = '';
+        document.getElementById('file-name-display').textContent = '';
+        return;
+      }
+      hideError('step2-error');
+      document.getElementById('file-name-display').textContent = `✓ ${file.name}`;
+    }
+
+    function toggleConsent() {
+      const cb = document.getElementById('consent');
+      cb.checked = !cb.checked;
+    }
+
+    // Drag & drop
+    const zone = document.getElementById('upload-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        document.getElementById('mp3file').files = e.dataTransfer.files;
+        handleFileChange(document.getElementById('mp3file'));
+      }
+    });
+
+    async function submitForm() {
+      hideError('step2-error');
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const social = document.getElementById('social').value.trim();
+      const aiTool = document.getElementById('aiTool').value;
+      const trackName = document.getElementById('trackName').value.trim();
+      const note = document.getElementById('note').value.trim();
+      const consent = document.getElementById('consent').checked;
+      const mp3 = document.getElementById('mp3file').files[0];
+
+      if (!fullName || !social || !aiTool || !trackName || !note) {
+        showError('step2-error', 'Lütfen tüm alanları doldur.');
+        return;
+      }
+      if (note.length < 30) {
+        showError('step2-error', 'Parça notun çok kısa — en az 2-3 cümle yaz.');
+        return;
+      }
+      if (!mp3) {
+        showError('step2-error', 'MP3 dosyası seçilmedi.');
+        return;
+      }
+      if (!consent) {
+        showError('step2-error', 'Telif beyanını onaylamadan devam edemezsin.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span>Gönderiliyor...';
+
+      const formData = new FormData();
+      formData.append('email', userEmail);
+      formData.append('fullName', fullName);
+      formData.append('social', social);
+      formData.append('aiTool', aiTool);
+      formData.append('trackName', trackName);
+      formData.append('note', note);
+      formData.append('consent', 'true');
+      formData.append('mp3', mp3);
+
+      try {
+        const res = await fetch('/submit', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.status === 429) {
+          document.getElementById('countdown-display').textContent =
+            `${data.days} gün ${data.hours} saat kaldı`;
+          showStep('step-blocked');
+          return;
+        }
+
+        if (!res.ok) {
+          showError('step2-error', data.error || 'Bir hata oluştu.');
+          return;
+        }
+
+        showStep('step-success');
+      } catch (e) {
+        showError('step2-error', 'Bağlantı hatası. Lütfen tekrar dene.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Parçamı Gönder';
+      }
+    }
+
+    // Enter key on email field
+    document.getElementById('email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkEmail();
+    });
+  </script>
+</body>
+</html>
