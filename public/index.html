@@ -689,7 +689,16 @@
       let n = 0;
       const iv = setInterval(() => {
         n++;
-        if (tryGSI() || n > 80) clearInterval(iv);
+        if (tryGSI()) {
+          clearInterval(iv);
+        } else if (n > 80) {
+          clearInterval(iv);
+          if (!googleClientId) {
+            showErr('err-email', 'Sistem Hatası: Google Client ID ayarlanmamış.');
+          } else {
+            showErr('err-email', 'Google Sign-in yüklenemedi. Adblocker kullanıyorsanız devre dışı bırakın.');
+          }
+        }
       }, 200);
     }
 
@@ -697,12 +706,17 @@
       if (gsiReady) return true;
       if (!googleClientId || typeof google === 'undefined' || !google.accounts) return false;
       gsiReady = true;
-      google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleLogin });
-      google.accounts.id.renderButton(
-        document.getElementById('gsi-btn'),
-        { theme: 'filled_black', size: 'large', width: 280, locale: 'tr' }
-      );
-      return true;
+      try {
+        google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleLogin });
+        google.accounts.id.renderButton(
+          document.getElementById('gsi-btn'),
+          { theme: 'filled_black', size: 'large', width: 280, locale: 'tr' }
+        );
+        return true;
+      } catch (e) {
+        console.error("GSI render error:", e);
+        return false;
+      }
     }
 
     function onGoogleLogin(resp) {
