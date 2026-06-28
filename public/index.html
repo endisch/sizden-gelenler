@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sizden Gelenler — MAIS Studio</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -552,14 +553,15 @@
         <div class="step active" id="step-email">
           <div class="step-label">Adım 1 / 3 — Kimlik Kontrolü</div>
           <div class="error-box" id="err-email" style="display:none;"></div>
-          <div class="field">
-            <label>E-posta adresin <span class="req">*</span></label>
-            <input type="email" id="email" placeholder="ornek@email.com" />
+          <div class="field" style="text-align: center; margin: 32px 0 20px;">
+            <div id="google-signin-btn" style="display: inline-block;"></div>
+            <div id="loading-auth" style="display:none; font-size:0.82rem; color:var(--accent-gold); margin-top:14px; font-weight:600;">
+              <span class="loading-spinner"></span>Kimlik doğrulanıyor...
+            </div>
           </div>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:20px;line-height:1.7;">
-            Haftada yalnızca 1 parça kabul ediyoruz. E-posta adresin bunu takip etmek için kullanılır.
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:20px;line-height:1.7;text-align:center;">
+            Haftada yalnızca 1 parça kabul ediyoruz. Google ile giriş yaparak e-posta adresinizi doğrulayabilirsiniz.
           </div>
-          <button class="btn" id="btn-email" onclick="checkEmail()">Devam Et</button>
         </div>
 
         <!-- BLOCKED -->
@@ -577,14 +579,14 @@
 
         <!-- STEP 2 -->
         <div class="step" id="step-form">
-          <div class="step-label">Adım 2 / 3 — ParÃ§a Bilgileri</div>
+          <div class="step-label">Adım 2 / 3 — Parça Bilgileri</div>
           <div class="error-box" id="err-form" style="display:none;"></div>
           <div class="field">
             <label>Ad Soyad <span class="req">*</span></label>
-            <input type="text" id="fullName" placeholder="Adın ve soyadÄ±n" />
+            <input type="text" id="fullName" placeholder="Adın ve soyadın" />
           </div>
           <div class="field">
-            <label>Sosyal medya hesabÄ±n <span class="req">*</span></label>
+            <label>Sosyal medya hesabın <span class="req">*</span></label>
             <input type="text" id="social" placeholder="@kullaniciadiniz (Instagram, YouTube, TikTok...)" />
           </div>
           <div class="field">
@@ -607,19 +609,19 @@
             </select>
           </div>
           <div class="field">
-            <label>ParÃ§a adÄ± <span class="req">*</span></label>
-            <input type="text" id="trackName" placeholder="ParÃ§anÄ±n adÄ±" />
+            <label>Parça adı <span class="req">*</span></label>
+            <input type="text" id="trackName" placeholder="Parçanın adı" />
           </div>
           <div class="field">
-            <label>ParÃ§a hakkında kÄ±sa not <span class="req">*</span></label>
-            <textarea id="note" placeholder="Bu parçayÄ± nasÄ±l Ã¼rettin? Ne anlatmak istedin? (En az 2-3 cÃ¼mle)"></textarea>
+            <label>Parça hakkında kısa not <span class="req">*</span></label>
+            <textarea id="note" placeholder="Bu parçayı nasıl ürettin? Ne anlatmak istedin? (En az 2-3 cümle)"></textarea>
           </div>
           <div class="field">
             <label>MP3 Dosyası <span class="req">*</span> <span class="hint">— maks. 20 MB</span></label>
             <div class="upload-zone" id="upload-zone">
               <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)" />
               <div class="icon">ğŸµ</div>
-              <div class="hint">MP3 dosyanÄ± buraya sürükle veya tıkla</div>
+              <div class="hint">MP3 dosyanı buraya sürükle veya tıkla</div>
               <div class="sub-hint">Sadece .mp3 — maksimum 20 MB</div>
               <div class="file-name" id="file-name"></div>
             </div>
@@ -627,7 +629,7 @@
           <div class="field">
             <div class="consent-box" onclick="toggleConsent()">
               <div class="checkbox" id="checkbox"><span class="tick">✓</span></div>
-              <p>Bu parçanÄ±n tÃ¼m telif ve kullanÄ±m haklarÄ±nÄ±n bana ait olduğunu beyan ederim. Parçamın <strong>"Sizden Gelenler"</strong> serisinde yayınlanmasına izin veriyorum.</p>
+              <p>Bu parçanın tüm telif ve kullanım haklarının bana ait olduğunu beyan ederim. Parçamın <strong>"Sizden Gelenler"</strong> serisinde yayınlanmasına izin veriyorum.</p>
             </div>
           </div>
           <button class="btn" id="btn-submit" onclick="submitForm()">Parçamı Gönder</button>
@@ -637,8 +639,8 @@
         <div class="step" id="step-success">
           <div class="success">
             <div class="circle">✓</div>
-            <h2>ParÃ§an bize ulaştı</h2>
-            <p>Teşekkürler. Her parçayÄ± dinliyoruz.<br/>Bir sonraki haftadan itibaren tekrar parça gönderebilirsin.</p>
+            <h2>Parçan bize ulaştı</h2>
+            <p>Teşekkürler. Her parçayı dinliyoruz.<br/>Bir sonraki haftadan itibaren tekrar parça gönderebilirsin.</p>
           </div>
         </div>
       </div>
@@ -647,8 +649,77 @@
   </div>
 
   <script>
-    let userEmail = '';
+    let userGoogleToken = '';
     let consentChecked = false;
+    let googleClientId = '';
+
+    // Fetch config on page load
+    fetch('/config')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.googleClientId) {
+          googleClientId = data.googleClientId;
+          initializeGoogleSignIn();
+        } else {
+          showErr('err-email', 'Google Client ID sunucuda yapılandırılmamış.');
+        }
+      })
+      .catch(function() {
+        showErr('err-email', 'Sunucu yapılandırması yüklenemedi.');
+      });
+
+    function initializeGoogleSignIn() {
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById("google-signin-btn"),
+        { theme: "dark", size: "large", width: 280, text: "signin_with" }
+      );
+    }
+
+    function handleCredentialResponse(response) {
+      userGoogleToken = response.credential;
+      checkGoogleLimit(userGoogleToken);
+    }
+
+    function checkGoogleLimit(token) {
+      hideErr('err-email');
+      document.getElementById('loading-auth').style.display = 'block';
+      document.getElementById('google-signin-btn').style.pointerEvents = 'none';
+      document.getElementById('google-signin-btn').style.opacity = '0.5';
+
+      fetch('/check-limit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: token })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) {
+          showErr('err-email', data.error);
+          return;
+        }
+        if (!data.allowed) {
+          document.getElementById('countdown').textContent = data.days + ' gün ' + data.hours + ' saat kaldı';
+          showStep('step-blocked');
+        } else {
+          if (data.name) {
+            document.getElementById('fullName').value = data.name;
+          }
+          showStep('step-form');
+        }
+      })
+      .catch(function() {
+        showErr('err-email', 'Bağlantı hatası, lütfen tekrar dene.');
+      })
+      .finally(function() {
+        document.getElementById('loading-auth').style.display = 'none';
+        document.getElementById('google-signin-btn').style.pointerEvents = 'auto';
+        document.getElementById('google-signin-btn').style.opacity = '1';
+      });
+    }
 
     function showStep(id) {
       document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
@@ -669,43 +740,16 @@
     function showErr(id, msg){ var el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
     function hideErr(id){ document.getElementById(id).style.display='none'; }
 
-    function checkEmail() {
-      const email = document.getElementById('email').value.trim();
-      if(!email||!email.includes('@')){ showErr('err-email','Geçerli bir e-posta adresi gir.'); return; }
-      hideErr('err-email');
-      userEmail = email;
-      const btn = document.getElementById('btn-email');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading-spinner"></span>Kontrol ediliyor...';
-      fetch('/check-limit', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({email:email})
-      }).then(function(r){ return r.json(); }).then(function(data){
-        if(!data.allowed){
-          document.getElementById('countdown').textContent = data.days+' gün '+data.hours+' saat kaldı';
-          showStep('step-blocked');
-        } else {
-          showStep('step-form');
-        }
-      }).catch(function(){
-        showErr('err-email','Bağlantı hatası, lütfen tekrar dene.');
-      }).finally(function(){
-        btn.disabled=false;
-        btn.innerHTML='Devam Et';
-      });
-    }
-
-    function goBack(){ 
-      document.getElementById('dots').style.display='flex';
-      document.getElementById('email').value='';
+    function goBack() { 
+      document.getElementById('dots').style.display = 'flex';
+      userGoogleToken = '';
       showStep('step-email'); 
     }
 
     function handleFile(input) {
       const file = input.files[0];
       if(!file) return;
-      if(file.size > 20*1024*1024){ showErr('err-form','Dosya boyutu 20 MB\'Ä± geçemez.'); input.value=''; document.getElementById('file-name').textContent=''; return; }
+      if(file.size > 20*1024*1024){ showErr('err-form','Dosya boyutu 20 MB\'ı geçemez.'); input.value=''; document.getElementById('file-name').textContent=''; return; }
       hideErr('err-form');
       document.getElementById('file-name').textContent = '✓ '+file.name;
       const zone = document.getElementById('upload-zone');
@@ -743,19 +787,19 @@
       const mp3 = document.getElementById('mp3file').files[0];
 
       if (!fullName || !social || !aiTool || !trackName || !note) {
-        showErr('err-form', 'LÃ¼tfen tÃ¼m alanlarÄ± doldur.');
+        showErr('err-form', 'Lütfen tüm alanları doldur.');
         return;
       }
       if (note.length < 30) {
-        showErr('err-form', 'ParÃ§a hakkında daha fazla bilgi verin (en az 2-3 cÃ¼mle).');
+        showErr('err-form', 'Parça hakkında daha fazla bilgi verin (en az 2-3 cümle).');
         return;
       }
       if (!mp3) {
-        showErr('err-form', 'MP3 dosyasÄ± seÃ§ilmedi.');
+        showErr('err-form', 'MP3 dosyası seçilmedi.');
         return;
       }
       if (!consent) {
-        showErr('err-form', 'Telif beyanÄ±nÄ± onaylamadan devam edemezsin.');
+        showErr('err-form', 'Telif beyanını onaylamadan devam edemezsin.');
         return;
       }
 
@@ -764,7 +808,7 @@
       btn.innerHTML = '<span class="loading-spinner"></span>Gönderiliyor...';
 
       const formData = new FormData();
-      formData.append('email', userEmail);
+      formData.append('token', userGoogleToken);
       formData.append('fullName', fullName);
       formData.append('social', social);
       formData.append('aiTool', aiTool);
@@ -779,28 +823,24 @@
 
         if (res.status === 429) {
           document.getElementById('countdown').textContent =
-            ${data.days} gün  saat kaldı;
+            data.days + ' gün ' + data.hours + ' saat kaldı';
           showStep('step-blocked');
           return;
         }
 
         if (!res.ok) {
-          showErr('err-form', data.error || 'Bir hata oluÅŸtu.');
+          showErr('err-form', data.error || 'Bir hata oluştu.');
           return;
         }
 
         showStep('step-success');
       } catch (e) {
-        showErr('err-form', 'Bağlantı hatası. LÃ¼tfen tekrar dene.');
+        showErr('err-form', 'Bağlantı hatası. Lütfen tekrar dene.');
       } finally {
         btn.disabled = false;
         btn.innerHTML = 'Parçamı Gönder';
       }
     }
-
-    document.getElementById('email').addEventListener('keydown', e => {
-      if (e.key === 'Enter') checkEmail();
-    });
-  </script>
+</script>
 </body>
 </html>

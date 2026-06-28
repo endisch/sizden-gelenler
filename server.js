@@ -4,12 +4,27 @@ const multer = require('multer');
 const { google } = require('googleapis');
 const path = require('path');
 const fs = require('fs');
+const { OAuth2Client } = require('google-auth-library');
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
 const submissions = {};
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const oauthClient = googleClientId ? new OAuth2Client(googleClientId) : null;
+
+async function verifyGoogleToken(token) {
+  if (!oauthClient) {
+    throw new Error('Google Client ID configuration is missing on the server.');
+  }
+  const ticket = await oauthClient.verifyIdToken({
+    idToken: token,
+    audience: googleClientId,
+  });
+  return ticket.getPayload();
+}
 
 // Ensure local uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');
@@ -91,15 +106,19 @@ function checkRateLimit(email) {
 app.post('/submit', upload.single('mp3'), async (req, res) => {
   let tempTxtPath = null;
   try {
-    const { fullName, email, social, aiTool, trackName, note, consent } = req.body;
-    if (!fullName || !email || !social || !aiTool || !trackName || !note || !consent) {
+    const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
+    if (!token || !fullName || !social || !aiTool || !trackName || !note || !consent) {
       return res.status(400).json({ error: 'Tüm alanlar zorunludur.' });
     }
     if (!req.file) {
       return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
     }
     
-    const limit = checkRateLimit(email.toLowerCase());
+    // Verify token and extract email
+    const payload = await verifyGoogleToken(token);
+    const email = payload.email.toLowerCase();
+    
+    const limit = checkRateLimit(email);
     if (!limit.allowed) {
       fs.unlinkSync(req.file.path);
       return res.status(429).json({ error: 'Bu hafta zaten bir parça gönderdin.', days: limit.days, hours: limit.hours });
@@ -141,7 +160,7 @@ ${note}
       fs.unlinkSync(txtFilePath);
     }
     
-    submissions[email.toLowerCase()] = Date.now();
+    submissions[email] = Date.now();
     res.json({ success: true });
   } catch (err) {
     console.error(err);
@@ -155,11 +174,22 @@ ${note}
   }
 });
 
-app.post('/check-limit', (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.json({ allowed: true });
-  const limit = checkRateLimit(email.toLowerCase());
-  res.json(limit);
+app.post('/check-limit', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'Token zorunludur.' });
+  try {
+    const payload = await verifyGoogleToken(token);
+    const email = payload.email.toLowerCase();
+    const limit = checkRateLimit(email);
+    res.json({ ...limit, email, name: payload.name });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: 'Google kimlik doğrulaması başarısız: ' + err.message });
+  }
+});
+
+app.get('/config', (req, res) => {
+  res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || '' });
 });
 
 const PORT = process.env.PORT || 3000;
