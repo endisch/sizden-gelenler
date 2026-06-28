@@ -545,7 +545,7 @@ app.post('/api/admin/sync-drive', verifyStaffToken, async (req, res) => {
     let addedCount = 0;
     do {
       const response = await drive.files.list({
-        q: \`'\${folderId}' in parents and trashed = false\`,
+        q: "'" + folderId + "' in parents and trashed = false",
         fields: 'nextPageToken, files(id, name, createdTime, mimeType)',
         pageToken: pageToken
       });
@@ -559,7 +559,7 @@ app.post('/api/admin/sync-drive', verifyStaffToken, async (req, res) => {
               id: 'sub_' + Date.now() + Math.random().toString(36).substr(2,5),
               fullName: 'Eski Gönderim (Drive)',
               email: 'Bilinmiyor',
-              trackName: f.name.replace(/\\.[^/.]+$/, ""),
+              trackName: f.name.replace(/\.[^/.]+$/, ""),
               aiTool: 'Bilinmiyor',
               timestamp: f.createdTime || new Date().toISOString(),
               fileId: f.id,
