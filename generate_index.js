@@ -965,7 +965,7 @@ const html = `<!DOCTYPE html>
       ab.innerHTML = '';
       if(data.accounts && data.accounts.length > 0) {
         data.accounts.forEach(function(acc) {
-          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn red" onclick="deleteAccount(\'' + acc.username + '\')">Sil</button>' : '-';
+          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn red" onclick="deleteAccount(\\\'' + acc.username + '\\\')">Sil</button>' : '-';
           let role = acc.role === 'owner' ? 'Kurucu' : 'Çalışan';
           ab.innerHTML += '<tr><td>' + acc.username + '</td><td>' + role + '</td><td style="text-align:right;">' + act + '</td></tr>';
         });
@@ -996,8 +996,8 @@ const html = `<!DOCTYPE html>
       if (currentInboxList.length === 0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
       else {
         currentInboxList.forEach(function(s, idx) {
-          let link = '<a href="#" onclick="playFromList(\'inbox\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
-          let action = '<button class="action-btn" onclick="updateStatus(\'' + s.id + '\',\'reviewed\')">İncelendi</button>';
+          let link = '<a href="#" onclick="playFromList(\\\'inbox\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let action = '<button class="action-btn" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>';
           let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
@@ -1009,8 +1009,8 @@ const html = `<!DOCTYPE html>
       if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
       else {
         currentReviewedList.forEach(function(s, idx) {
-          let link = '<a href="#" onclick="playFromList(\'reviewed\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
-          let action = '<button class="action-btn red" onclick="updateStatus(\'' + s.id + '\',\'pending\')">Geri Al</button>';
+          let link = '<a href="#" onclick="playFromList(\\\'reviewed\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let action = '<button class="action-btn red" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'pending\\\')">Geri Al</button>';
           let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
@@ -1024,10 +1024,10 @@ const html = `<!DOCTYPE html>
       currentSpecialList = data.specialSubmissions || [];
       if(currentSpecialList.length > 0) {
         currentSpecialList.forEach(function(s, idx) {
-          let link = '<a href="#" onclick="playFromList(\'special\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let link = '<a href="#" onclick="playFromList(\\\'special\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
           let action = s.status === 'pending'
-            ? '<button class="action-btn" onclick="updateSpecialStatus(\'' + s.id + '\',\'reviewed\')">İncelendi</button>'
-            : '<button class="action-btn red" onclick="updateSpecialStatus(\'' + s.id + '\',\'pending\')">Geri Al</button>';
+            ? '<button class="action-btn" onclick="updateSpecialStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>'
+            : '<button class="action-btn red" onclick="updateSpecialStatus(\\\'' + s.id + '\\\',\\\'pending\\\')">Geri Al</button>';
           
           let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
                         '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
