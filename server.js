@@ -63,13 +63,14 @@ function getDriveClient() {
   return google.drive({ version: 'v3', auth });
 }
 
-async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg') {
+async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', description = '') {
   const drive = getDriveClient();
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
   const response = await drive.files.create({
     requestBody: {
       name: fileName,
       parents: [folderId],
+      description: description
     },
     media: {
       mimeType: mimeType,
@@ -114,7 +115,6 @@ function checkRateLimit(email) {
 }
 
 app.post('/submit', upload.single('mp3'), async (req, res) => {
-  let tempTxtPath = null;
   try {
     const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
     if (!token || !fullName || !social || !aiTool || !trackName || !note || !consent) {
@@ -135,19 +135,23 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     }
     
     const date = new Date().toISOString().slice(0, 10);
-    const safeName = (str) => str.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_');
-    const baseName = `${date}_${safeName(fullName)}_${safeName(trackName)}`;
-    const fileName = `${baseName}.mp3`;
-    const txtFileName = `${baseName}.txt`;
     
-    // Upload MP3
-    await uploadToDrive(req.file.path, fileName, 'audio/mpeg');
+    // Human-readable clean names (Capitalize words, preserve Turkish characters)
+    const cleanStr = (str) => {
+      return str
+        .replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s-]/g, '')
+        .trim()
+        .split(/\s+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    };
     
-    // Create companion text file with metadata
-    const txtFilePath = path.join(uploadDir, txtFileName);
-    tempTxtPath = txtFilePath;
+    const formattedFullName = cleanStr(fullName);
+    const formattedTrackName = cleanStr(trackName);
+    const fileName = `${date} - ${formattedFullName} - ${formattedTrackName}.mp3`;
     
-    const txtContent = `Gönderen: ${fullName}
+    // Compile detailed metadata for the file description field in Google Drive
+    const description = `Gönderen: ${fullName}
 E-posta: ${email}
 Sosyal Medya: ${social}
 Yapay Zeka Aracı: ${aiTool}
@@ -155,19 +159,14 @@ Parça Adı: ${trackName}
 Tarih: ${date}
 
 Parça Notu:
-${note}
-`;
-    fs.writeFileSync(txtFilePath, txtContent, 'utf8');
+${note}`;
+
+    // Upload MP3 with embedded description
+    await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
     
-    // Upload companion text file
-    await uploadToDrive(txtFilePath, txtFileName, 'text/plain');
-    
-    // Clean up local temp files
+    // Clean up local temp file
     if (fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
-    }
-    if (fs.existsSync(txtFilePath)) {
-      fs.unlinkSync(txtFilePath);
     }
     
     submissions[email] = Date.now();
@@ -176,9 +175,6 @@ ${note}
     console.error(err);
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
-    }
-    if (tempTxtPath && fs.existsSync(tempTxtPath)) {
-      fs.unlinkSync(tempTxtPath);
     }
     res.status(500).json({ error: err.message || 'Bir hata oluştu, lütfen tekrar dene.' });
   }
