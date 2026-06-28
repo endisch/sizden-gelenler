@@ -534,6 +534,57 @@ app.post('/api/admin/save-special-config', verifyStaffToken, (req, res) => {
   res.json({ success: true, specialConfig });
 });
 
+app.post('/api/admin/sync-drive', verifyStaffToken, async (req, res) => {
+  if (req.staffUser.role !== 'owner') return res.status(403).json({ error: 'Yetkisiz erişim.' });
+  try {
+    const drive = getDriveClient();
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    if (!folderId) return res.status(400).json({ error: 'Drive folder ID missing' });
+    
+    let pageToken = null;
+    let addedCount = 0;
+    do {
+      const response = await drive.files.list({
+        q: \`'\${folderId}' in parents and trashed = false\`,
+        fields: 'nextPageToken, files(id, name, createdTime, mimeType)',
+        pageToken: pageToken
+      });
+      const files = response.data.files;
+      if (files) {
+        for (const f of files) {
+          if (f.mimeType === 'application/vnd.google-apps.folder') continue;
+          const exists = submissionsData.some(s => s.fileId === f.id) || specialSubmissionsData.some(s => s.fileId === f.id);
+          if (!exists) {
+            submissionsData.unshift({
+              id: 'sub_' + Date.now() + Math.random().toString(36).substr(2,5),
+              fullName: 'Eski Gönderim (Drive)',
+              email: 'Bilinmiyor',
+              trackName: f.name.replace(/\\.[^/.]+$/, ""),
+              aiTool: 'Bilinmiyor',
+              timestamp: f.createdTime || new Date().toISOString(),
+              fileId: f.id,
+              status: 'pending'
+            });
+            systemStats.usedQuota += 1;
+            addedCount++;
+          }
+        }
+      }
+      pageToken = response.data.nextPageToken;
+    } while (pageToken);
+    
+    if (addedCount > 0) {
+      saveSubmissions();
+      saveStats();
+    }
+    
+    res.json({ success: true, count: addedCount, usedQuota: systemStats.usedQuota });
+  } catch (err) {
+    console.error('Drive sync error:', err);
+    res.status(500).json({ error: 'Drive eşitleme hatası.' });
+  }
+});
+
 app.post('/api/admin/update-special-status', verifyStaffToken, (req, res) => {
   const { id, status } = req.body;
   const sub = specialSubmissionsData.find(s => s.id === id);

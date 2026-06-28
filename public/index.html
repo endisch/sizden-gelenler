@@ -561,6 +561,14 @@
               <button class="panel-btn" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;" onclick="resetSpecialQuota()">🔄 Kotayı Sıfırla</button>
             </div>
             <div id="cfg-msg" style="display:none; font-size:0.78rem; color:#4ade80; margin-top:6px;">✓ Ayarlar kaydedildi.</div>
+
+            <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+              <div class="panel-input-row">
+                <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Drive Eşitleme:</label>
+                <button class="panel-btn" onclick="syncDrive()">🔄 Eski Parçaları Çek</button>
+              </div>
+              <div style="font-size:0.7rem; color:var(--txt3); margin-top:6px;">Daha önce Drive'a gelen ve listede olmayan parçaları ekler, kotadan düşer.</div>
+            </div>
           </div>
         </div>
 
@@ -1068,6 +1076,27 @@
     function fmt(dateStr) {
       if (!dateStr) return '';
       try { return new Date(dateStr).toLocaleDateString('tr-TR'); } catch(e) { return dateStr; }
+    }
+
+    async function resetSpecialQuota() {
+      if(!confirm('Özel gönderim kotası sıfırlanacak. Emin misiniz?')) return;
+      try {
+        const res = await authFetch('/api/admin/save-special-config', { resetQuota: true });
+        if(res.success) { alert('Kota sıfırlandı.'); loadPanelData(); }
+      } catch(e) { alert('Hata.'); }
+    }
+
+    async function syncDrive() {
+      if (!confirm('Drive klasörünüz taranıp, listede olmayan tüm eski parçalar eklenecek ve kalan kotadan düşülecektir. Onaylıyor musunuz?')) return;
+      try {
+        const res = await authFetch('/api/admin/sync-drive', {});
+        if (res.success) {
+          alert(res.count + ' adet yeni parça eklendi! Kalan kota: ' + (200 - res.usedQuota));
+          loadPanelData();
+        } else {
+          alert(res.error || 'Hata oluştu.');
+        }
+      } catch(e) { alert('Bağlantı hatası.'); }
     }
 
     function switchTab(name) {
