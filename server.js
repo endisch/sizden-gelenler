@@ -38,7 +38,7 @@ function getDriveClient() {
   return google.drive({ version: 'v3', auth });
 }
 
-async function uploadToDrive(filePath, fileName) {
+async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg') {
   const drive = getDriveClient();
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
   const response = await drive.files.create({
@@ -47,7 +47,7 @@ async function uploadToDrive(filePath, fileName) {
       parents: [folderId],
     },
     media: {
-      mimeType: 'audio/mpeg',
+      mimeType: mimeType,
       body: fs.createReadStream(filePath),
     },
     fields: 'id',
@@ -89,6 +89,7 @@ function checkRateLimit(email) {
 }
 
 app.post('/submit', upload.single('mp3'), async (req, res) => {
+  let tempTxtPath = null;
   try {
     const { fullName, email, social, aiTool, trackName, note, consent } = req.body;
     if (!fullName || !email || !social || !aiTool || !trackName || !note || !consent) {
@@ -106,13 +107,38 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     
     const date = new Date().toISOString().slice(0, 10);
     const safeName = (str) => str.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_');
-    const fileName = `${date}_${safeName(fullName)}_${safeName(trackName)}.mp3`;
+    const baseName = `${date}_${safeName(fullName)}_${safeName(trackName)}`;
+    const fileName = `${baseName}.mp3`;
+    const txtFileName = `${baseName}.txt`;
     
-    await uploadToDrive(req.file.path, fileName);
+    // Upload MP3
+    await uploadToDrive(req.file.path, fileName, 'audio/mpeg');
     
-    // Clean up local temp file
+    // Create companion text file with metadata
+    const txtFilePath = path.join(uploadDir, txtFileName);
+    tempTxtPath = txtFilePath;
+    
+    const txtContent = `Gönderen: ${fullName}
+E-posta: ${email}
+Sosyal Medya: ${social}
+Yapay Zeka Aracı: ${aiTool}
+Parça Adı: ${trackName}
+Tarih: ${date}
+
+Parça Notu:
+${note}
+`;
+    fs.writeFileSync(txtFilePath, txtContent, 'utf8');
+    
+    // Upload companion text file
+    await uploadToDrive(txtFilePath, txtFileName, 'text/plain');
+    
+    // Clean up local temp files
     if (fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
+    }
+    if (fs.existsSync(txtFilePath)) {
+      fs.unlinkSync(txtFilePath);
     }
     
     submissions[email.toLowerCase()] = Date.now();
@@ -121,6 +147,9 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     console.error(err);
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
+    }
+    if (tempTxtPath && fs.existsSync(tempTxtPath)) {
+      fs.unlinkSync(tempTxtPath);
     }
     res.status(500).json({ error: err.message || 'Bir hata oluştu, lütfen tekrar dene.' });
   }
