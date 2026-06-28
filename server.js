@@ -258,7 +258,7 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     const ipLimit = checkIpLimit(clientIp);
     if (!ipLimit.allowed) {
       fs.unlinkSync(req.file.path);
-      return res.status(429).json({ error: 'Bu hafta bu IP adresinden zaten bir parça gönderildi.', days: ipLimit.days, hours: ipLimit.hours });
+      return res.status(429).json({ error: 'Sistem limitlerine ulaşıldı. Bu hafta zaten bir başvuru gerçekleştirdiniz.', days: ipLimit.days, hours: ipLimit.hours });
     }
 
     const googlePayload = await verifyGoogleToken(token);
