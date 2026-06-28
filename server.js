@@ -50,6 +50,44 @@ function saveSubmissionsData() {
   fs.writeFileSync(submissionsFile, JSON.stringify(submissionsData, null, 2), 'utf8');
 }
 
+// ── IP Rate Limit Storage ────────────────────────────────────────────────────
+const ipLimitsFile = path.join(__dirname, 'ip_limits.json');
+let ipLimits = {}; // { 'ip': lastSubmissionTimestamp }
+if (fs.existsSync(ipLimitsFile)) {
+  try { ipLimits = JSON.parse(fs.readFileSync(ipLimitsFile, 'utf8')); } catch(e) {}
+}
+function saveIpLimits() {
+  fs.writeFileSync(ipLimitsFile, JSON.stringify(ipLimits, null, 2), 'utf8');
+}
+
+// ── Quota System Storage ─────────────────────────────────────────────────────
+const statsFile = path.join(__dirname, 'stats.json');
+let systemStats = { maxQuota: 200, usedQuota: 0 };
+if (fs.existsSync(statsFile)) {
+  try { systemStats = JSON.parse(fs.readFileSync(statsFile, 'utf8')); } catch(e) {}
+}
+function saveStats() {
+  fs.writeFileSync(statsFile, JSON.stringify(systemStats, null, 2), 'utf8');
+}
+
+function getClientIp(req) {
+  return (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
+}
+
+function checkIpLimit(ip) {
+  const lastSub = ipLimits[ip];
+  if (!lastSub) return { allowed: true };
+  const diff = Date.now() - lastSub;
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  if (diff < sevenDays) {
+    const remaining = sevenDays - diff;
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return { allowed: false, days, hours };
+  }
+  return { allowed: true };
+}
+
 // ── Google OAuth (for public submission form only) ──────────────────────────
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -149,11 +187,12 @@ function checkRateLimit(email) {
 app.get('/config', (req, res) => {
   res.json({
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-    setupRequired: staffCredentials.length === 0
+    setupRequired: staffCredentials.length === 0,
+    quota: systemStats
   });
 });
 
-app.get('/api/playlist', (req, res) => {
+app.get('/api/playlist', verifyStaffToken, (req, res) => {
   const published = submissionsData
     .filter(s => s.status === 'published')
     .sort((a, b) => new Date(b.publishDate || b.timestamp) - new Date(a.publishDate || a.timestamp))
@@ -201,9 +240,31 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     }
     if (!req.file) return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
 
+    // Note character limit: 210
+    if (note.length > 210) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Parça notu en fazla 210 karakter olabilir.' });
+    }
+
+    // Check global quota
+    if (systemStats.usedQuota >= systemStats.maxQuota) {
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Sistem kotası dolmuştur. Yeni başvuru kabul edilmemektedir.' });
+    }
+
+    const clientIp = getClientIp(req);
+
+    // Check IP rate limit first
+    const ipLimit = checkIpLimit(clientIp);
+    if (!ipLimit.allowed) {
+      fs.unlinkSync(req.file.path);
+      return res.status(429).json({ error: 'Bu hafta bu IP adresinden zaten bir parça gönderildi.', days: ipLimit.days, hours: ipLimit.hours });
+    }
+
     const googlePayload = await verifyGoogleToken(token);
     const email = googlePayload.email.toLowerCase();
 
+    // Check email rate limit
     const limit = checkRateLimit(email);
     if (!limit.allowed) {
       fs.unlinkSync(req.file.path);
@@ -223,10 +284,20 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     submissionsData.push({
       id: Date.now().toString(),
       fullName, email, social, aiTool, trackName, note, fileId,
+      submittedIp: clientIp,
       timestamp: new Date().toISOString(),
       status: 'pending'
     });
     saveSubmissionsData();
+
+    // Record IP limit
+    ipLimits[clientIp] = Date.now();
+    saveIpLimits();
+
+    // Increment quota
+    systemStats.usedQuota += 1;
+    saveStats();
+
     res.json({ success: true });
   } catch (err) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);

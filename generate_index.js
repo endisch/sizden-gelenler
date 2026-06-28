@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+const fs = require('fs');
+const path = require('path');
+
+const htmlFile = path.join(__dirname, 'public', 'index.html');
+
+const html = `<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sizden Gelenler — MAIS Studio</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer><\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -907,34 +912,34 @@
       const tbody = document.getElementById('inbox-body');
       const items = panelData.submissions.filter(s => s.status === 'pending');
       if (!items.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Bekleyen başvuru yok.</td></tr>'; return; }
-      tbody.innerHTML = items.map(item => `
-        <tr style="cursor:pointer;" onclick="playTrackById('${item.fileId}','${esc(item.trackName)}','${esc(item.fullName)}','${esc(item.aiTool)}')">
+      tbody.innerHTML = items.map(item => \`
+        <tr style="cursor:pointer;" onclick="playTrackById('\${item.fileId}','\${esc(item.trackName)}','\${esc(item.fullName)}','\${esc(item.aiTool)}')">
           <td>
-            <div style="font-weight:600; color:var(--txt);">${esc(item.trackName)} <span class="show-note" onclick="event.stopPropagation(); toggleNote('${item.id}')">Notu Gör</span></div>
-            <div style="font-size:0.73rem; color:var(--txt2);">${esc(item.fullName)} · ${esc(item.social)}</div>
-            <div class="note-box" id="note-${item.id}" onclick="event.stopPropagation()">${esc(item.note)}</div>
+            <div style="font-weight:600; color:var(--txt);">\${esc(item.trackName)} <span class="show-note" onclick="event.stopPropagation(); toggleNote('\${item.id}')">Notu Gör</span></div>
+            <div style="font-size:0.73rem; color:var(--txt2);">\${esc(item.fullName)} · \${esc(item.social)}</div>
+            <div class="note-box" id="note-\${item.id}" onclick="event.stopPropagation()">\${esc(item.note)}</div>
           </td>
-          <td><span class="tag">${esc(item.aiTool)}</span></td>
+          <td><span class="tag">\${esc(item.aiTool)}</span></td>
           <td style="text-align:right; white-space:nowrap;" onclick="event.stopPropagation()">
-            <button class="action-btn approve" onclick="updateStatus('${item.id}','reviewed')" style="margin-right:4px;">İncelendi</button>
+            <button class="action-btn approve" onclick="updateStatus('\${item.id}','reviewed')" style="margin-right:4px;">İncelendi</button>
           </td>
         </tr>
-      `).join('');
+      \`).join('');
     }
 
     function renderReviewed() {
       const tbody = document.getElementById('reviewed-body');
       const items = panelData.submissions.filter(s => s.status === 'reviewed' || s.status === 'published'); // handle older ones too
       if (!items.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">İncelenmiş parça yok.</td></tr>'; return; }
-      tbody.innerHTML = items.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).map(item => `
+      tbody.innerHTML = items.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).map(item => \`
         <tr>
-          <td style="font-weight:600; color:var(--txt); cursor:pointer;" onclick="playTrackById('${item.fileId}','${esc(item.trackName)}','${esc(item.fullName)}','${esc(item.aiTool)}')">
-            ${esc(item.trackName)} ▶
+          <td style="font-weight:600; color:var(--txt); cursor:pointer;" onclick="playTrackById('\${item.fileId}','\${esc(item.trackName)}','\${esc(item.fullName)}','\${esc(item.aiTool)}')">
+            \${esc(item.trackName)} ▶
           </td>
-          <td style="color:var(--txt2);">${esc(item.fullName)}</td>
-          <td style="color:var(--txt3);">${fmt(item.timestamp)}</td>
+          <td style="color:var(--txt2);">\${esc(item.fullName)}</td>
+          <td style="color:var(--txt3);">\${fmt(item.timestamp)}</td>
         </tr>
-      `).join('');
+      \`).join('');
     }
 
     function renderLimits() {
@@ -947,29 +952,29 @@
       });
       const active = Object.entries(limitMap).filter(([,t]) => Date.now()-t < sevenDays);
       if (!active.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Limitli kullanıcı yok.</td></tr>'; return; }
-      tbody.innerHTML = active.map(([email, ts]) => `
+      tbody.innerHTML = active.map(([email, ts]) => \`
         <tr>
-          <td style="color:var(--txt);">${esc(email)}</td>
-          <td style="color:var(--txt3);">${new Date(ts).toLocaleString('tr-TR')}</td>
-          <td style="text-align:right;"><button class="action-btn approve" onclick="resetLimit('${esc(email)}')">Sıfırla</button></td>
+          <td style="color:var(--txt);">\${esc(email)}</td>
+          <td style="color:var(--txt3);">\${new Date(ts).toLocaleString('tr-TR')}</td>
+          <td style="text-align:right;"><button class="action-btn approve" onclick="resetLimit('\${esc(email)}')">Sıfırla</button></td>
         </tr>
-      `).join('');
+      \`).join('');
     }
 
     function renderAccounts() {
       const tbody = document.getElementById('accounts-body');
       if (!panelData.accounts || !panelData.accounts.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>'; return; }
-      tbody.innerHTML = panelData.accounts.map(acc => `
+      tbody.innerHTML = panelData.accounts.map(acc => \`
         <tr>
-          <td style="font-weight:600; color:var(--txt);">${esc(acc.username)}</td>
-          <td><span class="tag" style="${acc.role==='owner' ? 'background:rgba(251,191,36,0.15);' : ''}">${acc.role === 'owner' ? 'Kurucu' : 'Çalışan'}</span></td>
+          <td style="font-weight:600; color:var(--txt);">\${esc(acc.username)}</td>
+          <td><span class="tag" style="\${acc.role==='owner' ? 'background:rgba(251,191,36,0.15);' : ''}">\${acc.role === 'owner' ? 'Kurucu' : 'Çalışan'}</span></td>
           <td style="text-align:right;">
-            ${acc.username !== staffUsername && staffRole === 'owner' && acc.role !== 'owner'
-              ? `<button class="action-btn danger" onclick="removeAccount('${esc(acc.username)}')">Kaldır</button>`
+            \${acc.username !== staffUsername && staffRole === 'owner' && acc.role !== 'owner'
+              ? \`<button class="action-btn danger" onclick="removeAccount('\${esc(acc.username)}')">Kaldır</button>\`
               : '<span style="color:var(--txt3); font-size:0.75rem;">—</span>'}
           </td>
         </tr>
-      `).join('');
+      \`).join('');
     }
 
     function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1035,17 +1040,17 @@
       try {
         const tracks = await authFetch('/api/playlist', null);
         if (!tracks.length) { container.innerHTML = '<div class="empty-state">Arşivde incelenmiş parça bulunmuyor.</div>'; return; }
-        container.innerHTML = tracks.map((t, i) => `
-          <div class="playlist-item" onclick="playTrack('${esc(t.audioUrl)}','${esc(t.title)}','${esc(t.artist)}','${esc(t.aiTool)}')">
-            <div class="pl-num">${i+1}</div>
+        container.innerHTML = tracks.map((t, i) => \`
+          <div class="playlist-item" onclick="playTrack('\${esc(t.audioUrl)}','\${esc(t.title)}','\${esc(t.artist)}','\${esc(t.aiTool)}')">
+            <div class="pl-num">\${i+1}</div>
             <div class="pl-info">
-              <div class="pl-title">${esc(t.title)}</div>
-              <div class="pl-artist">${esc(t.artist)} · <span style="color:var(--gold);">${esc(t.aiTool)}</span></div>
+              <div class="pl-title">\${esc(t.title)}</div>
+              <div class="pl-artist">\${esc(t.artist)} · <span style="color:var(--gold);">\${esc(t.aiTool)}</span></div>
             </div>
-            <div style="font-size:0.7rem; color:var(--txt3); margin-right:6px;">${fmt(t.publishDate)}</div>
+            <div style="font-size:0.7rem; color:var(--txt3); margin-right:6px;">\${fmt(t.publishDate)}</div>
             <div class="pl-play">▶</div>
           </div>
-        `).join('');
+        \`).join('');
       } catch(e) { container.innerHTML = '<div class="empty-state">Playlist yüklenemedi. Yetkinizi kontrol edin.</div>'; }
     }
 
@@ -1109,6 +1114,9 @@
         if (e.target === overlay && overlay.id !== 'welcome-overlay') overlay.classList.remove('open');
       });
     });
-  </script>
+  <\/script>
 </body>
-</html>
+</html>`;
+
+fs.writeFileSync(htmlFile, html, 'utf8');
+console.log('SUCCESS: Overwritten index.html directly with new UI.');
