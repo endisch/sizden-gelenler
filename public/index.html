@@ -546,7 +546,6 @@
         <div class="progress-dots" id="dots">
           <div class="dot active" id="dot-email"></div>
           <div class="dot" id="dot-form"></div>
-          <div class="dot" id="dot-success"></div>
         </div>
 
         <!-- STEP 1 -->
@@ -635,14 +634,7 @@
           <button class="btn" id="btn-submit" onclick="submitForm()">Parçamı Gönder</button>
         </div>
 
-        <!-- SUCCESS -->
-        <div class="step" id="step-success">
-          <div class="success">
-            <div class="circle">✓</div>
-            <h2>Parçan bize ulaştı</h2>
-            <p>Teşekkürler. Her parçayı dinliyoruz.<br/>Bir sonraki haftadan itibaren tekrar parça gönderebilirsin.</p>
-          </div>
-        </div>
+        
       </div>
     </div>
     <div class="footer">MAIS Studio · Sizden Gelenler Sezon 2</div>
@@ -724,9 +716,9 @@
     function showStep(id) {
       document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
       document.getElementById(id).classList.add('active');
-      const map = {'step-email':0,'step-form':1,'step-success':2};
+      const map = {'step-email':0,'step-form':1};
       const cur = map[id];
-      ['email','form','success'].forEach(function(stepName){
+      ['email','form'].forEach(function(stepName){
         const d = document.getElementById('dot-' + stepName);
         if(!d) return;
         d.classList.remove('active','done');
@@ -734,7 +726,7 @@
         if(i < cur) d.classList.add('done');
         else if(i === cur) d.classList.add('active');
       });
-      if(id==='step-blocked'||id==='step-success') document.getElementById('dots').style.display='none';
+      if(id==='step-blocked') document.getElementById('dots').style.display='none';
     }
 
     function showErr(id, msg){ var el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
@@ -774,6 +766,12 @@
         handleFile(document.getElementById('mp3file'));
       }
     });
+
+    
+    function closeSuccessModal() {
+      document.getElementById('success-modal').style.display = 'none';
+      goBack();
+    }
 
     async function submitForm() {
       hideErr('err-form');
@@ -833,7 +831,8 @@
           return;
         }
 
-        showStep('step-success');
+        // Show prominent overlay modal instead of step navigation
+        document.getElementById('success-modal').style.display = 'flex';
       } catch (e) {
         showErr('err-form', 'Bağlantı hatası. Lütfen tekrar dene.');
       } finally {
@@ -842,5 +841,19 @@
       }
     }
 </script>
+
+  <!-- SUCCESS MODAL -->
+  <div id="success-modal" style="display:none; position:fixed; inset:0; background:rgba(8,7,6,0.85); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:24px; max-width:440px; width:100%; padding:40px 32px; text-align:center; box-shadow:0 30px 60px rgba(0,0,0,0.8), 0 0 100px rgba(245, 197, 24, 0.05); animation:scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+      <div style="width:72px; height:72px; border-radius:50%; border:2.5px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; margin:0 auto 28px; font-size:2.2rem; color:var(--accent-gold); box-shadow:0 0 25px rgba(245, 197, 24, 0.3); animation:pulse 2s infinite alternate;">✓</div>
+      <h2 style="font-size:1.4rem; font-weight:700; color:var(--text-primary); margin-bottom:16px; letter-spacing:0.01em;">Parçanız Başarıyla Ulaştı!</h2>
+      <p style="font-size:0.88rem; color:var(--text-secondary); line-height:1.8; margin-bottom:28px;">
+        Teşekkür ederiz. Yüklediğiniz parça dinleme listemize eklendi. Her parçayı titizlikle dinliyoruz.<br><br>
+        <span style="color:var(--text-muted); font-size:0.8rem;">Bir sonraki haftadan itibaren yeni bir parçayla tekrar başvurabilirsiniz.</span>
+      </p>
+      <button class="btn" style="margin-top:0;" onclick="closeSuccessModal()">Harika, Kapat</button>
+    </div>
+  </div>
+
 </body>
 </html>

@@ -245,5 +245,17 @@ app.get('/oauth2callback', async (req, res) => {
   }
 });
 
+app.get('/reset-submissions', (req, res) => {
+  const secret = req.query.secret;
+  const adminSecret = process.env.ADMIN_SECRET || 'mais-studio-reset-secret-2026';
+  if (secret === adminSecret) {
+    for (const key in submissions) {
+      delete submissions[key];
+    }
+    return res.send('Tüm başvuru limitleri başarıyla sıfırlandı!');
+  }
+  return res.status(403).send('Yetkisiz erişim.');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
