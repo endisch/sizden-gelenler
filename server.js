@@ -44,6 +44,13 @@ const upload = multer({
   }
 });
 
+
+function isAuthorizedStaff(email) {
+  const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
+  const checkEmail = email.toLowerCase();
+  return checkEmail === superAdmin || staffList.includes(checkEmail);
+}
+
 function getDriveClient() {
   const refresh_token = process.env.GOOGLE_REFRESH_TOKEN;
   if (refresh_token) {
@@ -101,9 +108,6 @@ async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', descri
 }
 
 function checkRateLimit(email) {
-  if (vipList.includes(email.toLowerCase())) {
-    return { allowed: true };
-  }
   const last = submissions[email];
   if (!last) return { allowed: true };
   const diff = Date.now() - last;
@@ -200,7 +204,8 @@ app.post('/check-limit', async (req, res) => {
 app.get('/config', (req, res) => {
   res.json({ 
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-    adminEmail: process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com'
+    adminEmail: process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com',
+    staffList: staffList
   });
 });
 
@@ -252,12 +257,38 @@ app.get('/oauth2callback', async (req, res) => {
 });
 
 
+
+// Public API to get current playlist
+app.get('/api/playlist', (req, res) => {
+  res.json(playlist);
+});
+
+// Proxy streaming from Google Drive so we can stream files in custom HTML audio player
+app.get('/api/stream-audio', async (req, res) => {
+  const { fileId } = req.query;
+  if (!fileId) return res.status(400).send('File ID missing');
+  try {
+    const drive = getDriveClient();
+    const file = await drive.files.get({
+      fileId: fileId,
+      alt: 'media'
+    }, {
+      responseType: 'stream'
+    });
+    
+    res.setHeader('Content-Type', 'audio/mpeg');
+    file.data.pipe(res);
+  } catch (err) {
+    console.error('Error streaming from Drive:', err);
+    res.status(500).send('Error streaming audio');
+  }
+});
+
 app.post('/api/admin/submissions', async (req, res) => {
   const { token } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
-    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+    if (!isAuthorizedStaff(payload.email)) {
       return res.status(403).json({ error: 'Yetkisiz erişim.' });
     }
     
@@ -271,7 +302,7 @@ app.post('/api/admin/submissions', async (req, res) => {
       }
     }
     
-    res.json({ submissions: activeSubmissions, vipList });
+    res.json({ submissions: activeSubmissions, staffList, playlist });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
@@ -281,8 +312,7 @@ app.post('/api/admin/reset-user', async (req, res) => {
   const { token, targetEmail } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
-    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+    if (!isAuthorizedStaff(payload.email)) {
       return res.status(403).json({ error: 'Yetkisiz erişim.' });
     }
     delete submissions[targetEmail.toLowerCase()];
@@ -292,42 +322,90 @@ app.post('/api/admin/reset-user', async (req, res) => {
   }
 });
 
-app.post('/api/admin/add-vip', async (req, res) => {
+app.post('/api/admin/add-staff', async (req, res) => {
   const { token, targetEmail } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
-    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
-      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    // Only superAdmin can add other staff members
+    const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
+    if (payload.email.toLowerCase() !== superAdmin) {
+      return res.status(403).json({ error: 'Yalnızca ana yönetici stüdyo çalışanı ekleyebilir.' });
     }
     const emailLower = targetEmail.toLowerCase().trim();
-    if (emailLower && !vipList.includes(emailLower)) {
-      vipList.push(emailLower);
-      saveVipList();
+    if (emailLower && !staffList.includes(emailLower)) {
+      staffList.push(emailLower);
+      saveStaffList();
     }
-    res.json({ success: true, vipList });
+    res.json({ success: true, staffList });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
 });
 
-app.post('/api/admin/remove-vip', async (req, res) => {
+app.post('/api/admin/remove-staff', async (req, res) => {
   const { token, targetEmail } = req.body;
   try {
     const payload = await verifyGoogleToken(token);
-    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
-    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
-      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    // Only superAdmin can remove staff members
+    const superAdmin = (process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com').toLowerCase();
+    if (payload.email.toLowerCase() !== superAdmin) {
+      return res.status(403).json({ error: 'Yalnızca ana yönetici stüdyo çalışanı kaldırabilir.' });
     }
     const emailLower = targetEmail.toLowerCase().trim();
-    vipList = vipList.filter(e => e !== emailLower);
-    saveVipList();
-    res.json({ success: true, vipList });
+    staffList = staffList.filter(e => e !== emailLower);
+    saveStaffList();
+    res.json({ success: true, staffList });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
 });
 
+app.post('/api/admin/add-playlist', async (req, res) => {
+  const { token, title, artist, aiTool, audioUrl } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    if (!isAuthorizedStaff(payload.email)) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    
+    let finalUrl = audioUrl.trim();
+    // Google Drive URL Parser: extract file ID
+    const driveRegex = /\/file\/d\/([a-zA-Z0-9_-]+)/;
+    const match = finalUrl.match(driveRegex);
+    if (match && match[1]) {
+      finalUrl = `/api/stream-audio?fileId=${match[1]}`;
+    }
+    
+    const newItem = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      artist: artist.trim(),
+      aiTool: aiTool.trim(),
+      audioUrl: finalUrl
+    };
+    
+    playlist.push(newItem);
+    savePlaylist();
+    res.json({ success: true, playlist });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/remove-playlist', async (req, res) => {
+  const { token, itemId } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    if (!isAuthorizedStaff(payload.email)) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    playlist = playlist.filter(item => item.id !== itemId);
+    savePlaylist();
+    res.json({ success: true, playlist });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
 app.get('/reset-submissions', (req, res) => {
   const secret = req.query.secret;
   const adminSecret = process.env.ADMIN_SECRET || 'mais-studio-reset-secret-2026';
