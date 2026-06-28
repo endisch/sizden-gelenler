@@ -69,7 +69,7 @@ const html = `<!DOCTYPE html>
 
     /* ── HOST BAR ── */
     .host-bar { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border-bottom: 1.5px solid var(--border); background: rgba(0,0,0,0.2); }
-    .host-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #fbbf24); display: flex; align-items: center; justify-content: center; color: #080706; font-weight: 800; font-size: 1.1rem; border: 2px solid var(--border); box-shadow: 0 0 10px rgba(251,191,36,0.18); }
+    .host-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border); box-shadow: 0 0 12px rgba(251,191,36,0.15); object-fit: cover; }
     .host-name { font-size: 0.92rem; font-weight: 700; color: var(--txt); }
     .host-sub { font-size: 0.7rem; color: var(--txt2); margin-top: 2px; }
     .host-badge { margin-left: auto; background: var(--border); color: var(--gold); font-size: 0.62rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(251,191,36,0.12); }
@@ -292,7 +292,7 @@ const html = `<!DOCTYPE html>
 
     <div class="card">
       <div class="host-bar">
-        <div class="host-avatar">Mİ</div>
+        <img src="host.jpg" class="host-avatar" alt="Mustafa İnce">
         <div>
           <div class="host-name">Mustafa İnce</div>
           <div class="host-sub">MAIS Studio Yönetimi</div>
