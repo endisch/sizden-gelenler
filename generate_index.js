@@ -264,6 +264,14 @@ const html = `<!DOCTYPE html>
     .ab-seek { flex: 1; accent-color: var(--gold); height: 3px; cursor: pointer; }
     .ab-close { background: none; border: none; color: var(--txt3); font-size: 1.3rem; cursor: pointer; padding: 0; flex-shrink: 0; }
     .ab-close:hover { color: var(--txt); }
+    .ab-btns-row { display: flex; align-items: center; gap: 8px; }
+    .ab-btn { background: none; border: none; color: var(--txt2); font-size: 1.1rem; cursor: pointer; padding: 4px; transition: all 0.15s ease; border-radius: 50%; }
+    .ab-btn:hover { color: var(--gold); transform: scale(1.15); }
+    @media (max-width: 600px) {
+      #audio-bar { flex-wrap: wrap; padding: 10px 14px; gap: 10px; }
+      .ab-controls { max-width: 100%; flex: unset; width: 100%; }
+      .ab-info { flex: 1; }
+    }
   </style>
 </head>
 <body>
@@ -469,6 +477,8 @@ const html = `<!DOCTYPE html>
           <button class="tab-btn" onclick="switchTab('reviewed')">📁 İncelenenler / Arşiv</button>
           <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
           <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
+          <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;">🌟 Özel Gelenler</button>
+          <button class="tab-btn" id="settings-tab-btn" onclick="switchTab('settings')" style="display:none;">⚙️ Sistem Ayarları</button>
         </div>
 
         <!-- INBOX -->
@@ -532,6 +542,44 @@ const html = `<!DOCTYPE html>
           </div>
         </div>
 
+        <!-- SPECIAL -->
+        <div class="tab-pane" id="tab-special">
+          <p class="pane-desc">Özel bölümden gelen parçalar. Normal gelen kutusundan ayrıdır.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Parça / Sanatçı</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="special-body"><tr><td colspan="2" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="tab-pane" id="tab-settings">
+          <p class="pane-desc">Özel bölüm ayarları. Sadece kurucu (owner) görebilir.</p>
+          <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Durum:</label>
+              <select class="panel-input" id="cfg-active" style="max-width:140px;">
+                <option value="true">Açık</option>
+                <option value="false">Kapalı</option>
+              </select>
+            </div>
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Başlık:</label>
+              <input type="text" class="panel-input" id="cfg-title" placeholder="Özel Konsept" />
+            </div>
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Max Kota:</label>
+              <input type="number" class="panel-input" id="cfg-quota" value="50" style="max-width:100px;" />
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button class="panel-btn" onclick="saveSpecialCfg()">💾 Kaydet</button>
+              <button class="panel-btn" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;" onclick="resetSpecialQuota()">🔄 Kotayı Sıfırla</button>
+            </div>
+            <div id="cfg-msg" style="display:none; font-size:0.78rem; color:#4ade80; margin-top:6px;">✓ Ayarlar kaydedildi.</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -573,7 +621,13 @@ const html = `<!DOCTYPE html>
       <div class="ab-artist" id="ab-artist">—</div>
     </div>
     <div class="ab-controls">
-      <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
+      <div class="ab-btns-row">
+        <button class="ab-btn" onclick="skipBackward()" title="10s Geri">⏪</button>
+        <button class="ab-btn" onclick="prevTrack()" title="Önceki Parça">⏮</button>
+        <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
+        <button class="ab-btn" onclick="nextTrack()" title="Sonraki Parça">⏭</button>
+        <button class="ab-btn" onclick="skipForward()" title="10s İleri">⏩</button>
+      </div>
       <div class="ab-seek-row">
         <span class="ab-time" id="ab-cur">0:00</span>
         <input type="range" class="ab-seek" id="ab-seek" min="0" max="100" value="0" oninput="seek(this.value)" />
@@ -905,6 +959,7 @@ const html = `<!DOCTYPE html>
         ab.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>';
       }
 
+      document.getElementById('special-tab-btn').style.display = 'inline-block';
       if (staffRole === 'owner') {
         document.getElementById('settings-tab-btn').style.display = 'inline-block';
         if (data.specialConfig) {
@@ -918,7 +973,7 @@ const html = `<!DOCTYPE html>
       const ib = document.getElementById('inbox-body');
       const rb = document.getElementById('reviewed-body');
       ib.innerHTML = ''; rb.innerHTML = '';
-      currentInboxList = []; currentReviewedList = [];
+      currentInboxList.length = 0; currentReviewedList.length = 0;
       data.submissions.forEach(function(s) {
         if(s.status === 'pending') currentInboxList.push(s);
         else currentReviewedList.push(s);
@@ -1017,7 +1072,117 @@ const html = `<!DOCTYPE html>
       } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
     }
 
-    // ═══ PLAYLIST MODAL ══════════════════════════════════════════════════════
+    // ═══ MISSING FUNCTION DEFINITIONS (AUTO-PATCHED) ════════════════════════
+    let currentInboxList = [];
+    let currentReviewedList = [];
+    let currentSpecialList = [];
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function fmt(dateStr) {
+      if (!dateStr) return '';
+      try { return new Date(dateStr).toLocaleDateString('tr-TR'); } catch(e) { return dateStr; }
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      var pane = document.getElementById('tab-' + name);
+      if (pane) pane.classList.add('active');
+      var keywords = { inbox: 'gelen', reviewed: 'incelen', limits: 'bekleme', accounts: 'hesap', special: 'özel', settings: 'ayar' };
+      var kw = keywords[name] || '---';
+      document.querySelectorAll('.tab-btn').forEach(function(b) {
+        if (b.textContent.toLowerCase().indexOf(kw) !== -1) b.classList.add('active');
+      });
+    }
+
+    function logout() { clearStaff(); closeModal('panel-modal'); }
+
+    async function updateStatus(id, status) {
+      try { await authFetch('/api/admin/update-status', { id: id, status: status }); loadPanelData(); }
+      catch(e) { alert(e.message); }
+    }
+
+    async function updateSpecialStatus(id, status) {
+      try { await authFetch('/api/admin/update-special-status', { id: id, status: status }); loadPanelData(); }
+      catch(e) { alert(e.message); }
+    }
+
+    async function deleteAccount(username) {
+      if (!confirm(username + ' hesabini silmek istediginize emin misiniz?')) return;
+      try {
+        var data = await authFetch('/api/staff/remove-account', { username: username });
+        if (data.error) { alert(data.error); return; }
+        loadPanelData();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function saveSpecialCfg() {
+      try {
+        var active = document.getElementById('cfg-active').value === 'true';
+        var title = document.getElementById('cfg-title').value;
+        var maxQuota = document.getElementById('cfg-quota').value;
+        await authFetch('/api/admin/save-special-config', { active: active, title: title, maxQuota: maxQuota });
+        var msg = document.getElementById('cfg-msg');
+        msg.textContent = '\u2713 Ayarlar kaydedildi.';
+        msg.style.display = 'block';
+        setTimeout(function() { msg.style.display = 'none'; }, 3000);
+      } catch(e) { alert(e.message); }
+    }
+
+    async function resetSpecialQuota() {
+      if (!confirm('Ozel bolum kotasini sifirlamak istediginize emin misiniz?')) return;
+      try {
+        await authFetch('/api/admin/save-special-config', { resetQuota: true });
+        var msg = document.getElementById('cfg-msg');
+        msg.textContent = '\u2713 Kota sifirlandi.';
+        msg.style.display = 'block';
+        setTimeout(function() { msg.style.display = 'none'; }, 3000);
+      } catch(e) { alert(e.message); }
+    }
+
+    function renderAccounts() { loadPanelData(); }
+
+    // ═══ PLAYLIST QUEUE & ADVANCED AUDIO ═════════════════════════════════════
+    var playlist = [];
+    var playlistIndex = -1;
+
+    function playFromList(listName, idx) {
+      var srcList = listName === 'inbox' ? currentInboxList : listName === 'reviewed' ? currentReviewedList : currentSpecialList;
+      playlist = srcList.map(function(s) {
+        return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || '\u2014', aiTool: s.aiTool || '' };
+      });
+      playlistIndex = idx;
+      playCurrent();
+    }
+
+    function playCurrent() {
+      if (playlistIndex < 0 || playlistIndex >= playlist.length) return;
+      var track = playlist[playlistIndex];
+      playTrack(track.audioUrl, track.title, track.artist, track.aiTool);
+    }
+
+    function nextTrack() {
+      if (playlistIndex + 1 < playlist.length) { playlistIndex++; playCurrent(); }
+    }
+
+    function prevTrack() {
+      if (playerEl.currentTime > 3) { playerEl.currentTime = 0; return; }
+      if (playlistIndex > 0) { playlistIndex--; playCurrent(); }
+    }
+
+    function skipForward() {
+      if (playerEl.duration) playerEl.currentTime = Math.min(playerEl.duration, playerEl.currentTime + 10);
+    }
+
+    function skipBackward() {
+      playerEl.currentTime = Math.max(0, playerEl.currentTime - 10);
+    }
+
+        // ═══ PLAYLIST MODAL ══════════════════════════════════════════════════════
     async function openPlaylistModal() {
       openModal('playlist-modal');
       const container = document.getElementById('playlist-container');
@@ -1084,7 +1249,7 @@ const html = `<!DOCTYPE html>
         document.getElementById('ab-dur').textContent = fmtTime(playerEl.duration);
       }
     });
-    playerEl.addEventListener('ended', () => { document.getElementById('ab-play').textContent = '▶'; });
+    playerEl.addEventListener('ended', function() { if (playlistIndex + 1 < playlist.length) { nextTrack(); } else { document.getElementById('ab-play').textContent = '\u25b6'; } });
 
     // ═══ MISC ════════════════════════════════════════════════════════════════
     function togglePw(inputId, btn) {

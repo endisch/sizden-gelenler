@@ -516,15 +516,15 @@ app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
 
 app.get('/api/admin/submissions', verifyStaffToken, (req, res) => {
   res.json({
-    submissions: submissionsData,
+    submissions: submissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId })),
     accounts: staffCredentials.map(c => ({ username: c.username, role: c.role })),
     specialConfig: specialConfig,
-    specialSubmissions: specialSubmissionsData
+    specialSubmissions: specialSubmissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId }))
   });
 });
 
 app.post('/api/admin/save-special-config', verifyStaffToken, (req, res) => {
-  if (req.staffRole !== 'owner') return res.status(403).json({ error: 'Yetkisiz erişim.' });
+  if (req.staffUser.role !== 'owner') return res.status(403).json({ error: 'Yetkisiz erişim.' });
   const { active, title, maxQuota, resetQuota } = req.body;
   if (typeof active !== 'undefined') specialConfig.active = active;
   if (title) specialConfig.title = title;
