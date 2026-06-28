@@ -8,7 +8,7 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sizden Gelenler — MAIS Studio</title>
+  <title>Sizden Gelenler — Mustafa İnce</title>
   <script src="https://accounts.google.com/gsi/client" async defer><\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -268,7 +268,7 @@ const html = `<!DOCTYPE html>
 
   <!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════ -->
   <div class="navbar">
-    <div class="navbar-brand">MAIS Studio</div>
+    <div class="navbar-brand">Mustafa İnce</div>
     <div class="navbar-actions">
       <!-- Sadece yetkili girişinde görünür olacak -->
       <button class="nav-btn" id="playlist-btn" onclick="openPlaylistModal()" style="display:none;">🎵 Gönderiler Arşivi</button>
@@ -280,7 +280,7 @@ const html = `<!DOCTYPE html>
   <div class="wrap">
     
     <div class="logo-wrap">
-      <div class="logo-main">MAIS Studio<br><span>Sizden Gelenler</span></div>
+      <div class="logo-main">Mustafa İnce<br><span>Sizden Gelenler</span></div>
       <div class="logo-sub">Sezon 2 — Dinleyici Gönderim Portalı</div>
     </div>
 
@@ -404,7 +404,7 @@ const html = `<!DOCTYPE html>
       </a>
     </div>
 
-    <div class="footer">MAIS Studio · Sizden Gelenler Sezon 2</div>
+    <div class="footer">Mustafa İnce · Sizden Gelenler Sezon 2</div>
   </div>
 
   <!-- ═══ WELCOME OVERLAY ═══════════════════════════════════════════════ -->
