@@ -175,7 +175,7 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     const limit = checkRateLimit(email);
     if (!limit.allowed) {
       fs.unlinkSync(req.file.path);
-      return res.status(429).json({ error: 'Bu hafta zaten bir parça gönderdin.', days: limit.days, hours: limit.hours });
+      return res.status(429).json({ error: 'Bu hafta zaten bir parça gönderdiniz.', days: limit.days, hours: limit.hours });
     }
     
     const date = new Date().toISOString().slice(0, 10);
