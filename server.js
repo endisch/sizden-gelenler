@@ -70,12 +70,54 @@ function saveStats() {
   fs.writeFileSync(statsFile, JSON.stringify(systemStats, null, 2), 'utf8');
 }
 
+// ── Special System Storage ───────────────────────────────────────────────────
+const specialConfigFile = path.join(__dirname, 'special_config.json');
+let specialConfig = { active: false, title: 'Özel Konsept', maxQuota: 50, usedQuota: 0 };
+if (fs.existsSync(specialConfigFile)) {
+  try { specialConfig = JSON.parse(fs.readFileSync(specialConfigFile, 'utf8')); } catch(e) {}
+}
+function saveSpecialConfig() {
+  fs.writeFileSync(specialConfigFile, JSON.stringify(specialConfig, null, 2), 'utf8');
+}
+
+const specialSubmissionsFile = path.join(__dirname, 'special_submissions_data.json');
+let specialSubmissionsData = [];
+if (fs.existsSync(specialSubmissionsFile)) {
+  try { specialSubmissionsData = JSON.parse(fs.readFileSync(specialSubmissionsFile, 'utf8')); } catch(e) {}
+}
+function saveSpecialSubmissionsData() {
+  fs.writeFileSync(specialSubmissionsFile, JSON.stringify(specialSubmissionsData, null, 2), 'utf8');
+}
+
+const specialIpLimitsFile = path.join(__dirname, 'special_ip_limits.json');
+let specialIpLimits = {}; // { 'ip': lastSubmissionTimestamp }
+if (fs.existsSync(specialIpLimitsFile)) {
+  try { specialIpLimits = JSON.parse(fs.readFileSync(specialIpLimitsFile, 'utf8')); } catch(e) {}
+}
+function saveSpecialIpLimits() {
+  fs.writeFileSync(specialIpLimitsFile, JSON.stringify(specialIpLimits, null, 2), 'utf8');
+}
+
 function getClientIp(req) {
   return (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
 }
 
 function checkIpLimit(ip) {
   const lastSub = ipLimits[ip];
+  if (!lastSub) return { allowed: true };
+  const diff = Date.now() - lastSub;
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  if (diff < sevenDays) {
+    const remaining = sevenDays - diff;
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return { allowed: false, days, hours };
+  }
+  return { allowed: true };
+}
+
+function checkSpecialIpLimit(ip) {
+  const lastSub = specialIpLimits[ip];
   if (!lastSub) return { allowed: true };
   const diff = Date.now() - lastSub;
   const sevenDays = 7 * 24 * 60 * 60 * 1000;
@@ -188,7 +230,8 @@ app.get('/config', (req, res) => {
   res.json({
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
     setupRequired: staffCredentials.length === 0,
-    quota: systemStats
+    quota: systemStats,
+    specialConfig: specialConfig
   });
 });
 
@@ -305,6 +348,86 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
   }
 });
 
+app.post('/submit-special', upload.single('mp3'), async (req, res) => {
+  try {
+    if (!specialConfig.active) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Özel bölüm şu anda aktif değildir.' });
+    }
+
+    const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
+    if (!token || !fullName || !social || !aiTool || !trackName || !note || !consent) {
+      return res.status(400).json({ error: 'Tüm alanlar zorunludur.' });
+    }
+    if (!req.file) return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
+
+    if (note.length > 210) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Parça notu en fazla 210 karakter olabilir.' });
+    }
+
+    if (specialConfig.usedQuota >= specialConfig.maxQuota) {
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Özel bölüm kotası dolmuştur.' });
+    }
+
+    const clientIp = getClientIp(req);
+    const ipLimit = checkSpecialIpLimit(clientIp);
+    if (!ipLimit.allowed) {
+      fs.unlinkSync(req.file.path);
+      return res.status(429).json({ error: 'Her katılımcıdan haftalık yalnızca 1 başvuru kabul edilmektedir.', days: ipLimit.days, hours: ipLimit.hours });
+    }
+
+    const googlePayload = await verifyGoogleToken(token);
+    const email = googlePayload.email.toLowerCase();
+
+    // Special limit via email
+    const userSubs = specialSubmissionsData.filter(s => s.email.toLowerCase() === email);
+    if (userSubs.length > 0) {
+      const latestSub = Math.max(...userSubs.map(s => new Date(s.timestamp).getTime()));
+      const diff = Date.now() - latestSub;
+      const sevenDays = 7 * 24 * 60 * 60 * 1000;
+      if (diff < sevenDays) {
+        fs.unlinkSync(req.file.path);
+        const remaining = sevenDays - diff;
+        const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        return res.status(429).json({ error: 'Özel bölüme bu hafta zaten parça gönderdiniz.', days, hours });
+      }
+    }
+
+    const date = new Date().toISOString().slice(0, 10);
+    const cleanStr = (str) => str.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s-]/g, '').trim()
+      .split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+    const fileName = 'SPECIAL - ' + date + ' - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + '.mp3';
+    const description = `ÖZEL BÖLÜM: ${specialConfig.title}\nGönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
+
+    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
+    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+    specialSubmissionsData.push({
+      id: Date.now().toString(),
+      fullName, email, social, aiTool, trackName, note, fileId,
+      submittedIp: clientIp,
+      timestamp: new Date().toISOString(),
+      status: 'pending'
+    });
+    saveSpecialSubmissionsData();
+
+    specialIpLimits[clientIp] = Date.now();
+    saveSpecialIpLimits();
+
+    specialConfig.usedQuota += 1;
+    saveSpecialConfig();
+
+    res.json({ success: true });
+  } catch (err) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.status(500).json({ error: err.message || 'Bir hata oluştu.' });
+  }
+});
+
 // ════════════════════════════════════════════════════════════════════════════
 // STAFF AUTH ROUTES
 // ════════════════════════════════════════════════════════════════════════════
@@ -394,8 +517,31 @@ app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
 app.get('/api/admin/submissions', verifyStaffToken, (req, res) => {
   res.json({
     submissions: submissionsData,
-    accounts: staffCredentials.map(u => ({ username: u.username, role: u.role }))
+    accounts: staffCredentials.map(c => ({ username: c.username, role: c.role })),
+    specialConfig: specialConfig,
+    specialSubmissions: specialSubmissionsData
   });
+});
+
+app.post('/api/admin/save-special-config', verifyStaffToken, (req, res) => {
+  if (req.staffRole !== 'owner') return res.status(403).json({ error: 'Yetkisiz erişim.' });
+  const { active, title, maxQuota, resetQuota } = req.body;
+  if (typeof active !== 'undefined') specialConfig.active = active;
+  if (title) specialConfig.title = title;
+  if (maxQuota) specialConfig.maxQuota = parseInt(maxQuota) || 50;
+  if (resetQuota) specialConfig.usedQuota = 0;
+  saveSpecialConfig();
+  res.json({ success: true, specialConfig });
+});
+
+app.post('/api/admin/update-special-status', verifyStaffToken, (req, res) => {
+  const { id, status } = req.body;
+  const sub = specialSubmissionsData.find(s => s.id === id);
+  if (!sub) return res.status(404).json({ error: 'Kayıt bulunamadı.' });
+  sub.status = status;
+  if (status === 'published' || status === 'reviewed') sub.publishDate = new Date().toISOString();
+  saveSpecialSubmissionsData();
+  res.json({ success: true });
 });
 
 app.post('/api/admin/update-status', verifyStaffToken, (req, res) => {
