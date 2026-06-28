@@ -249,6 +249,8 @@
     .ab-title { font-size: 0.84rem; font-weight: 600; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ab-artist { font-size: 0.72rem; color: var(--txt2); }
     .ab-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 2; max-width: 440px; }
+    .ab-btn { background: none; border: none; color: var(--txt2); font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    .ab-btn:hover { color: var(--gold); transform: scale(1.1); }
     .ab-play { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: none; color: #080808; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
     .ab-play:hover { transform: scale(1.08); }
     .ab-seek-row { display: flex; align-items: center; gap: 8px; width: 100%; }
@@ -903,37 +905,48 @@
         }
       }
 
+      
       const ib = document.getElementById('inbox-body');
       const rb = document.getElementById('reviewed-body');
       ib.innerHTML = ''; rb.innerHTML = '';
-      let iC=0, rC=0;
+      currentInboxList = []; currentReviewedList = [];
       data.submissions.forEach(function(s) {
-        let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
-        let action = s.status === 'pending'
-          ? '<button class="action-btn" onclick="updateStatus('' + s.id + '','reviewed')">İncelendi</button>'
-          : '<button class="action-btn red" onclick="updateStatus('' + s.id + '','pending')">Geri Al</button>';
-        
-        let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+        if(s.status === 'pending') currentInboxList.push(s);
+        else currentReviewedList.push(s);
+      });
+
+      if (currentInboxList.length === 0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
+      else {
+        currentInboxList.forEach(function(s, idx) {
+          let link = '<a href="#" onclick="playFromList('inbox', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let action = '<button class="action-btn" onclick="updateStatus('' + s.id + '','reviewed')">İncelendi</button>';
+          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
-
-        if(s.status === 'pending') {
           ib.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
-          iC++;
-        } else {
+        });
+      }
+
+      if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
+      else {
+        currentReviewedList.forEach(function(s, idx) {
+          let link = '<a href="#" onclick="playFromList('reviewed', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let action = '<button class="action-btn red" onclick="updateStatus('' + s.id + '','pending')">Geri Al</button>';
+          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
           rb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
-          rC++;
-        }
-      });
-      if(iC===0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
-      if(rC===0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
+        });
+      }
 
       const spb = document.getElementById('special-body');
       spb.innerHTML = '';
-      if(data.specialSubmissions && data.specialSubmissions.length > 0) {
-        data.specialSubmissions.forEach(function(s) {
-          let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
+      currentSpecialList = data.specialSubmissions || [];
+      if(currentSpecialList.length > 0) {
+        currentSpecialList.forEach(function(s, idx) {
+          let link = '<a href="#" onclick="playFromList('special', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
           let action = s.status === 'pending'
             ? '<button class="action-btn" onclick="updateSpecialStatus('' + s.id + '','reviewed')">İncelendi</button>'
             : '<button class="action-btn red" onclick="updateSpecialStatus('' + s.id + '','pending')">Geri Al</button>';
@@ -953,6 +966,7 @@
       console.error(e);
     }
   }
+
 
   async function addAccount() {
       const username = document.getElementById('new-username').value.trim();
