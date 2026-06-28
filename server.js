@@ -16,7 +16,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'mais-studio-jwt-secret-2026-secure
 const JWT_EXPIRES = '8h';
 
 // ── Upload dir ──────────────────────────────────────────────────────────────
-const uploadDir = path.join(__dirname, 'uploads');
+const dataDir = fs.existsSync('/app/data') ? '/app/data' : __dirname;
+const uploadDir = path.join(dataDir, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({
@@ -32,7 +33,7 @@ const upload = multer({
 });
 
 // ── Data files ──────────────────────────────────────────────────────────────
-const credFile = path.join(__dirname, 'staff_credentials.json');
+const credFile = path.join(dataDir, 'staff_credentials.json');
 let staffCredentials = [];
 if (fs.existsSync(credFile)) {
   try { staffCredentials = JSON.parse(fs.readFileSync(credFile, 'utf8')); } catch(e) {}
@@ -41,7 +42,7 @@ function saveCredentials() {
   fs.writeFileSync(credFile, JSON.stringify(staffCredentials, null, 2), 'utf8');
 }
 
-const submissionsFile = path.join(__dirname, 'submissions_data.json');
+const submissionsFile = path.join(dataDir, 'submissions_data.json');
 let submissionsData = [];
 if (fs.existsSync(submissionsFile)) {
   try { submissionsData = JSON.parse(fs.readFileSync(submissionsFile, 'utf8')); } catch(e) {}
@@ -51,7 +52,7 @@ function saveSubmissionsData() {
 }
 
 // ── IP Rate Limit Storage ────────────────────────────────────────────────────
-const ipLimitsFile = path.join(__dirname, 'ip_limits.json');
+const ipLimitsFile = path.join(dataDir, 'ip_limits.json');
 let ipLimits = {}; // { 'ip': lastSubmissionTimestamp }
 if (fs.existsSync(ipLimitsFile)) {
   try { ipLimits = JSON.parse(fs.readFileSync(ipLimitsFile, 'utf8')); } catch(e) {}
@@ -61,7 +62,7 @@ function saveIpLimits() {
 }
 
 // ── Quota System Storage ─────────────────────────────────────────────────────
-const statsFile = path.join(__dirname, 'stats.json');
+const statsFile = path.join(dataDir, 'stats.json');
 let systemStats = { maxQuota: 200, usedQuota: 0 };
 if (fs.existsSync(statsFile)) {
   try { systemStats = JSON.parse(fs.readFileSync(statsFile, 'utf8')); } catch(e) {}
@@ -71,7 +72,7 @@ function saveStats() {
 }
 
 // ── Special System Storage ───────────────────────────────────────────────────
-const specialConfigFile = path.join(__dirname, 'special_config.json');
+const specialConfigFile = path.join(dataDir, 'special_config.json');
 let specialConfig = { active: false, title: 'Özel Konsept', maxQuota: 50, usedQuota: 0 };
 if (fs.existsSync(specialConfigFile)) {
   try { specialConfig = JSON.parse(fs.readFileSync(specialConfigFile, 'utf8')); } catch(e) {}
@@ -80,7 +81,7 @@ function saveSpecialConfig() {
   fs.writeFileSync(specialConfigFile, JSON.stringify(specialConfig, null, 2), 'utf8');
 }
 
-const specialSubmissionsFile = path.join(__dirname, 'special_submissions_data.json');
+const specialSubmissionsFile = path.join(dataDir, 'special_submissions_data.json');
 let specialSubmissionsData = [];
 if (fs.existsSync(specialSubmissionsFile)) {
   try { specialSubmissionsData = JSON.parse(fs.readFileSync(specialSubmissionsFile, 'utf8')); } catch(e) {}
