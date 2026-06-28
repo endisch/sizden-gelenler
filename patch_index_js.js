@@ -4,15 +4,13 @@ let file = fs.readFileSync('generate_index.js', 'utf8');
 
 // Update fetchConfig to handle specialConfig
 file = file.replace(/function fetchConfig\(\) \{([\s\S]*?)function loadGoogleClient\(\) \{/, `function fetchConfig() {
-    fetch('/config').then(r=>r.json()).then(data => {
+    fetch('/config').then(function(r){return r.json()}).then(function(data) {
       systemStats = data.quota || { maxQuota:200, usedQuota:0 };
       updateQuotaUI();
       if(data.setupRequired) {
         openModal('setup-modal');
         setupRequired = true;
       }
-      
-      // Handle Special Config
       if (data.specialConfig) {
         if (data.specialConfig.active) {
           document.getElementById('special-concept-btn').style.display = 'flex';
@@ -47,7 +45,6 @@ const newJS = `
     
     openModal('special-modal');
 
-    // Init Google Sign-In for Special Modal
     if(window.google && google.accounts) {
       google.accounts.id.renderButton(
         document.getElementById("gsi-special-btn"),
@@ -59,12 +56,10 @@ const newJS = `
   function handleCredentialResponseSpecial(response) {
     document.getElementById('sp-gsi-loading').style.display = 'block';
     spToken = response.credential;
-    
-    // Decode JWT to get email for display
     try {
       const base64Url = spToken.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
       const payload = JSON.parse(jsonPayload);
       document.getElementById('sp-email-val').textContent = payload.email;
       document.getElementById('sp-email-ok').style.display = 'block';
@@ -74,8 +69,6 @@ const newJS = `
     }
   }
 
-  // Hooking the callback dynamically because Google uses data-callback
-  // Since we use the same gsi.js, we will just patch the global callback to handle both
   const oldCallback = window.handleCredentialResponse;
   window.handleCredentialResponse = function(response) {
     if (document.getElementById('special-modal').style.display === 'flex') {
@@ -115,17 +108,17 @@ const newJS = `
     const err = document.getElementById('err-special');
     err.style.display = 'none';
     
-    if(!spToken) return err.textContent = 'Google hesabı doğrulaması zorunludur.', err.style.display='block';
+    if(!spToken) { err.textContent = 'Google hesabı doğrulaması zorunludur.'; err.style.display='block'; return; }
     const fullName = document.getElementById('sp-fullName').value.trim();
     const social = document.getElementById('sp-social').value.trim();
     const aiTool = document.getElementById('sp-aiTool').value.trim();
     const trackName = document.getElementById('sp-trackName').value.trim();
     const note = document.getElementById('sp-note').value.trim();
 
-    if(!fullName || !social || !aiTool || !trackName || !note) return err.textContent = 'Lütfen tüm alanları doldurun.', err.style.display='block';
-    if(note.length > 210) return err.textContent = 'Parça notu 210 karakteri aşamaz.', err.style.display='block';
-    if(!spFile) return err.textContent = 'Lütfen MP3 dosyasını seçin.', err.style.display='block';
-    if(!spConsent) return err.textContent = 'Telif hakkı beyanını onaylamalısınız.', err.style.display='block';
+    if(!fullName || !social || !aiTool || !trackName || !note) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.style.display='block'; return; }
+    if(note.length > 210) { err.textContent = 'Parça notu 210 karakteri aşamaz.'; err.style.display='block'; return; }
+    if(!spFile) { err.textContent = 'Lütfen MP3 dosyasını seçin.'; err.style.display='block'; return; }
+    if(!spConsent) { err.textContent = 'Telif hakkı beyanını onaylamalısınız.'; err.style.display='block'; return; }
 
     const btn = document.getElementById('btn-submit-special');
     btn.disabled = true; btn.textContent = 'Gönderiliyor...';
@@ -155,7 +148,6 @@ const newJS = `
     }
   }
 
-  // ── SPECIAL ADMIN LOGIC ──
   function toggleResetQuota() {
     spResetQuota = !spResetQuota;
     if(spResetQuota) document.getElementById('cfg-reset-chk').classList.add('active');
@@ -171,13 +163,13 @@ const newJS = `
       const res = await fetch('/api/admin/save-special-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffToken },
-        body: JSON.stringify({ active, title, maxQuota, resetQuota: spResetQuota })
+        body: JSON.stringify({ active: active, title: title, maxQuota: maxQuota, resetQuota: spResetQuota })
       });
       const data = await res.json();
       if(!res.ok) { alert(data.error); return; }
       
       document.getElementById('cfg-msg').style.display = 'block';
-      setTimeout(() => document.getElementById('cfg-msg').style.display='none', 3000);
+      setTimeout(function(){ document.getElementById('cfg-msg').style.display='none'; }, 3000);
       spResetQuota = false;
       document.getElementById('cfg-reset-chk').classList.remove('active');
       fetchConfig();
@@ -192,9 +184,12 @@ const newJS = `
       const res = await fetch('/api/admin/update-special-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffToken },
-        body: JSON.stringify({ id, status })
+        body: JSON.stringify({ id: id, status: status })
       });
-      if(!res.ok) throw new Error((await res.json()).error);
+      if(!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error);
+      }
       loadPanelData();
     } catch(e) {
       alert(e.message);
@@ -205,7 +200,7 @@ const newJS = `
 
 file = file.replace(/<\/script>/, newJS + '\n</script>');
 
-// Update loadPanelData to include Special data and Owner checks
+// Rewrite loadPanelData safely
 file = file.replace(/app\.get\('\\\/api\\\/admin\\\/submissions'/g, `app.get('/api/admin/submissions'`);
 
 const loadPanelReplacement = `
@@ -215,19 +210,18 @@ const loadPanelReplacement = `
       if(res.status === 401 || res.status === 403) { logout(); return; }
       const data = await res.json();
 
-      // Accounts Tab rendering...
       const ab = document.getElementById('accounts-body');
       ab.innerHTML = '';
       if(data.accounts && data.accounts.length > 0) {
-        data.accounts.forEach(acc => {
-          let act = acc.role !== 'owner' && staffRole === 'owner' ? \`<button class="action-btn red" onclick="deleteAccount('\${acc.username}')">Sil</button>\` : '-';
-          ab.innerHTML += \`<tr><td>\${acc.username}</td><td>\${acc.role==='owner'?'Kurucu':'Çalışan'}</td><td style="text-align:right;">\${act}</td></tr>\`;
+        data.accounts.forEach(function(acc) {
+          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn red" onclick="deleteAccount(\\'' + acc.username + '\\')">Sil</button>' : '-';
+          let role = acc.role === 'owner' ? 'Kurucu' : 'Çalışan';
+          ab.innerHTML += '<tr><td>' + acc.username + '</td><td>' + role + '</td><td style="text-align:right;">' + act + '</td></tr>';
         });
       } else {
         ab.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>';
       }
 
-      // Settings Tab (Owner Only)
       if (staffRole === 'owner') {
         document.getElementById('settings-tab-btn').style.display = 'inline-block';
         if (data.specialConfig) {
@@ -237,49 +231,47 @@ const loadPanelReplacement = `
         }
       }
 
-      // Regular Inbox rendering...
       const ib = document.getElementById('inbox-body');
       const rb = document.getElementById('reviewed-body');
       ib.innerHTML = ''; rb.innerHTML = '';
       let iC=0, rC=0;
-      data.submissions.forEach(s => {
-        const link = \`<a href="https://drive.google.com/file/d/\${s.fileId}/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">\${s.trackName}</a>\`;
-        const action = s.status === 'pending'
-          ? \`<button class="action-btn" onclick="updateStatus('\${s.id}','reviewed')">İncelendi</button>\`
-          : \`<button class="action-btn red" onclick="updateStatus('\${s.id}','pending')">Geri Al</button>\`;
+      data.submissions.forEach(function(s) {
+        let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
+        let action = s.status === 'pending'
+          ? '<button class="action-btn" onclick="updateStatus(\\'' + s.id + '\\',\\'reviewed\\')">İncelendi</button>'
+          : '<button class="action-btn red" onclick="updateStatus(\\'' + s.id + '\\',\\'pending\\')">Geri Al</button>';
         
-        const info = \`<div style="font-size:0.85rem;margin-bottom:4px;">\${link} <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">\${new Date(s.timestamp).toLocaleDateString()}</span></div>
-                      <div style="font-size:0.75rem;color:var(--txt2);">\${s.fullName} · \${s.aiTool}</div>
-                      <div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">\${s.email}</div>
-                      <div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">\${s.note}</div>\`;
+        let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
 
         if(s.status === 'pending') {
-          ib.innerHTML += \`<tr><td>\${info}</td><td style="text-align:right;vertical-align:middle;">\${action}</td></tr>\`;
+          ib.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
           iC++;
         } else {
-          rb.innerHTML += \`<tr><td>\${info}</td><td style="text-align:right;vertical-align:middle;">\${action}</td></tr>\`;
+          rb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
           rC++;
         }
       });
       if(iC===0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
       if(rC===0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
 
-      // Special Inbox rendering
       const spb = document.getElementById('special-body');
       spb.innerHTML = '';
       if(data.specialSubmissions && data.specialSubmissions.length > 0) {
-        data.specialSubmissions.forEach(s => {
-          const link = \`<a href="https://drive.google.com/file/d/\${s.fileId}/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">\${s.trackName}</a>\`;
-          const action = s.status === 'pending'
-            ? \`<button class="action-btn" onclick="updateSpecialStatus('\${s.id}','reviewed')">İncelendi</button>\`
-            : \`<button class="action-btn red" onclick="updateSpecialStatus('\${s.id}','pending')">Geri Al</button>\`;
+        data.specialSubmissions.forEach(function(s) {
+          let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
+          let action = s.status === 'pending'
+            ? '<button class="action-btn" onclick="updateSpecialStatus(\\'' + s.id + '\\',\\'reviewed\\')">İncelendi</button>'
+            : '<button class="action-btn red" onclick="updateSpecialStatus(\\'' + s.id + '\\',\\'pending\\')">Geri Al</button>';
           
-          const info = \`<div style="font-size:0.85rem;margin-bottom:4px;">\${link} <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">\${new Date(s.timestamp).toLocaleDateString()}</span></div>
-                        <div style="font-size:0.75rem;color:var(--txt2);">\${s.fullName} · \${s.aiTool}</div>
-                        <div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">\${s.email}</div>
-                        <div style="font-size:0.75rem;color:var(--gold);margin-top:6px;padding:6px;background:rgba(251,191,36,0.05);border-radius:6px;border:1px dashed rgba(251,191,36,0.3);">\${s.note}</div>\`;
+          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+                        '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
+                        '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
+                        '<div style="font-size:0.75rem;color:var(--gold);margin-top:6px;padding:6px;background:rgba(251,191,36,0.05);border-radius:6px;border:1px dashed rgba(251,191,36,0.3);">' + s.note + '</div>';
 
-          spb.innerHTML += \`<tr><td>\${info}</td><td style="text-align:right;vertical-align:middle;">\${action}</td></tr>\`;
+          spb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
         });
       } else {
         spb.innerHTML = '<tr><td colspan="2" class="empty-state">Özel bölümde gönderilmiş parça yok.</td></tr>';

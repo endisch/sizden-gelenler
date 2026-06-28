@@ -270,8 +270,6 @@ const html = `<!DOCTYPE html>
   <div class="navbar">
     <div class="navbar-brand">Mustafa İnce</div>
     <div class="navbar-actions">
-      <!-- Sadece özel konsept açıkken görünür -->
-      <button class="nav-btn gold" id="special-concept-btn" onclick="openSpecialModal()" style="display:none; background:rgba(251,191,36,0.15); border-color:var(--gold);">🌟 <span id="special-btn-txt">Özel Konsept</span></button>
       <!-- Sadece yetkili girişinde görünür olacak -->
       <button class="nav-btn" id="playlist-btn" onclick="openPlaylistModal()" style="display:none;">🎵 Gönderiler Arşivi</button>
       <button class="nav-btn gold" id="staff-btn" onclick="handleStaffBtnClick()">🔑 Yetkili Girişi</button>
@@ -463,10 +461,8 @@ const html = `<!DOCTYPE html>
         <div class="tab-bar">
           <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
           <button class="tab-btn" onclick="switchTab('reviewed')">📁 İncelenenler / Arşiv</button>
-          <button class="tab-btn" onclick="switchTab('special')">🌟 Özel Gelenler</button>
           <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
           <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
-          <button class="tab-btn" onclick="switchTab('settings')" id="settings-tab-btn" style="display:none;">⚙️ Sistem Ayarları</button>
         </div>
 
         <!-- INBOX -->
@@ -530,101 +526,6 @@ const html = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- SETTINGS (Owner Only) -->
-        <div class="tab-pane" id="tab-settings">
-          <p class="pane-desc">Sistem genel ayarları ve Özel Konsept yönetimi.</p>
-          <div style="border:1px solid var(--border); border-radius:12px; padding:20px; background:#0a0a0a; margin-bottom:16px;">
-            <div style="font-size:0.9rem; font-weight:700; color:var(--gold); margin-bottom:14px;">🌟 Özel Konsept Yönetimi</div>
-            <div class="panel-input-row" style="align-items:center;">
-              <span style="font-size:0.8rem; color:var(--txt);">Durum:</span>
-              <select class="panel-input" id="cfg-active" style="width:120px; flex:none;">
-                <option value="true">Açık</option>
-                <option value="false">Kapalı</option>
-              </select>
-            </div>
-            <div class="panel-input-row">
-              <input type="text" class="panel-input" id="cfg-title" placeholder="Buton Başlığı (Örn: Rap Yarışması)" />
-            </div>
-            <div class="panel-input-row">
-              <input type="number" class="panel-input" id="cfg-quota" placeholder="Kota Sayısı (Maksimum)" />
-            </div>
-            <div class="consent" style="margin-top:0; margin-bottom:14px;" onclick="toggleResetQuota()">
-              <div class="check-box" id="cfg-reset-chk"><span class="tick"></span></div>
-              <p style="color:#f87171;">Kotayı Sıfırla (Sadece sayacı sıfırlar)</p>
-            </div>
-            <button class="panel-btn" onclick="saveSpecialConfig()">Ayarları Kaydet</button>
-            <div id="cfg-msg" style="display:none; color:#4ade80; font-size:0.75rem; margin-top:10px;">✓ Kaydedildi.</div>
-          </div>
-        </div>
-
-        <!-- SPECIAL INBOX -->
-        <div class="tab-pane" id="tab-special">
-          <p class="pane-desc">Özel konsept üzerinden gelen başvurular.</p>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="text-align:right;">İşlem</th></tr></thead>
-              <tbody id="special-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ SPECIAL MODAL ═════════════════════════════════════════════════ -->
-  <div class="modal-overlay" id="special-modal">
-    <div class="modal-box" style="max-width: 540px; max-height: 90vh; overflow-y: auto;">
-      <div class="modal-header">
-        <div class="modal-title">🌟 <span id="sm-title">Özel Konsept</span></div>
-        <button class="modal-close" onclick="closeModal('special-modal')">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="step-lbl" style="text-align:left;">Bu alan ana formdan tamamen bağımsızdır.</div>
-        <div class="err" id="err-special"></div>
-        <div class="field">
-          <label>Ad Soyad <span class="req">*</span></label>
-          <input type="text" id="sp-fullName" placeholder="Adınız ve soyadınız" />
-        </div>
-        <div class="field">
-          <label>Google Hesabı Doğrulaması <span class="req">*</span></label>
-          <div id="gsi-special-btn"></div>
-          <div id="sp-gsi-loading" style="display:none; font-size:0.7rem; color:var(--gold); margin-top:8px;">Doğrulanıyor...</div>
-          <div id="sp-email-ok" style="display:none; color:#4ade80; font-size:0.75rem; margin-top:8px;">✓ E-posta doğrulandı: <span id="sp-email-val"></span></div>
-        </div>
-        <div class="field">
-          <label>Sosyal Medya Hesabı <span class="req">*</span></label>
-          <input type="text" id="sp-social" placeholder="@kullaniciadiniz" />
-        </div>
-        <div class="field">
-          <label>Kullanılan Yapay Zeka Aracı <span class="req">*</span></label>
-          <input type="text" id="sp-aiTool" placeholder="Hangi aracı kullandınız?" />
-        </div>
-        <div class="field">
-          <label>Parça Adı <span class="req">*</span></label>
-          <input type="text" id="sp-trackName" placeholder="Parçanın adı" />
-        </div>
-        <div class="field">
-          <label>Parça Hakkında Not <span class="req">*</span></label>
-          <textarea id="sp-note" maxlength="210" placeholder="Açıklamanızı yazın (Maks 210 karakter)" oninput="updateCharCountSp(this)"></textarea>
-          <div class="char-count" id="sp-note-count">0 / 210</div>
-        </div>
-        <div class="field">
-          <label>MP3 Dosyası <span class="req">*</span></label>
-          <div class="upload-zone" id="sp-upload-zone" onclick="document.getElementById('sp-mp3file').click()">
-            <input type="file" id="sp-mp3file" accept=".mp3,audio/mpeg" onchange="handleFileSp(this)" style="display:none;" />
-            <div class="uz-icon">🎵</div>
-            <div class="uz-title">MP3 dosyanı seç</div>
-            <div class="uz-name" id="sp-file-name"></div>
-          </div>
-        </div>
-        <div class="field">
-          <div class="consent" onclick="toggleConsentSp()">
-            <div class="check-box" id="sp-chk"><span class="tick"></span></div>
-            <p>Bu parçanın telif haklarının şahsıma ait olduğunu beyan ederim.</p>
-          </div>
-        </div>
-        <button class="btn" id="btn-submit-special" onclick="submitSpecialForm()">Gönder</button>
       </div>
     </div>
   </div>
@@ -986,19 +887,18 @@ const html = `<!DOCTYPE html>
       if(res.status === 401 || res.status === 403) { logout(); return; }
       const data = await res.json();
 
-      // Accounts Tab rendering...
       const ab = document.getElementById('accounts-body');
       ab.innerHTML = '';
       if(data.accounts && data.accounts.length > 0) {
-        data.accounts.forEach(acc => {
-          let act = acc.role !== 'owner' && staffRole === 'owner' ? `<button class="action-btn red" onclick="deleteAccount('${acc.username}')">Sil</button>` : '-';
-          ab.innerHTML += `<tr><td>${acc.username}</td><td>${acc.role==='owner'?'Kurucu':'Çalışan'}</td><td style="text-align:right;">${act}</td></tr>`;
+        data.accounts.forEach(function(acc) {
+          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn red" onclick="deleteAccount(\'' + acc.username + '\')">Sil</button>' : '-';
+          let role = acc.role === 'owner' ? 'Kurucu' : 'Çalışan';
+          ab.innerHTML += '<tr><td>' + acc.username + '</td><td>' + role + '</td><td style="text-align:right;">' + act + '</td></tr>';
         });
       } else {
         ab.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>';
       }
 
-      // Settings Tab (Owner Only)
       if (staffRole === 'owner') {
         document.getElementById('settings-tab-btn').style.display = 'inline-block';
         if (data.specialConfig) {
@@ -1008,49 +908,47 @@ const html = `<!DOCTYPE html>
         }
       }
 
-      // Regular Inbox rendering...
       const ib = document.getElementById('inbox-body');
       const rb = document.getElementById('reviewed-body');
       ib.innerHTML = ''; rb.innerHTML = '';
       let iC=0, rC=0;
-      data.submissions.forEach(s => {
-        const link = `<a href="https://drive.google.com/file/d/${s.fileId}/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">${s.trackName}</a>`;
-        const action = s.status === 'pending'
-          ? `<button class="action-btn" onclick="updateStatus('${s.id}','reviewed')">İncelendi</button>`
-          : `<button class="action-btn red" onclick="updateStatus('${s.id}','pending')">Geri Al</button>`;
+      data.submissions.forEach(function(s) {
+        let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
+        let action = s.status === 'pending'
+          ? '<button class="action-btn" onclick="updateStatus(\'' + s.id + '\',\'reviewed\')">İncelendi</button>'
+          : '<button class="action-btn red" onclick="updateStatus(\'' + s.id + '\',\'pending\')">Geri Al</button>';
         
-        const info = `<div style="font-size:0.85rem;margin-bottom:4px;">${link} <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">${new Date(s.timestamp).toLocaleDateString()}</span></div>
-                      <div style="font-size:0.75rem;color:var(--txt2);">${s.fullName} · ${s.aiTool}</div>
-                      <div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">${s.email}</div>
-                      <div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">${s.note}</div>`;
+        let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
 
         if(s.status === 'pending') {
-          ib.innerHTML += `<tr><td>${info}</td><td style="text-align:right;vertical-align:middle;">${action}</td></tr>`;
+          ib.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
           iC++;
         } else {
-          rb.innerHTML += `<tr><td>${info}</td><td style="text-align:right;vertical-align:middle;">${action}</td></tr>`;
+          rb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
           rC++;
         }
       });
       if(iC===0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
       if(rC===0) rb.innerHTML = '<tr><td colspan="2" class="empty-state">İncelenmiş parça yok.</td></tr>';
 
-      // Special Inbox rendering
       const spb = document.getElementById('special-body');
       spb.innerHTML = '';
       if(data.specialSubmissions && data.specialSubmissions.length > 0) {
-        data.specialSubmissions.forEach(s => {
-          const link = `<a href="https://drive.google.com/file/d/${s.fileId}/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">${s.trackName}</a>`;
-          const action = s.status === 'pending'
-            ? `<button class="action-btn" onclick="updateSpecialStatus('${s.id}','reviewed')">İncelendi</button>`
-            : `<button class="action-btn red" onclick="updateSpecialStatus('${s.id}','pending')">Geri Al</button>`;
+        data.specialSubmissions.forEach(function(s) {
+          let link = '<a href="https://drive.google.com/file/d/' + s.fileId + '/view" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + '</a>';
+          let action = s.status === 'pending'
+            ? '<button class="action-btn" onclick="updateSpecialStatus(\'' + s.id + '\',\'reviewed\')">İncelendi</button>'
+            : '<button class="action-btn red" onclick="updateSpecialStatus(\'' + s.id + '\',\'pending\')">Geri Al</button>';
           
-          const info = `<div style="font-size:0.85rem;margin-bottom:4px;">${link} <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">${new Date(s.timestamp).toLocaleDateString()}</span></div>
-                        <div style="font-size:0.75rem;color:var(--txt2);">${s.fullName} · ${s.aiTool}</div>
-                        <div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">${s.email}</div>
-                        <div style="font-size:0.75rem;color:var(--gold);margin-top:6px;padding:6px;background:rgba(251,191,36,0.05);border-radius:6px;border:1px dashed rgba(251,191,36,0.3);">${s.note}</div>`;
+          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
+                        '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
+                        '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
+                        '<div style="font-size:0.75rem;color:var(--gold);margin-top:6px;padding:6px;background:rgba(251,191,36,0.05);border-radius:6px;border:1px dashed rgba(251,191,36,0.3);">' + s.note + '</div>';
 
-          spb.innerHTML += `<tr><td>${info}</td><td style="text-align:right;vertical-align:middle;">${action}</td></tr>`;
+          spb.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
         });
       } else {
         spb.innerHTML = '<tr><td colspan="2" class="empty-state">Özel bölümde gönderilmiş parça yok.</td></tr>';
