@@ -194,7 +194,7 @@
     <!-- Sleek Top Header Bar -->
     <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:20px; padding:0 4px;">
       <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); letter-spacing:0.15em; text-transform:uppercase;">MAIS STUDIO</div>
-      <button id="admin-panel-btn" style="display:none; background:rgba(251, 191, 36, 0.08); border:1px solid rgba(251, 191, 36, 0.3); color:var(--accent-gold); padding:8px 16px; border-radius:10px; font-weight:600; font-size:0.78rem; cursor:pointer; backdrop-filter:blur(10px); transition:all 0.2s ease; align-items:center; gap:6px;" onmouseover="this.style.background='var(--accent-gold)'; this.style.color='#080706';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)'; this.style.color='var(--accent-gold)';" onclick="openAdminPanel()">
+      <button id="admin-panel-btn" style="display:flex; background:rgba(251, 191, 36, 0.08); border:1px solid rgba(251, 191, 36, 0.3); color:var(--accent-gold); padding:8px 16px; border-radius:10px; font-weight:600; font-size:0.78rem; cursor:pointer; backdrop-filter:blur(10px); transition:all 0.2s ease; align-items:center; gap:6px;" onmouseover="this.style.background='rgba(251,191,36,0.15)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)'; this.style.borderColor='rgba(251, 191, 36, 0.3)';" onclick="userGoogleToken ? openAdminPanel() : promptGoogleLogin()">
         🔑 Yetkili Girişi
       </button>
     </div>
@@ -468,43 +468,86 @@
     let isStaffUser = false;
     let localPlaylist = [];
     let currentPlayingTrack = null;
+    let gsiInitialized = false;
+    let gsiInitInterval = null;
 
-    let googleLibraryLoaded = (typeof google !== 'undefined' && google.accounts) ? true : false;
-    let configLoaded = false;
+    // Always-visible admin button — no login required to see it
+    // (login will be prompted when clicked)
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('admin-panel-btn').style.display = 'flex';
+    });
 
-    function onGoogleLibraryLoad() {
-      googleLibraryLoaded = true;
-      tryInitGoogleSignIn();
-    }
-
-    // Fetch config on page load
+    // Fetch config first, then start polling for GSI library
     fetch('/config')
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.googleClientId) {
           googleClientId = data.googleClientId;
           adminEmailAddress = data.adminEmail;
-          configLoaded = true;
-          tryInitGoogleSignIn();
+          startGSIPoller();
         } else {
           showErr('err-email', 'Google Client ID sunucuda yapılandırılmamış.');
         }
       })
       .catch(function() {
-        showErr('err-email', 'Sunucu yapılandırması yüklenemedi.');
+        showErr('err-email', 'Sunucu yapılandırması yüklenemedi. Sayfayı yenileyin.');
       });
 
-    function tryInitGoogleSignIn() {
-      if (googleLibraryLoaded && configLoaded) {
-        google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(
-          document.getElementById("google-signin-btn"),
-          { theme: "dark", size: "large", width: 280, text: "signin_with" }
-        );
+    function startGSIPoller() {
+      // Try immediately
+      if (tryInitGSI()) return;
+      // Then poll every 200ms until ready (max 15 seconds)
+      let attempts = 0;
+      gsiInitInterval = setInterval(function() {
+        attempts++;
+        if (tryInitGSI() || attempts > 75) {
+          clearInterval(gsiInitInterval);
+          if (attempts > 75) {
+            showErr('err-email', 'Google giriş kütüphanesi yüklenemedi. Sayfayı yenileyin.');
+          }
+        }
+      }, 200);
+    }
+
+    function tryInitGSI() {
+      if (gsiInitialized) return true;
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) return false;
+      if (!googleClientId) return false;
+
+      gsiInitialized = true;
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('google-signin-btn'),
+        { theme: 'filled_black', size: 'large', width: 280, text: 'signin_with', locale: 'tr' }
+      );
+      return true;
+    }
+
+    // Called when admin button is clicked (before login)
+    function promptGoogleLogin() {
+      if (!googleClientId) {
+        alert('Sistem henüz yüklenmedi. Lütfen bekleyin.');
+        return;
       }
+      if (!gsiInitialized) {
+        alert('Google giriş sistemi hazırlanıyor. Lütfen birkaç saniye bekleyin ve tekrar deneyin.');
+        return;
+      }
+      // Trigger One Tap prompt
+      google.accounts.id.prompt(function(notification) {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // One tap couldn't show - scroll to sign in button and highlight it
+          document.getElementById('step-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const btn = document.getElementById('google-signin-btn');
+          btn.style.outline = '2px solid #fbbf24';
+          btn.style.borderRadius = '8px';
+          setTimeout(function() { btn.style.outline = ''; }, 3000);
+          alert('Lütfen sayfadaki "Google ile Giriş Yap" butonunu kullanın.');
+        }
+      });
     }
 
     function handleCredentialResponse(response) {
@@ -632,21 +675,28 @@
       const staffEmails = (data.staffList || []).map(e => e.toLowerCase());
       
       isStaffUser = isOwner || staffEmails.includes(email.toLowerCase());
+      // Button is always visible - but update its appearance based on access level
+      const btn = document.getElementById('admin-panel-btn');
       if (isStaffUser) {
-        document.getElementById('admin-panel-btn').style.display = 'flex';
+        btn.style.background = 'rgba(251, 191, 36, 0.12)';
+        btn.title = 'Yetkili Paneli Aç';
         if (isOwner) {
           document.getElementById('staff-add-container').style.display = 'flex';
         } else {
           document.getElementById('staff-add-container').style.display = 'none';
         }
       } else {
-        document.getElementById('admin-panel-btn').style.display = 'none';
+        // Not staff - show toast style message instead of hiding
+        btn.title = 'Bu hesabın yetkili paneli erişimi yok';
+        setTimeout(function() {
+          alert('Bu Google hesabının yetkili paneli erişimi bulunmamaktadır. Lütfen yetkili hesabınızla giriş yapın.');
+        }, 500);
       }
     }
 
     function openAdminPanel() {
       if (!userGoogleToken) {
-        alert('Yetkili paneline erişmek için lütfen önce Google ile giriş yapın.');
+        promptGoogleLogin();
         return;
       }
       document.getElementById('admin-modal').style.display = 'flex';
