@@ -977,7 +977,7 @@ const html = `<!DOCTYPE html>
       else {
         currentInboxList.forEach(function(s, idx) {
           let link = '<a href="#" onclick="playFromList(\\\'inbox\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
-          let action = '<button class="action-btn" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>';
+          let action = '<button class="action-btn approve" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>';
           let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
                       '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
@@ -993,7 +993,7 @@ const html = `<!DOCTYPE html>
         currentSpecialList.forEach(function(s, idx) {
           let link = '<a href="#" onclick="playFromList(\\\'special\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
           let action = s.status === 'pending'
-            ? '<button class="action-btn" onclick="updateSpecialStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>'
+            ? '<button class="action-btn approve" onclick="updateSpecialStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>'
             : '<button class="action-btn red" onclick="updateSpecialStatus(\\\'' + s.id + '\\\',\\\'pending\\\')">Geri Al</button>';
           
           let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
