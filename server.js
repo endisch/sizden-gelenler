@@ -101,6 +101,9 @@ async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', descri
 }
 
 function checkRateLimit(email) {
+  if (vipList.includes(email.toLowerCase())) {
+    return { allowed: true };
+  }
   const last = submissions[email];
   if (!last) return { allowed: true };
   const diff = Date.now() - last;
@@ -195,7 +198,10 @@ app.post('/check-limit', async (req, res) => {
 });
 
 app.get('/config', (req, res) => {
-  res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || '' });
+  res.json({ 
+    googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+    adminEmail: process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com'
+  });
 });
 
 app.get('/auth', (req, res) => {
@@ -242,6 +248,83 @@ app.get('/oauth2callback', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Kod çevrim hatası: ' + err.message);
+  }
+});
+
+
+app.post('/api/admin/submissions', async (req, res) => {
+  const { token } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
+    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    
+    // Map active submissions
+    const activeSubmissions = [];
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    for (const [email, timestamp] of Object.entries(submissions)) {
+      const diff = Date.now() - timestamp;
+      if (diff < sevenDays) {
+        activeSubmissions.push({ email, timestamp });
+      }
+    }
+    
+    res.json({ submissions: activeSubmissions, vipList });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/reset-user', async (req, res) => {
+  const { token, targetEmail } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
+    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    delete submissions[targetEmail.toLowerCase()];
+    res.json({ success: true });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/add-vip', async (req, res) => {
+  const { token, targetEmail } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
+    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    const emailLower = targetEmail.toLowerCase().trim();
+    if (emailLower && !vipList.includes(emailLower)) {
+      vipList.push(emailLower);
+      saveVipList();
+    }
+    res.json({ success: true, vipList });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/remove-vip', async (req, res) => {
+  const { token, targetEmail } = req.body;
+  try {
+    const payload = await verifyGoogleToken(token);
+    const adminEmail = process.env.DRIVE_OWNER_EMAIL || 'endischoffical@gmail.com';
+    if (payload.email.toLowerCase() !== adminEmail.toLowerCase()) {
+      return res.status(403).json({ error: 'Yetkisiz erişim.' });
+    }
+    const emailLower = targetEmail.toLowerCase().trim();
+    vipList = vipList.filter(e => e !== emailLower);
+    saveVipList();
+    res.json({ success: true, vipList });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
   }
 });
 
