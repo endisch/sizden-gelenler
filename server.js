@@ -45,6 +45,16 @@ const upload = multer({
 });
 
 function getDriveClient() {
+  const refresh_token = process.env.GOOGLE_REFRESH_TOKEN;
+  if (refresh_token) {
+    const auth = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    );
+    auth.setCredentials({ refresh_token });
+    return google.drive({ version: 'v3', auth });
+  }
+
   const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
   const auth = new google.auth.GoogleAuth({
     credentials,
@@ -190,6 +200,53 @@ app.post('/check-limit', async (req, res) => {
 
 app.get('/config', (req, res) => {
   res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || '' });
+});
+
+app.get('/auth', (req, res) => {
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    `https://${req.headers.host}/oauth2callback`
+  );
+  
+  const authorizeUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['https://www.googleapis.com/auth/drive'],
+    prompt: 'consent'
+  });
+  
+  res.redirect(authorizeUrl);
+});
+
+app.get('/oauth2callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.send('Auth code missing');
+  try {
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `https://${req.headers.host}/oauth2callback`
+    );
+    const { tokens } = await oauth2Client.getToken(code);
+    
+    if (tokens.refresh_token) {
+      res.send(`
+        <html>
+          <body style="font-family:sans-serif; background:#080706; color:#f5f4f2; padding:40px; text-align:center;">
+            <h1 style="color:#f5c518;">Google Yetkilendirme Başarılı!</h1>
+            <p>Lütfen bu Refresh Token değerini kopyalayıp Railway üzerinde <b>GOOGLE_REFRESH_TOKEN</b> olarak tanımlayın:</p>
+            <textarea style="width:100%; max-width:600px; height:80px; background:#12100e; color:#fbbf24; border:1px solid #5e5c58; border-radius:8px; padding:10px; font-family:monospace; font-size:1rem;" readonly>${tokens.refresh_token}</textarea>
+            <p style="margin-top:20px; color:#a3a19d;">Ayrıca Railway'de <b>GOOGLE_CLIENT_SECRET</b> değerini de girdiğinizden emin olun.</p>
+          </body>
+        </html>
+      `);
+    } else {
+      res.send('Kimlik doğrulama başarılı fakat refresh_token dönmedi. Lütfen tekrar /auth sayfasına gidip deneyin.');
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Kod çevrim hatası: ' + err.message);
+  }
 });
 
 const PORT = process.env.PORT || 3000;
