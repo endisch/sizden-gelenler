@@ -276,7 +276,7 @@
     <div class="navbar-brand">Mustafa İnce</div>
     <div class="navbar-actions">
       <!-- Sadece yetkili girişinde görünür olacak -->
-      <button class="nav-btn" id="playlist-btn" onclick="openPlaylistModal()" style="display:none;">🎵 Gönderiler Arşivi</button>
+      <!-- Sadece yetkili girişinde görünür olacak -->
       <button class="nav-btn gold" id="staff-btn" onclick="handleStaffBtnClick()">🔑 Yetkili Girişi</button>
     </div>
   </div>
@@ -469,7 +469,6 @@
       <div class="modal-body">
         <div class="tab-bar">
           <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
-          <button class="tab-btn" onclick="switchTab('reviewed')">📁 İncelenenler / Arşiv</button>
           <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
           <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
           <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;">🌟 Özel Gelenler</button>
@@ -488,16 +487,6 @@
         </div>
 
         <!-- REVIEWED -->
-        <div class="tab-pane" id="tab-reviewed">
-          <p class="pane-desc">İncelenmiş ve arşive kaldırılmış parçalar. İstediğiniz zaman dinleyebilirsiniz.</p>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Parça</th><th>Sanatçı</th><th>Tarih</th></tr></thead>
-              <tbody id="reviewed-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
         <!-- LIMITS -->
         <div class="tab-pane" id="tab-limits">
           <p class="pane-desc">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
@@ -579,20 +568,7 @@
     </div>
   </div>
 
-  <!-- ═══ PLAYLIST MODAL (Staff Only) ════════════════════════════════════ -->
-  <div class="modal-overlay" id="playlist-modal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title">🎵 Gönderiler Arşivi (İncelenenler)</div>
-        <button class="modal-close" onclick="closeModal('playlist-modal')">×</button>
-      </div>
-      <div class="modal-body">
-        <div id="playlist-container">
-          <div class="empty-state">Yükleniyor...</div>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- ═══ SUCCESS MODAL ═════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="success-modal">
@@ -915,7 +891,6 @@
       const btn = document.getElementById('staff-btn');
       btn.textContent = '⚙️ ' + username;
       btn.classList.add('active');
-      document.getElementById('playlist-btn').style.display = 'flex';
     }
 
     function clearStaff() {
@@ -926,7 +901,6 @@
       const btn = document.getElementById('staff-btn');
       btn.textContent = '🔑 Yetkili Girişi';
       btn.classList.remove('active');
-      document.getElementById('playlist-btn').style.display = 'none';
     }
 
     // ═══ STAFF PANEL ═════════════════════════════════════════════════════════
@@ -1191,27 +1165,6 @@
       playerEl.currentTime = Math.max(0, playerEl.currentTime - 10);
     }
 
-        // ═══ PLAYLIST MODAL ══════════════════════════════════════════════════════
-    async function openPlaylistModal() {
-      openModal('playlist-modal');
-      const container = document.getElementById('playlist-container');
-      container.innerHTML = '<div class="empty-state">Yükleniyor...</div>';
-      try {
-        const tracks = await authFetch('/api/playlist', null);
-        if (!tracks.length) { container.innerHTML = '<div class="empty-state">Arşivde incelenmiş parça bulunmuyor.</div>'; return; }
-        container.innerHTML = tracks.map((t, i) => `
-          <div class="playlist-item" onclick="playTrack('${esc(t.audioUrl)}','${esc(t.title)}','${esc(t.artist)}','${esc(t.aiTool)}')">
-            <div class="pl-num">${i+1}</div>
-            <div class="pl-info">
-              <div class="pl-title">${esc(t.title)}</div>
-              <div class="pl-artist">${esc(t.artist)} · <span style="color:var(--gold);">${esc(t.aiTool)}</span></div>
-            </div>
-            <div style="font-size:0.7rem; color:var(--txt3); margin-right:6px;">${fmt(t.publishDate)}</div>
-            <div class="pl-play">▶</div>
-          </div>
-        `).join('');
-      } catch(e) { container.innerHTML = '<div class="empty-state">Playlist yüklenemedi. Yetkinizi kontrol edin.</div>'; }
-    }
 
     // ═══ AUDIO PLAYER ════════════════════════════════════════════════════════
     const playerEl = document.getElementById('player');
