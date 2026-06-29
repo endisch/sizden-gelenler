@@ -73,6 +73,16 @@ function saveCredentials() {
   fs.writeFileSync(credFile, JSON.stringify(staffCredentials, null, 2), 'utf8');
 }
 
+// Auto-seed if credentials are empty (e.g. fresh deployment without volume)
+if (staffCredentials.length === 0) {
+  const bcrypt = require('bcryptjs');
+  staffCredentials.push({ username: 'thendisch', passwordHash: bcrypt.hashSync('Th3nd!Schr$2026', 12), role: 'owner' });
+  staffCredentials.push({ username: 'mustafaince', passwordHash: bcrypt.hashSync('Mstf!nc3$Mais26', 12), role: 'owner' });
+  staffCredentials.push({ username: 'maisstudio', passwordHash: bcrypt.hashSync('Ma!sStd$2026x', 12), role: 'staff' });
+  saveCredentials();
+  console.log('Admin accounts auto-seeded!');
+}
+
 const submissionsFile = path.join(dataDir, 'submissions_data.json');
 let submissionsData = [];
 if (fs.existsSync(submissionsFile)) {
