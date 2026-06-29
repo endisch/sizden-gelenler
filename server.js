@@ -505,7 +505,7 @@ app.post('/api/staff/login', async (req, res) => {
 });
 
 // Verify session
-app.post('/api/staff/verify', verifyStaffToken, (req, res) => {
+app.get('/api/staff/verify', verifyStaffToken, (req, res) => {
   res.json({ valid: true, username: req.staffUser.username, role: req.staffUser.role });
 });
 
