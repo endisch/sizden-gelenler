@@ -27,7 +27,8 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https:"],
       mediaSrc: ["'self'", "blob:"],
     }
-  }
+  },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 }));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static('public'));
