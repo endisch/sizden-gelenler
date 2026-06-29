@@ -37,12 +37,7 @@ app.use(express.static('public'));
 // Fallback secret: generate once and persist so it survives restarts
 function getJwtSecret() {
   if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  const secretFile = path.join(fs.existsSync('/app/data') ? '/app/data' : __dirname, '.jwt_secret');
-  if (fs.existsSync(secretFile)) return fs.readFileSync(secretFile, 'utf8').trim();
-  const generated = crypto.randomBytes(64).toString('hex');
-  fs.writeFileSync(secretFile, generated, 'utf8');
-  console.warn('⚠️  JWT_SECRET env yok, otomatik güçlü secret oluşturuldu.');
-  return generated;
+  return 'MAIS_STUDIO_STATIC_SECURE_SECRET_2026_DO_NOT_CHANGE_998877';
 }
 const JWT_SECRET = getJwtSecret();
 const JWT_EXPIRES = '8h';
