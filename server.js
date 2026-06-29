@@ -18,13 +18,14 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com", "https://apis.google.com", "https://static.cloudflareinsights.com", "https://challenges.cloudflare.com"],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://accounts.google.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      frameSrc: ["https://accounts.google.com"],
-      connectSrc: ["'self'", "https://accounts.google.com"],
+      frameSrc: ["https://accounts.google.com", "https://challenges.cloudflare.com"],
+      connectSrc: ["'self'", "https://accounts.google.com", "https://static.cloudflareinsights.com"],
       imgSrc: ["'self'", "data:", "https:"],
-      mediaSrc: ["'self'"],
+      mediaSrc: ["'self'", "blob:"],
     }
   }
 }));
