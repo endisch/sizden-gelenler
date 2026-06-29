@@ -269,14 +269,14 @@ const html = `<!DOCTYPE html>
     .ab-btn:hover { color: var(--gold); transform: scale(1.15); }
     @media (max-width: 600px) {
       #audio-bar { flex-wrap: wrap; padding: 10px 14px; gap: 10px; }
-      .ab-controls { max-width: 100%; flex: unset; width: 100%; }
+      .ab-controls { width: 100%; max-width: 100%; flex: unset; width: 100%; }
       .ab-info { flex: 1; }
     }
   
     .admin-dashboard {
       max-width: 100%;
       margin: 0 auto;
-      padding: 20px 2% 100px 2%;
+      padding: 20px 0 100px 0;
       animation: fadeUp 0.3s ease;
     }
     .admin-dashboard .modal-header { border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
