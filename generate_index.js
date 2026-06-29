@@ -875,11 +875,13 @@ const html = `<!DOCTYPE html>
     // ═══ MODAL HELPERS ══════════════════════════════════════════════════════
     
     function showAdminDashboard() {
+      document.querySelector('.navbar').style.display = 'none';
       document.querySelector('.wrap').style.display = 'none';
       document.getElementById('admin-dashboard').style.display = 'block';
     }
     function hideAdminDashboard() {
-      document.querySelector('.wrap').style.display = 'block';
+      document.querySelector('.navbar').style.display = '';
+      document.querySelector('.wrap').style.display = '';
       document.getElementById('admin-dashboard').style.display = 'none';
     }
 
