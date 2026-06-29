@@ -269,9 +269,9 @@
     }
   
     .admin-dashboard {
-      max-width: 1200px;
+      max-width: 100%;
       margin: 0 auto;
-      padding: 40px 20px 100px 20px;
+      padding: 20px 2% 100px 2%;
       animation: fadeUp 0.3s ease;
     }
     .admin-dashboard .modal-header { border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
@@ -931,6 +931,7 @@
       const btn = document.getElementById('staff-btn');
       btn.textContent = '🔑 Yetkili Girişi';
       btn.classList.remove('active');
+      hideAdminDashboard();
     }
 
     // ═══ STAFF PANEL ═════════════════════════════════════════════════════════

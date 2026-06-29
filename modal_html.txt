@@ -1,0 +1,155 @@
+460:       </div>
+461:     </div>
+462:   </div>
+463: 
+464:   <!-- ═══ STAFF PANEL MODAL ═════════════════════════════════════════════ -->
+465:   <div class="modal-overlay" id="panel-modal">
+466:     <div class="modal-box">
+467:       <div class="modal-header">
+468:         <div class="modal-title">⚙️ Stüdyo Yetkili Paneli — <span id="panel-username" style="font-weight:400; font-size:0.85rem; color:var(--txt2); margin-left:4px;"></span></div>
+469:         <div style="display:flex; gap:10px; align-items:center;">
+470:           <button class="logout-btn" onclick="clearStaff(); closeModal('panel-modal')">🚪 Çıkış Yap</button>
+471:           <button class="modal-close" onclick="closeModal('panel-modal')">×</button>
+472:         </div>
+473:       </div>
+474:       <div class="modal-body">
+475:         <div class="tab-bar">
+476:           <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
+477:           <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
+478:           <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
+479:           <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;">🌟 Özel Gelenler</button>
+480:           <button class="tab-btn" id="settings-tab-btn" onclick="switchTab('settings')" style="display:none;">⚙️ Sistem Ayarları</button>
+481:         </div>
+482: 
+483:         <!-- INBOX -->
+484:         <div class="tab-pane active" id="tab-inbox">
+485:           <p class="pane-desc">Gelen başvurular. Parçayı dinlemek için satıra tıklayın. "İncelendi" olarak işaretleyerek arşive taşıyabilirsiniz.</p>
+486:           <div class="table-wrap">
+487:             <table class="data-table">
+488:               <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="text-align:right;">İşlem</th></tr></thead>
+489:               <tbody id="inbox-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+490:             </table>
+491:           </div>
+492:         </div>
+493: 
+494:         <!-- REVIEWED -->
+495:         <!-- LIMITS -->
+496:         <div class="tab-pane" id="tab-limits">
+497:           <p class="pane-desc">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
+498:           <div class="table-wrap">
+499:             <table class="data-table">
+500:               <thead><tr><th>E-posta</th><th>Son Başvuru</th><th style="text-align:right;">İşlem</th></tr></thead>
+501:               <tbody id="limits-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+502:             </table>
+503:           </div>
+504:         </div>
+505: 
+506:         <!-- ACCOUNTS -->
+507:         <div class="tab-pane" id="tab-accounts">
+508:           <p class="pane-desc">Yetkili personel hesapları. Yeni çalışan eklemek veya hesabını kaldırmak için bu sekmeyi kullanın.</p>
+509:           <div id="accounts-owner-section">
+510:             <div class="panel-input-row">
+511:               <input type="text" class="panel-input" id="new-username" placeholder="Kullanıcı adı" />
+512:               <input type="password" class="panel-input" id="new-password" placeholder="Şifre (min. 6 karakter)" />
+513:               <button class="panel-btn" onclick="addAccount()">Ekle</button>
+514:             </div>
+515:           </div>
+516:           <div class="table-wrap">
+517:             <table class="data-table">
+518:               <thead><tr><th>Kullanıcı Adı</th><th>Yetki</th><th style="text-align:right;">İşlem</th></tr></thead>
+519:               <tbody id="accounts-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+520:             </table>
+521:           </div>
+522:           <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+523:             <p style="font-size:0.75rem; color:var(--txt2); margin-bottom:10px; font-weight:600;">Şifremi Değiştir</p>
+524:             <div class="panel-input-row" style="flex-wrap:wrap; gap:8px;">
+525:               <input type="password" class="panel-input" id="cur-pw" placeholder="Mevcut şifre" style="min-width:160px;" />
+526:               <input type="password" class="panel-input" id="new-pw" placeholder="Yeni şifre" style="min-width:160px;" />
+527:               <button class="panel-btn" onclick="changePassword()">Güncelle</button>
+528:             </div>
+529:             <div class="login-err" id="pw-change-err" style="margin-top:8px;"></div>
+530:             <div id="pw-change-ok" style="display:none; color:#4ade80; font-size:0.78rem; margin-top:8px;">✓ Şifre başarıyla güncellendi.</div>
+531:           </div>
+532:         </div>
+533: 
+534:         <!-- SPECIAL -->
+535:         <div class="tab-pane" id="tab-special">
+536:           <p class="pane-desc">Özel bölümden gelen parçalar. Normal gelen kutusundan ayrıdır.</p>
+537:           <div class="table-wrap">
+538:             <table class="data-table">
+539:               <thead><tr><th>Parça / Sanatçı</th><th style="text-align:right;">İşlem</th></tr></thead>
+540:               <tbody id="special-body"><tr><td colspan="2" class="empty-state">Yükleniyor...</td></tr></tbody>
+541:             </table>
+542:           </div>
+543:         </div>
+544: 
+545:         <!-- SETTINGS -->
+546:         <div class="tab-pane" id="tab-settings">
+547:           <p class="pane-desc">Özel bölüm ayarları. Sadece kurucu (owner) görebilir.</p>
+548:           <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+549:             <div class="panel-input-row">
+550:               <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Durum:</label>
+551:               <select class="panel-input" id="cfg-active" style="max-width:140px;">
+552:                 <option value="true">Açık</option>
+553:                 <option value="false">Kapalı</option>
+554:               </select>
+555:             </div>
+556:             <div class="panel-input-row">
+557:               <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Başlık:</label>
+558:               <input type="text" class="panel-input" id="cfg-title" placeholder="Özel Konsept" />
+559:             </div>
+560:             <div class="panel-input-row">
+561:               <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Max Kota:</label>
+562:               <input type="number" class="panel-input" id="cfg-quota" value="50" style="max-width:100px;" />
+563:             </div>
+564:             <div style="display:flex; gap:10px; margin-top:6px;">
+565:               <button class="panel-btn" onclick="saveSpecialCfg()">💾 Kaydet</button>
+566:               <button class="panel-btn" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;" onclick="resetSpecialQuota()">🔄 Kotayı Sıfırla</button>
+567:             </div>
+568:             <div id="cfg-msg" style="display:none; font-size:0.78rem; color:#4ade80; margin-top:6px;">✓ Ayarlar kaydedildi.</div>
+569: 
+570:             <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+571:               <div class="panel-input-row">
+572:                 <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Drive Eşitleme:</label>
+573:                 <button class="panel-btn" onclick="syncDrive()">🔄 Eski Parçaları Çek</button>
+574:               </div>
+575:               <div style="font-size:0.7rem; color:var(--txt3); margin-top:6px;">Daha önce Drive'a gelen ve listede olmayan parçaları ekler, kotadan düşer.</div>
+576:             </div>
+577:           </div>
+578:         </div>
+579: 
+580:       </div>
+581:     </div>
+582:   </div>
+583: 
+584: 
+585: 
+586:   <!-- ═══ SUCCESS MODAL ═════════════════════════════════════════════════ -->
+587:   <div class="modal-overlay" id="success-modal">
+588:     <div class="modal-box">
+589:       <div class="success-icon">✓</div>
+590:       <div class="success-title">Başvurunuz Alındı!</div>
+591:       <div class="success-text">
+592:         Teşekkür ederiz. Parçanız değerlendirme listemize eklendi.<br>
+593:         Tüm başvuruları titizlikle dinliyoruz.<br><br>
+594:         <span style="font-size:0.78rem; color:var(--txt3);">Bir sonraki haftadan itibaren yeni başvuru yapabilirsiniz.</span>
+595:       </div>
+596:       <button class="btn" style="margin-top:0;" onclick="closeModal('success-modal'); goBack()">Kapat</button>
+597:     </div>
+598:   </div>
+599: 
+600:   <!-- ═══ GLOBAL AUDIO BAR ══════════════════════════════════════════════ -->
+601:   <div id="audio-bar">
+602:     <div class="ab-art" id="ab-art">🎵</div>
+603:     <div class="ab-info">
+604:       <div class="ab-title" id="ab-title">—</div>
+605:       <div class="ab-artist" id="ab-artist">—</div>
+606:     </div>
+607:     <div class="ab-controls">
+608:       <div class="ab-btns-row">
+609:         <button class="ab-btn" onclick="skipBackward()" title="10s Geri">⏪</button>
+610:         <button class="ab-btn" onclick="prevTrack()" title="Önceki Parça">⏮</button>
+611:         <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
+612:         <button class="ab-btn" onclick="nextTrack()" title="Sonraki Parça">⏭</button>
+613:         <button class="ab-btn" onclick="skipForward()" title="10s İleri">⏩</button>
+614:       </div>
