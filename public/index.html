@@ -276,7 +276,7 @@
     }
     /* .admin-dashboard .modal-header styles replaced by inline styles */
     .admin-dashboard .modal-title { font-size:1.3rem; font-weight:600; color:#fff; display:flex; align-items:center; }
-    .admin-dashboard .tab-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .admin-dashboard .tab-bar { display:flex; gap:10px; flex-wrap:wrap; }
     .admin-dashboard .table-wrap { overflow-x:auto; background:var(--bg2); border:1px solid var(--border); border-radius:12px; }
     .admin-dashboard .data-table th, .admin-dashboard .data-table td { padding:14px 16px; font-size:0.9rem; }
     .admin-dashboard .pane-desc { font-size:0.85rem; color:var(--txt2); margin-bottom:15px; }
@@ -472,21 +472,26 @@
 
   <!-- ═══ STAFF PANEL MODAL ═════════════════════════════════════════════ -->
   <div id="admin-dashboard" class="admin-dashboard" style="display:none;">
-      <div class="modal-header">
-        <div class="modal-title">⚙️ Stüdyo Yetkili Paneli — <span id="panel-username" style="font-weight:400; font-size:0.85rem; color:var(--txt2); margin-left:4px;"></span></div>
-        <div style="display:flex; gap:10px; align-items:center;">
+      <div class="modal-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:30px;">
+        <div class="navbar-brand" style="font-size: 1.1rem; color: var(--gold); letter-spacing: 0.1em; white-space:nowrap; margin-right: 20px;">
+          MUSTAFA İNCE 
+          <span id="panel-username" style="display:none;"></span>
+        </div>
+        
+        <div class="tab-bar" style="flex:1; justify-content:flex-start; margin-bottom:0; gap:8px;">
+          <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
+          <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süresi</button>
+          <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
+          <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;">🌟 Özel Gelenler</button>
+          <button class="tab-btn" id="settings-tab-btn" onclick="switchTab('settings')" style="display:none;">⚙️ Sistem Araçları</button>
+        </div>
+
+        <div style="white-space:nowrap; margin-left: 20px;">
           <button class="logout-btn" onclick="clearStaff()">🚪 Çıkış Yap</button>
-          
         </div>
       </div>
       <div class="modal-body">
-        <div class="tab-bar">
-          <button class="tab-btn active" onclick="switchTab('inbox')">📥 Gelen Kutusu</button>
-          <button class="tab-btn" onclick="switchTab('limits')">⏳ Bekleme Süreleri</button>
-          <button class="tab-btn" onclick="switchTab('accounts')">👤 Hesaplar</button>
-          <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;">🌟 Özel Gelenler</button>
-          <button class="tab-btn" id="settings-tab-btn" onclick="switchTab('settings')" style="display:none;">⚙️ Sistem Ayarları</button>
-        </div>
+        <!-- TAB BAR IS NOW MOVED TO HEADER -->
 
         <!-- INBOX -->
         <div class="tab-pane active" id="tab-inbox">
