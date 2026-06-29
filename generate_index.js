@@ -272,6 +272,20 @@ const html = `<!DOCTYPE html>
       .ab-controls { max-width: 100%; flex: unset; width: 100%; }
       .ab-info { flex: 1; }
     }
+  
+    .admin-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 100px 20px;
+      animation: fadeUp 0.3s ease;
+    }
+    .admin-dashboard .modal-header { border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+    .admin-dashboard .modal-title { font-size:1.3rem; font-weight:600; color:#fff; display:flex; align-items:center; }
+    .admin-dashboard .tab-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .admin-dashboard .table-wrap { overflow-x:auto; background:var(--bg2); border:1px solid var(--border); border-radius:12px; }
+    .admin-dashboard .data-table th, .admin-dashboard .data-table td { padding:14px 16px; font-size:0.9rem; }
+    .admin-dashboard .pane-desc { font-size:0.85rem; color:var(--txt2); margin-bottom:15px; }
+
   </style>
 </head>
 <body>
@@ -462,13 +476,12 @@ const html = `<!DOCTYPE html>
   </div>
 
   <!-- ═══ STAFF PANEL MODAL ═════════════════════════════════════════════ -->
-  <div class="modal-overlay" id="panel-modal">
-    <div class="modal-box">
+  <div id="admin-dashboard" class="admin-dashboard" style="display:none;">
       <div class="modal-header">
         <div class="modal-title">⚙️ Stüdyo Yetkili Paneli — <span id="panel-username" style="font-weight:400; font-size:0.85rem; color:var(--txt2); margin-left:4px;"></span></div>
         <div style="display:flex; gap:10px; align-items:center;">
-          <button class="logout-btn" onclick="clearStaff(); closeModal('panel-modal')">🚪 Çıkış Yap</button>
-          <button class="modal-close" onclick="closeModal('panel-modal')">×</button>
+          <button class="logout-btn" onclick="clearStaff()">🚪 Çıkış Yap</button>
+          
         </div>
       </div>
       <div class="modal-body">
@@ -578,7 +591,6 @@ const html = `<!DOCTYPE html>
         </div>
 
       </div>
-    </div>
   </div>
 
 
@@ -856,6 +868,16 @@ const html = `<!DOCTYPE html>
     }
 
     // ═══ MODAL HELPERS ══════════════════════════════════════════════════════
+    
+    function showAdminDashboard() {
+      document.querySelector('.wrap').style.display = 'none';
+      document.getElementById('admin-dashboard').style.display = 'block';
+    }
+    function hideAdminDashboard() {
+      document.querySelector('.wrap').style.display = 'block';
+      document.getElementById('admin-dashboard').style.display = 'none';
+    }
+
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
@@ -930,7 +952,7 @@ const html = `<!DOCTYPE html>
     function openPanelModal() {
       document.getElementById('panel-username').textContent = staffUsername + (staffRole === 'owner' ? ' (Kurucu)' : '');
       document.getElementById('accounts-owner-section').style.display = staffRole === 'owner' ? 'block' : 'none';
-      openModal('panel-modal');
+      showAdminDashboard();
       loadPanelData();
     }
 
@@ -1100,7 +1122,7 @@ const html = `<!DOCTYPE html>
       });
     }
 
-    function logout() { clearStaff(); closeModal('panel-modal'); }
+    function logout() { clearStaff(); }
 
     async function updateStatus(id, status) {
       try { await authFetch('/api/admin/update-status', { id: id, status: status }); loadPanelData(); }
