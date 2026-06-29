@@ -976,12 +976,12 @@ const html = `<!DOCTYPE html>
       if (currentInboxList.length === 0) ib.innerHTML = '<tr><td colspan="2" class="empty-state">Yeni parça yok.</td></tr>';
       else {
         currentInboxList.forEach(function(s, idx) {
-          let link = '<a href="#" onclick="playFromList(\\\'inbox\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + s.trackName + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
-          let action = '<button class="action-btn approve" onclick="updateStatus(\\\'' + s.id + '\\\',\\\'reviewed\\\')">İncelendi</button>';
-          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + new Date(s.timestamp).toLocaleDateString() + '</span></div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt2);">' + s.fullName + ' · ' + s.aiTool + '</div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + s.email + '</div>' +
-                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + s.note + '</div>';
+          let link = '<a href="#" onclick="playFromList(\\\'inbox\\\', ' + idx + '); return false;" style="color:var(--gold);text-decoration:none;font-weight:600;">' + esc(s.trackName) + ' <span style="font-size:0.7rem; color:var(--txt3);">▶ Dinle</span></a>';
+          let action = '<button class="action-btn approve" onclick="updateStatus(\\\'' + esc(s.id) + '\\\',\\\'reviewed\\\')">İncelendi</button>';
+          let info = '<div style="font-size:0.85rem;margin-bottom:4px;">' + link + ' <span style="color:var(--txt2);font-size:0.7rem;margin-left:6px;">' + esc(new Date(s.timestamp).toLocaleDateString()) + '</span></div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);">' + esc(s.fullName) + ' · ' + esc(s.aiTool) + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt2);margin-top:2px;">' + esc(s.email) + '</div>' +
+                      '<div style="font-size:0.75rem;color:var(--txt3);margin-top:6px;padding:6px;background:#151515;border-radius:6px;border:1px dashed var(--border2);">' + esc(s.note) + '</div>';
           ib.innerHTML += '<tr><td>' + info + '</td><td style="text-align:right;vertical-align:middle;">' + action + '</td></tr>';
         });
       }
@@ -1191,12 +1191,22 @@ const html = `<!DOCTYPE html>
       document.getElementById('ab-title').textContent = title;
       document.getElementById('ab-artist').textContent = artist;
       document.getElementById('ab-tag').textContent = aiTool;
-      playerEl.src = url;
-      playerEl.load();
-      playerEl.play().then(() => {
-        document.getElementById('ab-play').textContent = '⏸';
-        document.getElementById('audio-bar').classList.add('visible');
-      }).catch(() => alert('Ses dosyası oynatılamadı.'));
+      // Use fetch with JWT auth to get audio as blob
+      fetch(url, { headers: { 'Authorization': 'Bearer ' + staffToken } })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Audio fetch failed');
+          return res.blob();
+        })
+        .then(function(blob) {
+          var blobUrl = URL.createObjectURL(blob);
+          playerEl.src = blobUrl;
+          playerEl.load();
+          playerEl.play().then(function() {
+            document.getElementById('ab-play').textContent = '⏸';
+            document.getElementById('audio-bar').classList.add('visible');
+          }).catch(function() { alert('Ses dosyası oynatılamadı.'); });
+        })
+        .catch(function() { alert('Ses dosyası yüklenemedi. Yetkinizi kontrol edin.'); });
     }
 
     function playTrackById(fileId, title, artist, aiTool) {

@@ -1,3 +1,12 @@
 node_modules/
 uploads/
 .env
+staff_credentials.json
+seed_staff.js
+stats.json
+ip_limits.json
+special_ip_limits.json
+special_config.json
+submissions_data.json
+special_submissions_data.json
+.jwt_secret

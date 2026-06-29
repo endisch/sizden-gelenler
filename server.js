@@ -1,5 +1,7 @@
 const express = require('express');
 const multer = require('multer');
+const helmet = require('helmet');
+const crypto = require('crypto');
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
@@ -9,10 +11,38 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-app.use(express.json());
+
+// ── Security Middleware ─────────────────────────────────────────────────────
+app.set('trust proxy', 1);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://accounts.google.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      frameSrc: ["https://accounts.google.com"],
+      connectSrc: ["'self'", "https://accounts.google.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      mediaSrc: ["'self'"],
+    }
+  }
+}));
+app.use(express.json({ limit: '1mb' }));
 app.use(express.static('public'));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'mais-studio-jwt-secret-2026-secure';
+// ── JWT Config ──────────────────────────────────────────────────────────────
+// Fallback secret: generate once and persist so it survives restarts
+function getJwtSecret() {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  const secretFile = path.join(fs.existsSync('/app/data') ? '/app/data' : __dirname, '.jwt_secret');
+  if (fs.existsSync(secretFile)) return fs.readFileSync(secretFile, 'utf8').trim();
+  const generated = crypto.randomBytes(64).toString('hex');
+  fs.writeFileSync(secretFile, generated, 'utf8');
+  console.warn('⚠️  JWT_SECRET env yok, otomatik güçlü secret oluşturuldu.');
+  return generated;
+}
+const JWT_SECRET = getJwtSecret();
 const JWT_EXPIRES = '8h';
 
 // ── Upload dir ──────────────────────────────────────────────────────────────
@@ -90,7 +120,7 @@ function saveSpecialSubmissionsData() {
   fs.writeFileSync(specialSubmissionsFile, JSON.stringify(specialSubmissionsData, null, 2), 'utf8');
 }
 
-const specialIpLimitsFile = path.join(__dirname, 'special_ip_limits.json');
+const specialIpLimitsFile = path.join(dataDir, 'special_ip_limits.json');
 let specialIpLimits = {}; // { 'ip': lastSubmissionTimestamp }
 if (fs.existsSync(specialIpLimitsFile)) {
   try { specialIpLimits = JSON.parse(fs.readFileSync(specialIpLimitsFile, 'utf8')); } catch(e) {}
@@ -251,7 +281,7 @@ app.get('/api/playlist', verifyStaffToken, (req, res) => {
   res.json(published);
 });
 
-app.get('/api/stream-audio', async (req, res) => {
+app.get('/api/stream-audio', verifyStaffToken, async (req, res) => {
   const { fileId } = req.query;
   if (!fileId) return res.status(400).send('File ID missing');
   try {
@@ -345,7 +375,8 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    res.status(500).json({ error: err.message || 'Bir hata oluştu.' });
+    console.error('Submit error:', err);
+    res.status(500).json({ error: 'Gönderim sırasında bir hata oluştu. Lütfen tekrar deneyin.' });
   }
 });
 
@@ -425,7 +456,8 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    res.status(500).json({ error: err.message || 'Bir hata oluştu.' });
+    console.error('Special submit error:', err);
+    res.status(500).json({ error: 'Gönderim sırasında bir hata oluştu. Lütfen tekrar deneyin.' });
   }
 });
 
@@ -575,7 +607,7 @@ app.post('/api/admin/sync-drive', verifyStaffToken, async (req, res) => {
     } while (pageToken);
     
     if (addedCount > 0) {
-      saveSubmissions();
+      saveSubmissionsData();
       saveStats();
     }
     
@@ -615,50 +647,57 @@ app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
   res.json({ success: true });
 });
 
-// Legacy Google-token based reset (kept for backwards compat)
-app.get('/reset-submissions', (req, res) => {
-  const secret = req.query.secret;
-  const adminSecret = process.env.ADMIN_SECRET || 'mais-studio-reset-secret-2026';
-  if (secret === adminSecret) {
-    submissionsData = [];
-    saveSubmissionsData();
-    return res.send('Tüm başvuru limitleri ve kayıtları başarıyla sıfırlandı!');
-  }
-  return res.status(403).send('Yetkisiz erişim.');
-});
+// Legacy reset endpoint REMOVED for security
 
-// Google OAuth flow (for Drive auth setup)
-app.get('/auth', (req, res) => {
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    'https://' + req.headers.host + '/oauth2callback'
-  );
-  res.redirect(oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/drive'],
-    prompt: 'consent'
-  }));
-});
-
-app.get('/oauth2callback', async (req, res) => {
-  const { code } = req.query;
-  if (!code) return res.send('Auth code missing');
-  try {
+// Google OAuth flow — only available when ENABLE_AUTH_SETUP=true
+if (process.env.ENABLE_AUTH_SETUP === 'true') {
+  app.get('/auth', (req, res) => {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       'https://' + req.headers.host + '/oauth2callback'
     );
-    const { tokens } = await oauth2Client.getToken(code);
-    if (tokens.refresh_token) {
-      res.send(`<html><body style="font-family:sans-serif;background:#080706;color:#f5f4f2;padding:40px;text-align:center;"><h1 style="color:#fbbf24;">Yetkilendirme Başarılı!</h1><p>Refresh Token:</p><textarea style="width:100%;max-width:600px;height:80px;background:#12100e;color:#fbbf24;border:1px solid #333;border-radius:8px;padding:10px;font-family:monospace;" readonly>${tokens.refresh_token}</textarea></body></html>`);
-    } else {
-      res.send('refresh_token dönmedi.');
+    res.redirect(oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/drive'],
+      prompt: 'consent'
+    }));
+  });
+
+  app.get('/oauth2callback', async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.send('Auth code missing');
+    try {
+      const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        'https://' + req.headers.host + '/oauth2callback'
+      );
+      const { tokens } = await oauth2Client.getToken(code);
+      if (tokens.refresh_token) {
+        res.send('Yetkilendirme basarili. Token alindi. Railway env degiskenlerine ekleyin.');
+      } else {
+        res.send('refresh_token dönmedi.');
+      }
+    } catch (err) {
+      res.status(500).send('Yetkilendirme hatası oluştu.');
     }
-  } catch (err) {
-    res.status(500).send('Hata: ' + err.message);
+  });
+}
+
+// ── Multer Error Handler ────────────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Dosya boyutu çok büyük. Maksimum 20MB.' });
+    }
+    return res.status(400).json({ error: 'Dosya yükleme hatası.' });
   }
+  if (err) {
+    console.error('Unhandled error:', err);
+    return res.status(500).json({ error: 'Sunucu hatası oluştu.' });
+  }
+  next();
 });
 
 const PORT = process.env.PORT || 3000;
