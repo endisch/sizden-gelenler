@@ -767,6 +767,9 @@ app.post('/api/admin/reset-all-limits', verifyStaffToken, (req, res) => {
   specialSubmissionsData.forEach(s => { s.timestamp = oldTs; });
   saveSpecialSubmissionsData();
 
+  specialConfig.usedQuota = 0;
+  saveSpecialConfig();
+
   res.json({ success: true });
 });
 
