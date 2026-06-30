@@ -592,12 +592,38 @@ app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
 // STAFF MANAGEMENT ROUTES (JWT protected)
 // ════════════════════════════════════════════════════════════════════════════
 
+
+function getLimitsArray() {
+  const limitsList = [];
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  
+  const ipToEmail = {};
+  submissionsData.forEach(s => { if (s.submittedIp) ipToEmail[s.submittedIp] = s.email; });
+  specialSubmissionsData.forEach(s => { if (s.submittedIp) ipToEmail[s.submittedIp] = s.email; });
+
+  for (const [ip, ts] of Object.entries(ipLimits)) {
+    if (Date.now() - ts < sevenDays) {
+      limitsList.push({ ip: ip, email: ipToEmail[ip] || ip, timestamp: ts, type: 'Normal' });
+    }
+  }
+  for (const [ip, ts] of Object.entries(specialIpLimits)) {
+    if (Date.now() - ts < sevenDays) {
+      // Avoid duplicate IPs if they are blocked in both, or just add them
+      limitsList.push({ ip: ip, email: ipToEmail[ip] || ip, timestamp: ts, type: 'Özel' });
+    }
+  }
+  // Sort descending by timestamp
+  limitsList.sort((a,b) => b.timestamp - a.timestamp);
+  return limitsList;
+}
+
 app.get('/api/admin/submissions', verifyStaffToken, (req, res) => {
   res.json({
     submissions: submissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId })),
     accounts: staffCredentials.map(c => ({ username: c.username, role: c.role })),
     specialConfig: specialConfig,
-    specialSubmissions: specialSubmissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId }))
+    specialSubmissions: specialSubmissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId })),
+    limits: getLimitsArray()
   });
 });
 
@@ -698,10 +724,32 @@ app.post('/api/admin/unreview', verifyStaffToken, (req, res) => {
 });
 
 app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
-  const { targetEmail } = req.body;
-  const emailLower = targetEmail.toLowerCase();
-  submissionsData = submissionsData.filter(s => s.email.toLowerCase() !== emailLower);
+  const { targetEmail, targetIp } = req.body;
+  if (targetEmail) {
+    const emailLower = targetEmail.toLowerCase();
+    const oldTs = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
+    submissionsData.forEach(s => { if (s.email.toLowerCase() === emailLower) s.timestamp = oldTs; });
+    saveSubmissionsData();
+  }
+  if (targetIp) {
+    if (ipLimits[targetIp]) delete ipLimits[targetIp];
+    if (specialIpLimits[targetIp]) delete specialIpLimits[targetIp];
+    saveIpLimits();
+    saveSpecialIpLimits();
+  }
+  res.json({ success: true });
+});
+
+app.post('/api/admin/reset-all-limits', verifyStaffToken, (req, res) => {
+  ipLimits = {};
+  saveIpLimits();
+  specialIpLimits = {};
+  saveSpecialIpLimits();
+
+  const oldTs = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
+  submissionsData.forEach(s => { s.timestamp = oldTs; });
   saveSubmissionsData();
+
   res.json({ success: true });
 });
 
