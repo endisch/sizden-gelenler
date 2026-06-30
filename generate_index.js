@@ -600,7 +600,7 @@ const html = `<!DOCTYPE html>
         <div class="tab-pane" id="tab-limits">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <p class="pane-desc" style="margin-bottom:0;">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
-            <button class="action-btn red" onclick="resetAllLimits()" style="padding:8px 16px;">Tümünü Sıfırla</button>
+            <button class="action-btn danger" onclick="resetAllLimits()" style="padding:8px 16px;">Tümünü Sıfırla</button>
           </div>
           <div class="table-wrap">
             <table class="data-table">
@@ -1118,7 +1118,7 @@ const html = `<!DOCTYPE html>
       ab.innerHTML = '';
       if(data.accounts && data.accounts.length > 0) {
         data.accounts.forEach(function(acc) {
-          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn red" onclick="deleteAccount(\\\'' + acc.username + '\\\')">Sil</button>' : '-';
+          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn danger" onclick="deleteAccount(\\\'' + acc.username + '\\\')">Sil</button>' : '-';
           let role = acc.role === 'owner' ? 'Kurucu' : 'Çalışan';
           ab.innerHTML += '<tr><td>' + acc.username + '</td><td>' + role + '</td><td style="text-align:right;">' + act + '</td></tr>';
         });
@@ -1178,7 +1178,7 @@ const html = `<!DOCTYPE html>
       if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="4" class="empty-state">Geçmiş boş.</td></tr>';
       else {
         currentReviewedList.forEach(function(s, idx) {
-          let action = '<button class="action-btn red" onclick="event.stopPropagation(); unreviewTrack(\\\'' + esc(s.id) + '\\\')">Geri Al</button>';
+          let action = '<button class="action-btn danger" onclick="event.stopPropagation(); unreviewTrack(\\\'' + esc(s.id) + '\\\')">Geri Al</button>';
           let playBtn = '<td style="width: 60px; text-align: center;"><button id="btn-play-reviewed-' + idx + '" class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\\'reviewed\\\', ' + idx + ')">▶</button></td>';
           let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
           let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
@@ -1201,7 +1201,7 @@ const html = `<!DOCTYPE html>
         currentSpecialList.forEach(function(s, idx) {
           let action = s.status === 'pending'
             ? '<button class="action-btn approve" onclick="event.stopPropagation(); updateSpecialStatus(\\'' + s.id + '\\',\\'reviewed\\')">İncelendi</button>'
-            : '<button class="action-btn red" onclick="event.stopPropagation(); updateSpecialStatus(\\'' + s.id + '\\',\\'pending\\')">Geri Al</button>';
+            : '<button class="action-btn danger" onclick="event.stopPropagation(); updateSpecialStatus(\\'' + s.id + '\\',\\'pending\\')">Geri Al</button>';
           let playBtn = '<td style="width: 60px; text-align: center;"><button class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\'special\\', ' + idx + ')">▶</button></td>';
           let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
           let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
@@ -1255,7 +1255,7 @@ const html = `<!DOCTYPE html>
         let emailHtml = '<td><div style="font-weight: 700; color: #fff;">' + esc(l.email) + '</div><div style="font-size: 0.8rem; color: var(--txt3); margin-top: 4px;">Mod: ' + esc(l.type) + '</div></td>';
         let dateStr = new Date(l.timestamp).toLocaleString();
         let dateHtml = '<td><div style="font-size: 0.85rem; color: var(--txt2);">' + esc(dateStr) + '</div></td>';
-        let actionHtml = '<td style="text-align:right;"><button class="action-btn red" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
+        let actionHtml = '<td style="text-align:right;"><button class="action-btn danger" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
         tr.innerHTML = emailHtml + dateHtml + actionHtml;
         lb.appendChild(tr);
       });
@@ -1422,7 +1422,7 @@ const html = `<!DOCTYPE html>
         let emailHtml = '<td><div style="font-weight: 700; color: #fff;">' + esc(l.email) + '</div><div style="font-size: 0.8rem; color: var(--txt3); margin-top: 4px;">Mod: ' + esc(l.type) + '</div></td>';
         let dateStr = new Date(l.timestamp).toLocaleString();
         let dateHtml = '<td><div style="font-size: 0.85rem; color: var(--txt2);">' + esc(dateStr) + '</div></td>';
-        let actionHtml = '<td style="text-align:right;"><button class="action-btn red" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
+        let actionHtml = '<td style="text-align:right;"><button class="action-btn danger" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
         tr.innerHTML = emailHtml + dateHtml + actionHtml;
         lb.appendChild(tr);
       });
