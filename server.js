@@ -626,6 +626,15 @@ function getLimitsArray() {
       }
     }
   });
+  specialSubmissionsData.forEach(s => {
+    if (s.email && !addedEmails.has(s.email.toLowerCase())) {
+      const ts = new Date(s.timestamp).getTime();
+      if (Date.now() - ts < sevenDays) {
+        limitsList.push({ ip: s.submittedIp || '', email: s.email, timestamp: ts, type: 'Özel' });
+        addedEmails.add(s.email.toLowerCase());
+      }
+    }
+  });
 
   limitsList.sort((a,b) => b.timestamp - a.timestamp);
   return limitsList;
