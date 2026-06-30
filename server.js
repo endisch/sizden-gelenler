@@ -304,6 +304,10 @@ app.get('/api/stream-audio', verifyStaffToken, async (req, res) => {
 app.post('/check-limit', async (req, res) => {
   try {
     const { token } = req.body;
+    const clientIp = getClientIp(req);
+    const ipLimit = checkIpLimit(clientIp);
+    if (!ipLimit.allowed) return res.json({ allowed: false, days: ipLimit.days, hours: ipLimit.hours });
+
     const payload = await verifyGoogleToken(token);
     const email = payload.email.toLowerCase();
     const limit = checkRateLimit(email);
@@ -321,6 +325,10 @@ app.post('/check-special-limit', async (req, res) => {
     if (!specialConfig.active) {
        return res.status(403).json({ error: 'Özel bölüm kapalıdır.' });
     }
+
+    const clientIp = getClientIp(req);
+    const ipLimit = checkSpecialIpLimit(clientIp);
+    if (!ipLimit.allowed) return res.json({ allowed: false, days: ipLimit.days, hours: ipLimit.hours });
 
     const payload = await verifyGoogleToken(token);
     const email = payload.email.toLowerCase();
