@@ -1098,8 +1098,8 @@ const html = `<!DOCTYPE html>
       if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="4" class="empty-state">Geçmiş boş.</td></tr>';
       else {
         currentReviewedList.forEach(function(s, idx) {
-          let action = '<button class="action-btn red" onclick="event.stopPropagation(); unreviewTrack(\'' + esc(s.id) + '\')">Geri Al</button>';
-          let playBtn = '<td style="width: 60px; text-align: center;"><button id="btn-play-reviewed-' + idx + '" class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\'reviewed\', ' + idx + ')">▶</button></td>';
+          let action = '<button class="action-btn red" onclick="event.stopPropagation(); unreviewTrack(\\\'' + esc(s.id) + '\\\')">Geri Al</button>';
+          let playBtn = '<td style="width: 60px; text-align: center;"><button id="btn-play-reviewed-' + idx + '" class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\\'reviewed\\\', ' + idx + ')">▶</button></td>';
           let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
           let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
           let dateStr = new Date(s.timestamp).toLocaleDateString();
@@ -1108,7 +1108,7 @@ const html = `<!DOCTYPE html>
           if (s.note && s.note !== 'Bilinmiyor') {
             rowNote = '<tr><td colspan="4" style="padding:0; border:none;"><div style="font-size:0.8rem;color:var(--txt3);margin:0 20px 10px 76px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.05);">' + esc(s.note) + '</div></td></tr>';
           }
-          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\'reviewed\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
+          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\\\'reviewed\\\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
           rb.innerHTML += rowHtml;
         });
       }
