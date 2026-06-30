@@ -704,7 +704,7 @@ app.post('/api/admin/update-status', verifyStaffToken, (req, res) => {
   const idx = submissionsData.findIndex(s => s.id === fileId);
   if (idx !== -1) {
     submissionsData[idx].status = status;
-    saveSubmissions();
+    saveSubmissionsData();
     res.json({ success: true });
   } else {
     res.status(404).json({ error: 'Kayıt bulunamadı.' });
@@ -716,7 +716,7 @@ app.post('/api/admin/unreview', verifyStaffToken, (req, res) => {
   const idx = submissionsData.findIndex(s => s.id === fileId);
   if (idx !== -1) {
     submissionsData[idx].status = 'pending';
-    saveSubmissions();
+    saveSubmissionsData();
     res.json({ success: true });
   } else {
     res.status(404).json({ error: 'Kayıt bulunamadı.' });
