@@ -636,14 +636,27 @@ app.post('/api/admin/update-special-status', verifyStaffToken, (req, res) => {
 });
 
 app.post('/api/admin/update-status', verifyStaffToken, (req, res) => {
-  const { id, status, publishDate } = req.body;
-  const item = submissionsData.find(s => s.id === id);
-  if (!item) return res.status(404).json({ error: 'Parça bulunamadı.' });
-  item.status = status;
-  if (publishDate) item.publishDate = publishDate;
-  if (status === 'published' && !item.publishDate) item.publishDate = new Date().toISOString();
-  saveSubmissionsData();
-  res.json({ success: true });
+  const { fileId, status } = req.body;
+  const idx = submissionsData.findIndex(s => s.id === fileId);
+  if (idx !== -1) {
+    submissionsData[idx].status = status;
+    saveSubmissions();
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Kayıt bulunamadı.' });
+  }
+});
+
+app.post('/api/admin/unreview', verifyStaffToken, (req, res) => {
+  const { fileId } = req.body;
+  const idx = submissionsData.findIndex(s => s.id === fileId);
+  if (idx !== -1) {
+    submissionsData[idx].status = 'pending';
+    saveSubmissions();
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Kayıt bulunamadı.' });
+  }
 });
 
 app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
