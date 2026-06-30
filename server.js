@@ -356,7 +356,7 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     const cleanStr = (str) => str.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s-]/g, '').trim()
       .split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 
-    const fileName = date + ' - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + '.mp3';
+    const fileName = cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
     const description = `Gönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
     const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
@@ -439,7 +439,7 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
     const cleanStr = (str) => str.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s-]/g, '').trim()
       .split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 
-    const fileName = 'SPECIAL - ' + date + ' - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + '.mp3';
+    const fileName = 'SPECIAL - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
     const description = `ÖZEL BÖLÜM: ${specialConfig.title}\nGönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
     const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
