@@ -260,7 +260,7 @@
     /* ── Global Audio Player ── */
     #audio-bar { 
       position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px); 
-      width: 90%; max-width: 600px; 
+      width: 90%; max-width: 900px; 
       background: rgba(10, 9, 8, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); 
       border: 1px solid var(--border); border-radius: 100px; 
       padding: 12px 24px; z-index: 9999; 
@@ -271,10 +271,10 @@
     #audio-bar.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
     #audio-bar.visible { display: flex; }
     .ab-art { width: 44px; height: 44px; background: var(--border2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-    .ab-info { flex: 1; min-width: 0; }
+    .ab-info { flex: 1.5; min-width: 120px; }
     .ab-title { font-size: 0.84rem; font-weight: 600; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ab-artist { font-size: 0.72rem; color: var(--txt2); }
-    .ab-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 2; max-width: 440px; }
+    .ab-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 2; max-width: 400px; }
     .ab-btn { background: none; border: none; color: var(--txt2); font-size: 1rem; cursor: pointer; transition: 0.2s; }
     .ab-btn:hover { color: var(--gold); transform: scale(1.1); }
     .ab-play { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: none; color: #080808; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
@@ -1307,7 +1307,7 @@
     function logout() { clearStaff(); }
 
     async function updateStatus(id, status) {
-      try { await authFetch('/api/admin/update-status', { id: id, status: status }); loadPanelData(); }
+      try { await authFetch('/api/admin/update-status', { fileId: id, status: status }); loadPanelData(); }
       catch(e) { alert(e.message); }
     }
 
