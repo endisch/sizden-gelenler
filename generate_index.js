@@ -578,7 +578,7 @@ const html = `<!DOCTYPE html>
           <p class="pane-desc">Gelen başvurular. Parçayı dinlemek için satıra tıklayın. "İncelendi" olarak işaretleyerek arşive taşıyabilirsiniz.</p>
           <div class="table-wrap">
             <table class="data-table">
-              <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
               <tbody id="inbox-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
             </table>
           </div>
@@ -590,7 +590,7 @@ const html = `<!DOCTYPE html>
           <p class="pane-desc">Daha önce "İncelendi" olarak işaretlenen son 15 parça. Yanlışlıkla elediğiniz parçaları "Geri Al" butonuna basarak Gelen Kutusu'na döndürebilirsiniz.</p>
           <div class="table-wrap">
             <table class="data-table">
-              <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
               <tbody id="reviewed-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
             </table>
           </div>
@@ -640,7 +640,7 @@ const html = `<!DOCTYPE html>
           <p class="pane-desc">Özel bölümden gelen parçalar. Normal gelen kutusundan ayrıdır.</p>
           <div class="table-wrap">
             <table class="data-table">
-              <thead><tr><th>Parça / Sanatçı</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
               <tbody id="special-body"><tr><td colspan="2" class="empty-state">Yükleniyor...</td></tr></tbody>
             </table>
           </div>
