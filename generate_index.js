@@ -567,7 +567,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div style="white-space:nowrap; margin-left: 20px;">
-          <button class="logout-btn" onclick="document.getElementById('admin-modal').style.display='none'" style="margin-right:10px; background:rgba(255,255,255,0.1); border-color:transparent; color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Ana Sayfaya Dön</button>
+          <button class="logout-btn" onclick="hideAdminDashboard()" style="margin-right:10px; background:rgba(255,255,255,0.1); border-color:transparent; color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Ana Sayfaya Dön</button>
           <button class="logout-btn" onclick="clearStaff()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Çıkış Yap</button>
         </div>
       </div>
