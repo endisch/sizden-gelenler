@@ -747,6 +747,16 @@ const html = `<!DOCTYPE html>
 
     function setMode(mode) {
       isSpecialMode = (mode === 'special');
+      
+      const cd = localStorage.getItem(isSpecialMode ? 'special_cooldown_until' : 'cooldown_until');
+      if (cd && Date.now() < parseInt(cd)) {
+        const remain = parseInt(cd) - Date.now();
+        document.getElementById('countdown-days').textContent = String(Math.floor(remain / (1000 * 60 * 60 * 24))).padStart(2, '0');
+        document.getElementById('countdown-hours').textContent = String(Math.floor((remain % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+        showStep('step-blocked');
+      } else {
+        goBack(); // reset form to email step
+      }
       document.getElementById('btn-mode-normal').classList.toggle('active', !isSpecialMode);
       document.getElementById('btn-mode-special').classList.toggle('active', isSpecialMode);
       updateMainQuota();
@@ -760,6 +770,16 @@ const html = `<!DOCTYPE html>
         
         const cfg = await fetch('/config').then(r => r.json());
         window.siteConfig = cfg;
+
+        // Check device block
+        const cd = localStorage.getItem('cooldown_until');
+        if (cd && Date.now() < parseInt(cd)) {
+          const remain = parseInt(cd) - Date.now();
+          document.getElementById('countdown-days').textContent = String(Math.floor(remain / (1000 * 60 * 60 * 24))).padStart(2, '0');
+          document.getElementById('countdown-hours').textContent = String(Math.floor((remain % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+          showStep('step-blocked');
+          return;
+        }
         
         if (cfg.specialConfig && cfg.specialConfig.active) {
           document.getElementById('mode-switcher-container').style.display = 'block';
@@ -848,7 +868,7 @@ const html = `<!DOCTYPE html>
         document.getElementById('gsi-btn').style.pointerEvents = 'auto';
         if (data.error) { showErr('err-email', data.error); return; }
         if (!data.allowed) {
-          localStorage.setItem('cooldown_until', Date.now() + (data.days * 24 * 60 * 60 * 1000) + (data.hours * 60 * 60 * 1000));
+          localStorage.setItem(isSpecialMode ? 'special_cooldown_until' : 'cooldown_until', Date.now() + (data.days * 24 * 60 * 60 * 1000) + (data.hours * 60 * 60 * 1000));
           document.getElementById('countdown-days').textContent = String(data.days).padStart(2, '0');
           document.getElementById('countdown-hours').textContent = String(data.hours).padStart(2, '0');
           showStep('step-blocked');
