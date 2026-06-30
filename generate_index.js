@@ -678,7 +678,11 @@ const html = `<!DOCTYPE html>
         <span class="ab-dur" id="ab-dur">0:00</span>
       </div>
     </div>
-    <span class="tag" id="ab-tag">—</span>
+    <span class="tag" id="ab-tag" style="margin-right:auto;">—</span>
+    <div style="display:flex; align-items:center; gap:8px; margin-right:15px; color:#fff;">
+      <button class="ab-btn" onclick="toggleMute()" id="ab-mute" style="font-size:1.1rem; padding:0 5px;">🔊</button>
+      <input type="range" class="ab-seek" id="ab-vol" min="0" max="100" value="100" oninput="changeVol(this.value)" style="width:70px; margin:0;" />
+    </div>
     <button class="ab-close" onclick="closePlayer()">×</button>
   </div>
   <audio id="player" style="display:none;"></audio>
