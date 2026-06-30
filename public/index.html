@@ -228,7 +228,10 @@
     .panel-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
     .panel-input { flex: 1; background: #0a0908; border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px; color: var(--txt); font-family: var(--font); font-size: 0.83rem; outline: none; }
     .panel-input:focus { border-color: var(--gold); }
-    .panel-btn { background: var(--gold); color: #080706; border: none; border-radius: 9px; padding: 0 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+    
+  .panel-btn { background: rgba(255,255,255,0.03); color: var(--txt); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+  .panel-btn:hover { background: rgba(255,255,255,0.08); }
+
     .panel-btn:hover { background: var(--gold2); }
     .empty-state { color: var(--txt3); text-align: center; padding: 24px; font-size: 0.82rem; }
     .logout-btn { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 6px 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
@@ -331,7 +334,7 @@
     <div class="navbar-actions">
       <!-- Sadece yetkili girişinde görünür olacak -->
       <!-- Sadece yetkili girişinde görünür olacak -->
-      <button class="nav-btn gold" id="staff-btn" onclick="handleStaffBtnClick()">🔑 Yetkili Girişi</button>
+      <button class="nav-btn gold" id="staff-btn" onclick="handleStaffBtnClick()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg> Yetkili Girişi</button>
     </div>
   </div>
 
@@ -489,7 +492,7 @@
   <div class="modal-overlay" id="login-modal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">🔑 Yetkili Girişi</div>
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 0 20px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold); margin-bottom:15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="modal-title" style="font-size:1.4rem;">Yetkili Girişi</div></div>
         <button class="modal-close" onclick="closeModal('login-modal')">×</button>
       </div>
       <div class="modal-body">
@@ -502,7 +505,7 @@
           <label>Şifre</label>
           <div class="pw-wrap">
             <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()" />
-            <button class="pw-toggle" onclick="togglePw('login-password', this)" type="button">👁</button>
+            <button class="pw-toggle" onclick="togglePw('login-password', this)" type="button" style="display:flex; align-items:center; justify-content:center; color:var(--txt2);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
           </div>
         </div>
         <button class="login-btn" id="login-btn" onclick="doLogin()" style="margin-top:20px;">Giriş Yap</button>
@@ -615,15 +618,15 @@
               <input type="number" class="panel-input" id="cfg-quota" value="50" style="max-width:100px;" />
             </div>
             <div style="display:flex; gap:10px; margin-top:6px;">
-              <button class="panel-btn" onclick="saveSpecialCfg()">💾 Kaydet</button>
-              <button class="panel-btn" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;" onclick="resetSpecialQuota()">🔄 Kotayı Sıfırla</button>
+              <button class="panel-btn" style="background:var(--gold); border-color:var(--gold); color:#000;" onclick="saveSpecialCfg()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Kaydet</button>
+              <button class="panel-btn" style="background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2);color:#ef4444;" onclick="resetSpecialQuota()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg> Kotayı Sıfırla</button>
             </div>
             <div id="cfg-msg" style="display:none; font-size:0.78rem; color:#4ade80; margin-top:6px;">✓ Ayarlar kaydedildi.</div>
 
             <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
               <div class="panel-input-row">
                 <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Drive Eşitleme:</label>
-                <button class="panel-btn" onclick="syncDrive()">🔄 Eski Parçaları Çek</button>
+                <button class="panel-btn" onclick="syncDrive()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Eski Parçaları Çek</button>
               </div>
               <div style="font-size:0.7rem; color:var(--txt3); margin-top:6px;">Daha önce Drive'a gelen ve listede olmayan parçaları ekler, kotadan düşer.</div>
             </div>
@@ -978,7 +981,7 @@
       localStorage.removeItem('staff_username');
       localStorage.removeItem('staff_role');
       const btn = document.getElementById('staff-btn');
-      btn.textContent = '🔑 Yetkili Girişi';
+      btn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg> Yetkili Girişi';
       btn.classList.remove('active');
       hideAdminDashboard();
     }
