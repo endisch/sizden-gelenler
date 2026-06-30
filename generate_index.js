@@ -598,7 +598,10 @@ const html = `<!DOCTYPE html>
 
         <!-- LIMITS -->
         <div class="tab-pane" id="tab-limits">
-          <p class="pane-desc">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <p class="pane-desc" style="margin-bottom:0;">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
+            <button class="action-btn red" onclick="resetAllLimits()" style="padding:8px 16px;">Tümünü Sıfırla</button>
+          </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr><th>E-posta</th><th>Son Başvuru</th><th style="text-align:right;">İşlem</th></tr></thead>
