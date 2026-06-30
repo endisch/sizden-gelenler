@@ -1221,6 +1221,40 @@ const html = `<!DOCTYPE html>
   }
 
 
+    async function resetUser(ip, email) {
+      if (!confirm(email + ' için bekleme süresini sıfırlamak istiyor musunuz?')) return;
+      try {
+        await authFetch('/api/admin/reset-user', { targetIp: ip, targetEmail: email });
+        loadPanelData();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function resetAllLimits() {
+      if (!confirm('TÜM kullanıcıların bekleme süresini sıfırlamak istiyor musunuz?')) return;
+      try {
+        await authFetch('/api/admin/reset-all-limits', {});
+        loadPanelData();
+      } catch(e) { alert(e.message); }
+    }
+
+    function renderLimits() {
+      const lb = document.getElementById('limits-body');
+      if (!panelData.limits || panelData.limits.length === 0) {
+        lb.innerHTML = '<tr><td colspan="3" class="empty-state">Aktif kısıtlama bulunmuyor.</td></tr>';
+        return;
+      }
+      lb.innerHTML = '';
+      panelData.limits.forEach(function(l) {
+        let tr = document.createElement('tr');
+        let emailHtml = '<td><div style="font-weight: 700; color: #fff;">' + esc(l.email) + '</div><div style="font-size: 0.8rem; color: var(--txt3); margin-top: 4px;">Mod: ' + esc(l.type) + '</div></td>';
+        let dateStr = new Date(l.timestamp).toLocaleString();
+        let dateHtml = '<td><div style="font-size: 0.85rem; color: var(--txt2);">' + esc(dateStr) + '</div></td>';
+        let actionHtml = '<td style="text-align:right;"><button class="action-btn red" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
+        tr.innerHTML = emailHtml + dateHtml + actionHtml;
+        lb.appendChild(tr);
+      });
+    }
+
   async function addAccount() {
       const username = document.getElementById('new-username').value.trim();
       const password = document.getElementById('new-password').value;
