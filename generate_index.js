@@ -1231,6 +1231,7 @@ const html = `<!DOCTYPE html>
       if (!confirm(email + ' için bekleme süresini sıfırlamak istiyor musunuz?')) return;
       try {
         await authFetch('/api/admin/reset-user', { targetIp: ip, targetEmail: email });
+        alert(email + ' kullanıcısının bekleme süresi başarıyla sıfırlandı!');
         loadPanelData();
       } catch(e) { alert(e.message); }
     }
@@ -1239,6 +1240,7 @@ const html = `<!DOCTYPE html>
       if (!confirm('TÜM kullanıcıların bekleme süresini sıfırlamak istiyor musunuz?')) return;
       try {
         await authFetch('/api/admin/reset-all-limits', {});
+        alert('Sistemdeki tüm aktif bekleme süreleri (IP ve E-posta) başarıyla sıfırlandı!');
         loadPanelData();
       } catch(e) { alert(e.message); }
     }

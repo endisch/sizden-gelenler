@@ -763,6 +763,9 @@ app.post('/api/admin/reset-all-limits', verifyStaffToken, (req, res) => {
   const oldTs = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
   submissionsData.forEach(s => { s.timestamp = oldTs; });
   saveSubmissionsData();
+  
+  specialSubmissionsData.forEach(s => { s.timestamp = oldTs; });
+  saveSpecialSubmissionsData();
 
   res.json({ success: true });
 });
