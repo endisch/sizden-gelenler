@@ -1048,7 +1048,8 @@
         currentInboxList.forEach(function(s, idx) {
           let action = '<button class="action-btn approve" onclick="event.stopPropagation(); updateStatus(\'' + esc(s.id) + '\',\'reviewed\')">İncelendi</button>';
           let playBtn = '<td style="width: 60px; text-align: center;"><button class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\'inbox\', ' + idx + ')">▶</button></td>';
-          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + ' &nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span></div></td>';
+          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
+          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
           let dateStr = new Date(s.timestamp).toLocaleDateString();
           let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
           let rowNote = '';
@@ -1069,7 +1070,8 @@
             ? '<button class="action-btn approve" onclick="event.stopPropagation(); updateSpecialStatus(\'' + s.id + '\',\'reviewed\')">İncelendi</button>'
             : '<button class="action-btn red" onclick="event.stopPropagation(); updateSpecialStatus(\'' + s.id + '\',\'pending\')">Geri Al</button>';
           let playBtn = '<td style="width: 60px; text-align: center;"><button class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\'special\', ' + idx + ')">▶</button></td>';
-          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + ' &nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span></div></td>';
+          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
+          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
           let dateStr = new Date(s.timestamp).toLocaleDateString();
           let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
           let rowNote = '';
@@ -1227,7 +1229,38 @@
     var playlist = [];
     var playlistIndex = -1;
 
+    
+    function toggleMute() {
+      if (playerEl.muted) {
+        playerEl.muted = false;
+        document.getElementById('ab-mute').textContent = '🔊';
+        document.getElementById('ab-vol').value = playerEl.volume * 100;
+      } else {
+        playerEl.muted = true;
+        document.getElementById('ab-mute').textContent = '🔇';
+        document.getElementById('ab-vol').value = 0;
+      }
+    }
+    
+    function changeVol(val) {
+      playerEl.volume = val / 100;
+      if (playerEl.volume === 0) {
+        playerEl.muted = true;
+        document.getElementById('ab-mute').textContent = '🔇';
+      } else {
+        playerEl.muted = false;
+        document.getElementById('ab-mute').textContent = '🔊';
+      }
+    }
+
+    let currentListType = '';
     function playFromList(listName, idx) {
+      if (currentListType === listName && playlistIndex === idx && playerEl.src) {
+        togglePlay();
+        return;
+      }
+      currentListType = listName;
+
       var srcList = listName === 'inbox' ? currentInboxList : currentSpecialList;
       playlist = srcList.map(function(s) {
         return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || '—', aiTool: s.aiTool || '' };
