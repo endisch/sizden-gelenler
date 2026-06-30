@@ -415,7 +415,17 @@ const html = `<!DOCTYPE html>
             <div class="big">⏳</div>
             <h2>Bu hafta zaten bir parça gönderdiniz</h2>
             <p>Sistem suistimalini önlemek adına kısıtlamalar aktiftir.</p>
-            <div class="countdown" id="countdown">— gün — saat kaldı</div>
+            <div class="countdown" id="countdown" style="background:transparent; border:none; padding:0; display:flex; justify-content:center; gap:16px;">
+              <div style="background:var(--bg-card); border:1px solid rgba(251,191,36,0.3); border-radius:12px; padding:16px; min-width:80px; box-shadow:0 0 15px rgba(251,191,36,0.1);">
+                <div id="countdown-days" style="font-size:2.2rem; font-weight:800; color:var(--gold); line-height:1;">--</div>
+                <div style="font-size:0.75rem; color:var(--txt3); margin-top:6px; text-transform:uppercase; letter-spacing:0.1em; font-weight:600;">Gün</div>
+              </div>
+              <div style="font-size:2rem; font-weight:800; color:var(--gold); align-self:center; opacity:0.5;">:</div>
+              <div style="background:var(--bg-card); border:1px solid rgba(251,191,36,0.3); border-radius:12px; padding:16px; min-width:80px; box-shadow:0 0 15px rgba(251,191,36,0.1);">
+                <div id="countdown-hours" style="font-size:2.2rem; font-weight:800; color:var(--gold); line-height:1;">--</div>
+                <div style="font-size:0.75rem; color:var(--txt3); margin-top:6px; text-transform:uppercase; letter-spacing:0.1em; font-weight:600;">Saat</div>
+              </div>
+            </div>
             <p>Süre dolduğunda yeni bir parçayla tekrar başvurabilirsiniz.</p>
             <br>
             <button class="btn-back" onclick="goBack()">← Geri Dön</button>
