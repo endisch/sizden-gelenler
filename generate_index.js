@@ -788,7 +788,6 @@ const html = `<!DOCTYPE html>
           document.getElementById('countdown-days').textContent = String(Math.floor(remain / (1000 * 60 * 60 * 24))).padStart(2, '0');
           document.getElementById('countdown-hours').textContent = String(Math.floor((remain % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
           showStep('step-blocked');
-          return;
         }
         
         if (cfg.specialConfig && cfg.specialConfig.active) {
