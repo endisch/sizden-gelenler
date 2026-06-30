@@ -523,7 +523,7 @@ const html = `<!DOCTYPE html>
       <div class="modal-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:30px;">
         <div class="navbar-brand" style="font-size: 1.1rem; color: var(--gold); letter-spacing: 0.1em; white-space:nowrap; margin-right: 20px;">
           MUSTAFA İNCE 
-          <span id="panel-username" style="display:none;"></span>
+          <span id="panel-username" style="display:none; margin-left:12px; background:rgba(255,255,255,0.05); padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; color:var(--gold); border:1px solid rgba(251,191,36,0.3); text-transform:none; letter-spacing:normal; box-shadow:0 0 10px rgba(251,191,36,0.1);"></span>
         </div>
         
         <div class="tab-bar" style="flex:1; justify-content:flex-start; margin-bottom:0; gap:8px;">
@@ -1322,6 +1322,7 @@ const html = `<!DOCTYPE html>
           playerEl.play().then(function() {
             document.getElementById('ab-play').textContent = '⏸';
             document.getElementById('audio-bar').classList.add('visible');
+            updateListPlayBtns();
           }).catch(function() { alert('Ses dosyası oynatılamadı.'); });
         })
         .catch(function() { alert('Ses dosyası yüklenemedi. Yetkinizi kontrol edin.'); });
@@ -1331,9 +1332,18 @@ const html = `<!DOCTYPE html>
       playTrack('/api/stream-audio?fileId=' + fileId, title, artist, aiTool);
     }
 
+    function updateListPlayBtns() {
+      document.querySelectorAll('.play-circle-btn').forEach(function(btn) { btn.textContent = '▶'; });
+      if (currentListType && playlistIndex >= 0) {
+        var btn = document.getElementById('btn-play-' + currentListType + '-' + playlistIndex);
+        if (btn) btn.textContent = playerEl.paused ? '▶' : '⏸';
+      }
+    }
+
     function togglePlay() {
       if (playerEl.paused) { playerEl.play(); document.getElementById('ab-play').textContent = '⏸'; }
       else { playerEl.pause(); document.getElementById('ab-play').textContent = '▶'; }
+      updateListPlayBtns();
     }
 
     function seek(val) {
@@ -1343,6 +1353,9 @@ const html = `<!DOCTYPE html>
     function closePlayer() {
       playerEl.pause();
       document.getElementById('audio-bar').classList.remove('visible');
+      currentListType = '';
+      playlistIndex = -1;
+      updateListPlayBtns();
     }
 
     function fmtTime(s) {
