@@ -601,18 +601,32 @@ function getLimitsArray() {
   submissionsData.forEach(s => { if (s.submittedIp) ipToEmail[s.submittedIp] = s.email; });
   specialSubmissionsData.forEach(s => { if (s.submittedIp) ipToEmail[s.submittedIp] = s.email; });
 
+  const addedEmails = new Set();
+
   for (const [ip, ts] of Object.entries(ipLimits)) {
     if (Date.now() - ts < sevenDays) {
-      limitsList.push({ ip: ip, email: ipToEmail[ip] || ip, timestamp: ts, type: 'Normal' });
+      const email = ipToEmail[ip] || ip;
+      limitsList.push({ ip: ip, email: email, timestamp: ts, type: 'Normal' });
+      if (email !== ip) addedEmails.add(email.toLowerCase());
     }
   }
   for (const [ip, ts] of Object.entries(specialIpLimits)) {
     if (Date.now() - ts < sevenDays) {
-      // Avoid duplicate IPs if they are blocked in both, or just add them
-      limitsList.push({ ip: ip, email: ipToEmail[ip] || ip, timestamp: ts, type: 'Özel' });
+      const email = ipToEmail[ip] || ip;
+      limitsList.push({ ip: ip, email: email, timestamp: ts, type: 'Özel' });
+      if (email !== ip) addedEmails.add(email.toLowerCase());
     }
   }
-  // Sort descending by timestamp
+  submissionsData.forEach(s => {
+    if (s.email && !addedEmails.has(s.email.toLowerCase())) {
+      const ts = new Date(s.timestamp).getTime();
+      if (Date.now() - ts < sevenDays) {
+        limitsList.push({ ip: s.submittedIp || '', email: s.email, timestamp: ts, type: 'Normal' });
+        addedEmails.add(s.email.toLowerCase());
+      }
+    }
+  });
+
   limitsList.sort((a,b) => b.timestamp - a.timestamp);
   return limitsList;
 }
