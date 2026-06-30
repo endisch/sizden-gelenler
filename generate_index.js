@@ -528,6 +528,7 @@ const html = `<!DOCTYPE html>
         
         <div class="tab-bar" style="flex:1; justify-content:flex-start; margin-bottom:0; gap:8px;">
           <button class="tab-btn active" onclick="switchTab('inbox')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg> Gelen Kutusu</button>
+          <button class="tab-btn" onclick="switchTab('reviewed')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Geçmiş</button>
           <button class="tab-btn" onclick="switchTab('limits')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Bekleme Süresi</button>
           <button class="tab-btn" onclick="switchTab('accounts')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Hesaplar</button>
           <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Özel Gelenler</button>
@@ -553,6 +554,17 @@ const html = `<!DOCTYPE html>
         </div>
 
         <!-- REVIEWED -->
+        <!-- REVIEWED -->
+        <div class="tab-pane" id="tab-reviewed">
+          <p class="pane-desc">Daha önce "İncelendi" olarak işaretlenen son 15 parça. Yanlışlıkla elediğiniz parçaları "Geri Al" butonuna basarak Gelen Kutusu'na döndürebilirsiniz.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Parça / Sanatçı</th><th>Araç</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="reviewed-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- LIMITS -->
         <div class="tab-pane" id="tab-limits">
           <p class="pane-desc">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
@@ -1070,6 +1082,38 @@ const html = `<!DOCTYPE html>
         });
       }
 
+
+      const rb = document.getElementById('reviewed-body');
+      rb.innerHTML = '';
+      currentReviewedList.length = 0;
+      
+      // Get reviewed items, sort them to get the latest 15 (if timestamp exists, assume they are chronological)
+      let allReviewed = data.submissions.filter(function(s) { return s.status === 'reviewed'; });
+      let last15 = allReviewed.slice(-15);
+      
+      last15.forEach(function(s) {
+        currentReviewedList.push(s);
+      });
+
+      if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="4" class="empty-state">Geçmiş boş.</td></tr>';
+      else {
+        currentReviewedList.forEach(function(s, idx) {
+          let action = '<button class="action-btn red" onclick="event.stopPropagation(); unreviewTrack(\'' + esc(s.id) + '\')">Geri Al</button>';
+          let playBtn = '<td style="width: 60px; text-align: center;"><button id="btn-play-reviewed-' + idx + '" class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\'reviewed\', ' + idx + ')">▶</button></td>';
+          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
+          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
+          let dateStr = new Date(s.timestamp).toLocaleDateString();
+          let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
+          let rowNote = '';
+          if (s.note && s.note !== 'Bilinmiyor') {
+            rowNote = '<tr><td colspan="4" style="padding:0; border:none;"><div style="font-size:0.8rem;color:var(--txt3);margin:0 20px 10px 76px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.05);">' + esc(s.note) + '</div></td></tr>';
+          }
+          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\'reviewed\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
+          rb.innerHTML += rowHtml;
+        });
+      }
+
+
       const spb = document.getElementById('special-body');
       spb.innerHTML = '';
       currentSpecialList = data.specialSubmissions || [];
@@ -1143,6 +1187,7 @@ const html = `<!DOCTYPE html>
     // ═══ MISSING FUNCTION DEFINITIONS (AUTO-PATCHED) ════════════════════════
     let currentInboxList = [];
     let currentSpecialList = [];
+    let currentReviewedList = [];
 
     function esc(str) {
       if (!str) return '';
@@ -1270,7 +1315,7 @@ const html = `<!DOCTYPE html>
       }
       currentListType = listName;
 
-      var srcList = listName === 'inbox' ? currentInboxList : currentSpecialList;
+      var srcList = listName === 'inbox' ? currentInboxList : (listName === 'reviewed' ? currentReviewedList : currentSpecialList);
       playlist = srcList.map(function(s) {
         return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || '\u2014', aiTool: s.aiTool || '' };
       });
