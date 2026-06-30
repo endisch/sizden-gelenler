@@ -742,8 +742,10 @@ app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
   if (targetEmail) {
     const emailLower = targetEmail.toLowerCase();
     const oldTs = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
-    submissionsData.forEach(s => { if (s.email.toLowerCase() === emailLower) s.timestamp = oldTs; });
+    submissionsData.forEach(s => { if (s.email && s.email.toLowerCase() === emailLower) s.timestamp = oldTs; });
     saveSubmissionsData();
+    specialSubmissionsData.forEach(s => { if (s.email && s.email.toLowerCase() === emailLower) s.timestamp = oldTs; });
+    saveSpecialSubmissionsData();
   }
   if (targetIp) {
     if (ipLimits[targetIp]) delete ipLimits[targetIp];
