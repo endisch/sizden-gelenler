@@ -1215,6 +1215,9 @@ const html = `<!DOCTYPE html>
         spb.innerHTML = '<tr><td colspan="2" class="empty-state">Özel bölümde gönderilmiş parça yok.</td></tr>';
       }
 
+      if (typeof renderLimits === 'function') renderLimits();
+
+
     } catch(e) {
       console.error(e);
     }
