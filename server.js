@@ -313,6 +313,36 @@ app.post('/check-limit', async (req, res) => {
   }
 });
 
+app.post('/check-special-limit', async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'Token eksik.' });
+
+    if (!specialConfig.active) {
+       return res.status(403).json({ error: 'Özel bölüm kapalıdır.' });
+    }
+
+    const payload = await verifyGoogleToken(token);
+    const email = payload.email.toLowerCase();
+
+    const userSubs = specialSubmissionsData.filter(s => s.email.toLowerCase() === email);
+    if (userSubs.length > 0) {
+      const latestSub = Math.max(...userSubs.map(s => new Date(s.timestamp).getTime()));
+      const diff = Date.now() - latestSub;
+      const sevenDays = 7 * 24 * 60 * 60 * 1000;
+      if (diff < sevenDays) {
+        const remaining = sevenDays - diff;
+        const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        return res.json({ allowed: false, days, hours });
+      }
+    }
+    res.json({ allowed: true, name: payload.name });
+  } catch (err) {
+    res.status(401).json({ error: 'Geçersiz token.' });
+  }
+});
+
 app.post('/submit', upload.single('mp3'), async (req, res) => {
   try {
     const { token, fullName, social, aiTool, trackName, note, consent } = req.body;

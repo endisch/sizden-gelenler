@@ -329,7 +329,20 @@ const html = `<!DOCTYPE html>
     }
     .data-table tbody tr td { border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
     .data-table tbody tr:last-child td { border-bottom: none; }
-  </style>
+  
+    .mode-switcher {
+      display: flex; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 4px; margin: 0 auto 30px; width: fit-content;
+      border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .mode-btn {
+      padding: 10px 24px; font-size: 0.85rem; font-weight: 700; color: var(--txt3); border-radius: 8px; cursor: pointer;
+      transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.05em; background: transparent; border: none;
+    }
+    .mode-btn.active { background: var(--gold); color: #000; box-shadow: 0 4px 12px rgba(251,191,36,0.3); }
+    .special-badge { display:none; background: linear-gradient(45deg, #ef4444, #f97316); color:#fff; font-size:0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+    .mode-btn.active .special-badge { background: #000; color: var(--gold); }
+
+</style>
 </head>
 <body>
 
@@ -368,6 +381,14 @@ const html = `<!DOCTYPE html>
       </div>
 
       <div class="body">
+        
+        <div id="mode-switcher-container" style="display:none; text-align:center;">
+          <div class="mode-switcher">
+            <button class="mode-btn active" id="btn-mode-normal" onclick="setMode('normal')">Normal Başvuru</button>
+            <button class="mode-btn" id="btn-mode-special" onclick="setMode('special')"><span id="special-mode-title">Özel Konsept</span> <span class="special-badge">ÖZEL</span></button>
+          </div>
+        </div>
+
         <div class="dots" id="dots">
           <div class="dot active" id="dot-email"></div>
           <div class="dot" id="dot-form"></div>
@@ -707,21 +728,48 @@ const html = `<!DOCTYPE html>
     let gsiReady = false;
     let staffToken = localStorage.getItem('staff_token') || '';
     let staffUsername = localStorage.getItem('staff_username') || '';
+    
     let staffRole = localStorage.getItem('staff_role') || '';
+    let isSpecialMode = false;
+
+    function updateMainQuota() {
+      if(!window.siteConfig) return;
+      const q = isSpecialMode ? window.siteConfig.specialConfig : window.siteConfig.quota;
+      if(q) {
+        const max = q.maxQuota || 50;
+        const used = q.usedQuota || 0;
+        const remain = Math.max(0, max - used);
+        const txt = remain + ' / ' + max;
+        document.getElementById('main-quota').textContent = txt;
+        document.getElementById('welcome-quota-val').textContent = txt;
+      }
+    }
+
+    function setMode(mode) {
+      isSpecialMode = (mode === 'special');
+      document.getElementById('btn-mode-normal').classList.toggle('active', !isSpecialMode);
+      document.getElementById('btn-mode-special').classList.toggle('active', isSpecialMode);
+      updateMainQuota();
+      goBack(); // reset form
+    }
+
 
     // ═══ INIT ════════════════════════════════════════════════════════════════
     (async function init() {
       try {
+        
         const cfg = await fetch('/config').then(r => r.json());
+        window.siteConfig = cfg;
+        
+        if (cfg.specialConfig && cfg.specialConfig.active) {
+          document.getElementById('mode-switcher-container').style.display = 'block';
+          if(cfg.specialConfig.title) document.getElementById('special-mode-title').textContent = cfg.specialConfig.title;
+        }
+        updateMainQuota();
+
         googleClientId = cfg.googleClientId;
         
-        // Quota
-        if (cfg.quota) {
-          const remain = Math.max(0, cfg.quota.maxQuota - cfg.quota.usedQuota);
-          const txt = remain + ' / ' + cfg.quota.maxQuota;
-          document.getElementById('main-quota').textContent = txt;
-          document.getElementById('welcome-quota-val').textContent = txt;
-        }
+        
 
         if (!staffToken) {
           setTimeout(() => openModal('welcome-overlay'), 300);
@@ -789,7 +837,7 @@ const html = `<!DOCTYPE html>
       document.getElementById('gsi-loading').style.display = 'block';
       document.getElementById('gsi-btn').style.opacity = '0.5';
       document.getElementById('gsi-btn').style.pointerEvents = 'none';
-      fetch('/check-limit', {
+      fetch(isSpecialMode ? '/check-special-limit' : '/check-limit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleToken })
       })
@@ -895,7 +943,7 @@ const html = `<!DOCTYPE html>
       fd.append('mp3', mp3);
 
       try {
-        const res = await fetch('/submit', { method: 'POST', body: fd });
+        const res = await fetch(isSpecialMode ? '/submit-special' : '/submit', { method: 'POST', body: fd });
         const data = await res.json();
         
         if (res.status === 403) {
