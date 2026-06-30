@@ -1099,6 +1099,7 @@ const html = `<!DOCTYPE html>
       const res = await fetch('/api/admin/submissions', { headers: { 'Authorization': 'Bearer '+staffToken }});
       if(res.status === 401 || res.status === 403) { logout(); return; }
       const data = await res.json();
+      panelData = data;
 
       const ab = document.getElementById('accounts-body');
       ab.innerHTML = '';
