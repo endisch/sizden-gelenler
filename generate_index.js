@@ -8,11 +8,11 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sizden Gelenler — Mustafa İnce</title>
+  <title>Sizden Gelenler | Mustafa İnce</title>
   <script src="https://accounts.google.com/gsi/client" async defer><\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #080706;
@@ -25,7 +25,7 @@ const html = `<!DOCTYPE html>
       --gold: #fbbf24;
       --gold2: #f59e0b;
       --glow: rgba(251,191,36,0.06);
-      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font: 'Montserrat', system-ui, sans-serif;
       --radius: 16px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -361,7 +361,7 @@ const html = `<!DOCTYPE html>
     
     <div class="logo-wrap">
       <div class="logo-main">Mustafa İnce<br><span>Sizden Gelenler</span></div>
-      <div class="logo-sub">Sezon 2 — Dinleyici Gönderim Portalı</div>
+      <div class="logo-sub">Sezon 2 Dinleyici Gönderim Portalı</div>
     </div>
 
     <div style="text-align: center;">
@@ -396,7 +396,7 @@ const html = `<!DOCTYPE html>
 
         <!-- Step 1: Google Sign-In -->
         <div class="step active" id="step-email">
-          <div class="step-lbl">Adım 1 / 2 — Kimlik Doğrulama</div>
+          <div class="step-lbl">1. Adım: Kimlik Doğrulama</div>
           <div class="err" id="err-email"></div>
           <div style="text-align:center; margin: 28px 0 18px;">
             <div id="gsi-btn" style="display:inline-block;"></div>
@@ -434,7 +434,7 @@ const html = `<!DOCTYPE html>
 
         <!-- Step 2: Form -->
         <div class="step" id="step-form">
-          <div class="step-lbl">Adım 2 / 2 — Parça Bilgileri</div>
+          <div class="step-lbl">2. Adım: Parça Bilgileri</div>
           <div class="err" id="err-form"></div>
           <div class="field">
             <label>Ad Soyad <span class="req">*</span></label>
@@ -470,7 +470,7 @@ const html = `<!DOCTYPE html>
               <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)" />
               <div class="uz-icon">🎵</div>
               <div class="uz-title">MP3 dosyanı sürükle veya tıkla</div>
-              <div class="uz-sub">Yalnızca .mp3 — maks. 20 MB</div>
+              <div class="uz-sub">Yalnızca .mp3, en fazla 20 MB</div>
               <div class="uz-name" id="file-name"></div>
             </div>
           </div>
@@ -513,14 +513,14 @@ const html = `<!DOCTYPE html>
   <div class="modal-overlay" id="welcome-overlay">
     <div class="modal-box" style="max-width: 440px; text-align: center; padding: 40px 32px;">
       <div class="welcome-icon">🚀</div>
-      <div class="modal-title" style="justify-content:center; margin-bottom: 12px; font-size:1.3rem;">Sistem Test Aşamasında</div>
+      <div class="modal-title" style="justify-content:center; margin-bottom: 12px; font-size:1.3rem;">Hoş Geldiniz! 🚀</div>
       <div class="pane-desc" style="margin-bottom:24px; font-size:0.86rem;">
-        Sizden Gelenler platformu şu anda kota sınırlı test aşamasındadır. Yalnızca belirli sayıda başvuru kabul edilmektedir.
+        Sizden Gelenler platformumuz şu an heyecanlı bir test aşamasında! Sistemi birlikte deneyimleyebilmek için küçük bir başvuru sınırımız var. Anlayışınız ve desteğiniz için çok teşekkürler! 😊
       </div>
       <div class="quota-badge" style="font-size: 0.82rem; padding: 10px 18px; margin-bottom: 28px; background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.2);">
         Kalan Gönderim Hakkı: <span class="val" id="welcome-quota-val">-- / 200</span>
       </div>
-      <button class="btn" style="margin-top:0;" onclick="closeModal('welcome-overlay')">Anladım, Devam Et</button>
+      <button class="btn" style="margin-top:0;" onclick="closeModal('welcome-overlay')">Anladım, Haydi Başlayalım!</button>
     </div>
   </div>
 
