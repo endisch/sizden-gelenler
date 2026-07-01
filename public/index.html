@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sizden Gelenler | Mustafa İnce</title>
+  <title>Sizden Gelenler — Mustafa İnce</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,7 @@
       --radius: 16px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    input, button, select, textarea { font-family: inherit; }
     body { background: var(--bg); color: var(--txt);  font-family: var(--font); min-height: 100vh; padding: 24px 20px 80px; display: flex; flex-direction: column; align-items: center;  position: relative; }
     body::before {
       content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -361,7 +362,7 @@
 
     <div style="text-align: center;">
       <div class="quota-badge">
-        Kalan Gönderim Hakkı: <span class="val" id="main-quota">-- / 200</span>
+        Kalan Gönderim Hakkı: <span class="val" id="main-quota">Hesaplanıyor...</span>
       </div>
     </div>
 
@@ -513,7 +514,7 @@
         Sizden Gelenler platformumuz şu an heyecanlı bir test aşamasında! Sistemi birlikte deneyimleyebilmek için küçük bir başvuru sınırımız var. Anlayışınız ve desteğiniz için çok teşekkürler! 😊
       </div>
       <div class="quota-badge" style="font-size: 0.82rem; padding: 10px 18px; margin-bottom: 28px; background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.2);">
-        Kalan Gönderim Hakkı: <span class="val" id="welcome-quota-val">-- / 200</span>
+        Kalan Gönderim Hakkı: <span class="val" id="welcome-quota-val">Hesaplanıyor...</span>
       </div>
       <button class="btn" style="margin-top:0;" onclick="closeModal('welcome-overlay')">Anladım, Haydi Başlayalım!</button>
     </div>
@@ -703,8 +704,8 @@
   <div id="audio-bar">
     <div class="ab-art" id="ab-art">🎵</div>
     <div class="ab-info">
-      <div class="ab-title" id="ab-title">—</div>
-      <div class="ab-artist" id="ab-artist">—</div>
+      <div class="ab-title" id="ab-title">Parça seçilmedi</div>
+      <div class="ab-artist" id="ab-artist">Sanatçı yok</div>
     </div>
     <div class="ab-controls">
       <div class="ab-btns-row">
@@ -1452,7 +1453,7 @@
 
       var srcList = listName === 'inbox' ? currentInboxList : (listName === 'reviewed' ? currentReviewedList : currentSpecialList);
       playlist = srcList.map(function(s) {
-        return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || '—', aiTool: s.aiTool || '' };
+        return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || 'Bilinmiyor', aiTool: s.aiTool || '' };
       });
       playlistIndex = idx;
       playCurrent();
