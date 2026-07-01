@@ -8,7 +8,7 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sizden Gelenler — Mustafa İnce</title>
+  <title>Sizden Gelenler Mustafa İnce</title>
   <script src="https://accounts.google.com/gsi/client" async defer><\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
