@@ -6,6 +6,872 @@ const htmlFile = path.join(__dirname, 'public', 'index.html');
 const html = `<!DOCTYPE html>
 <html lang="tr">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mustafa İnce · Sizden Gelenler — Sezon 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0c0c0e;
+    --bg-panel: #17161a;
+    --bg-panel-2: #1d1b1f;
+    --bg-raised: #232025;
+    --accent: #e8a33d;
+    --accent-soft: #f0c179;
+    --rec: #c7402a;
+    --text: #f3efe7;
+    --text-dim: #a39c8f;
+    --line: rgba(243,239,231,0.10);
+    --line-strong: rgba(243,239,231,0.18);
+    --radius: 14px;
+    --shadow: 0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family:'Montserrat', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .display{ font-family:'Montserrat', sans-serif; text-transform:uppercase; letter-spacing:0.02em; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+
+  ::selection{ background:var(--accent); color:#141116; }
+
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+
+  /* ---------- background texture ---------- */
+  .noise{
+    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px clamp(20px,5vw,64px);
+    background:rgba(12,12,14,0.75);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:8px;
+    background:linear-gradient(145deg, var(--accent), #c47a1f);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald'; font-weight:700; font-size:15px; color:#161213;
+  }
+  .brand-name{ font-family:'Oswald'; font-weight:600; letter-spacing:0.04em; font-size:15px; }
+  .brand-sub{ font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; }
+
+  .btn-ghost{
+    padding:10px 18px; border:1px solid var(--line-strong); border-radius:999px;
+    font-size:13px; font-weight:600; letter-spacing:0.02em;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .btn-ghost:hover{ border-color:var(--accent); background:rgba(232,163,61,0.07); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px;
+    align-items:center;
+    padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px) clamp(64px,8vw,120px);
+    max-width:1280px; margin:0 auto;
+  }
+
+  .rec-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 14px 6px 10px; border-radius:999px;
+    background:rgba(199,64,42,0.12); border:1px solid rgba(199,64,42,0.4);
+    font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:700; color:#e8846f;
+    margin-bottom:22px;
+  }
+  .rec-dot{
+    width:7px; height:7px; border-radius:50%; background:var(--rec);
+    box-shadow:0 0 0 0 rgba(199,64,42,0.6);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(199,64,42,0.55); }
+    70%{ box-shadow:0 0 0 9px rgba(199,64,42,0); }
+    100%{ box-shadow:0 0 0 0 rgba(199,64,42,0); }
+  }
+
+  .hero h1{
+    font-size:clamp(40px,6.4vw,72px);
+    line-height:0.98;
+    font-weight:700;
+    margin-bottom:18px;
+  }
+  .hero h1 span{ color:var(--accent); }
+
+  .hero p.lead{
+    color:var(--text-dim); font-size:16px; max-width:46ch; margin-bottom:32px;
+  }
+
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:40px; }
+
+  .btn-primary{
+    padding:15px 28px; border-radius:10px;
+    background:linear-gradient(180deg, var(--accent-soft), var(--accent));
+    color:#181215; font-weight:700; font-size:14px; letter-spacing:0.01em;
+    box-shadow:0 10px 30px -8px rgba(232,163,61,0.5);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 14px 34px -6px rgba(232,163,61,0.6); }
+  .btn-primary:active{ transform:translateY(0); }
+
+  /* quota readout */
+  .readout{
+    display:inline-flex; align-items:center; gap:16px;
+    background:var(--bg-panel); border:1px solid var(--line);
+    border-radius:12px; padding:14px 20px;
+  }
+  .readout-label{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); }
+  .readout-value{ font-size:22px; font-weight:700; color:var(--accent); letter-spacing:0.02em; }
+
+  /* equalizer signature element */
+  .eq{
+    display:flex; align-items:flex-end; gap:3px; height:34px;
+  }
+  .eq span{
+    width:3px; background:var(--accent); border-radius:2px; opacity:0.85;
+    animation:eq 1.2s ease-in-out infinite;
+  }
+  @keyframes eq{
+    0%,100%{ transform:scaleY(0.25); }
+    50%{ transform:scaleY(1); }
+  }
+
+  .hero-visual{ position:relative; display:flex; justify-content:center; }
+  .portrait-frame{
+    position:relative; width:min(360px, 90%); aspect-ratio:1/1.05;
+    border-radius:22px; overflow:hidden;
+    border:1px solid var(--line-strong);
+    box-shadow:var(--shadow);
+  }
+  .portrait-frame img{ width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.05) contrast(1.05); }
+  .portrait-frame::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(12,12,14,0) 55%, rgba(12,12,14,0.85) 100%);
+  }
+  .portrait-caption{
+    position:absolute; left:20px; right:20px; bottom:18px; z-index:2;
+  }
+  .portrait-caption .name{ font-family:'Oswald'; font-weight:600; font-size:20px; letter-spacing:0.02em; }
+  .portrait-caption .role{ font-size:12px; color:var(--text-dim); }
+
+  .hero-eq-strip{
+    position:absolute; top:-18px; right:-18px;
+    background:var(--bg-panel); border:1px solid var(--line);
+    border-radius:12px; padding:12px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+
+  /* ---------- section shell ---------- */
+  section.block{
+    max-width:1280px; margin:0 auto;
+    padding:56px clamp(20px,5vw,64px);
+    position:relative; z-index:1;
+  }
+  .step-label{
+    display:flex; align-items:center; gap:14px; margin-bottom:28px;
+  }
+  .step-num{
+    font-family:'JetBrains Mono'; font-weight:700; font-size:13px; color:var(--accent);
+    border:1px solid var(--line-strong); border-radius:8px; padding:5px 10px;
+  }
+  .step-title{ font-family:'Oswald'; font-weight:600; font-size:20px; letter-spacing:0.02em; }
+  .step-line{ flex:1; height:1px; background:var(--line); }
+
+  .panel{
+    background:var(--bg-panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:clamp(24px,4vw,40px);
+  }
+
+  /* step 1 */
+  .auth-panel{ display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap; }
+  .auth-copy p{ color:var(--text-dim); font-size:14px; max-width:48ch; }
+  .auth-copy p.rule{ margin-top:10px; font-size:12.5px; color:#847c6f; }
+
+  .google-btn{
+    display:flex; align-items:center; gap:12px;
+    background:var(--bg-raised); border:1px solid var(--line-strong);
+    padding:13px 22px; border-radius:10px; font-size:14px; font-weight:600;
+    transition:border-color .2s ease, transform .15s ease;
+    white-space:nowrap;
+  }
+  .google-btn:hover{ border-color:var(--accent); transform:translateY(-1px); }
+  .google-btn svg{ width:18px; height:18px; }
+
+  .countdown-tile{
+    display:none; text-align:center; background:var(--bg-raised);
+    border:1px solid var(--line); border-radius:10px; padding:16px 22px; min-width:120px;
+  }
+  .countdown-tile .num{ font-family:'JetBrains Mono'; font-size:26px; font-weight:700; color:var(--accent); }
+  .countdown-tile .lbl{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-top:4px; }
+
+  /* step 2 - form */
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field.full{ grid-column:1 / -1; }
+  .field label{ font-size:12px; font-weight:600; letter-spacing:0.03em; color:var(--text-dim); text-transform:uppercase; }
+  .field input[type="text"],
+  .field select,
+  .field textarea{
+    background:var(--bg-raised); border:1px solid var(--line-strong); border-radius:9px;
+    padding:13px 14px; color:var(--text); font-size:14px; font-family:'Manrope';
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--accent); box-shadow:0 0 0 3px rgba(232,163,61,0.15); outline:none;
+  }
+  .field select{ appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a39c8f'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center;
+  }
+  .field textarea{ resize:vertical; min-height:88px; }
+  .char-count{ align-self:flex-end; font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono'; }
+
+  /* dropzone */
+  .dropzone{
+    border:1.5px dashed var(--line-strong); border-radius:12px;
+    padding:30px 20px; text-align:center; cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .dropzone.drag{ border-color:var(--accent); background:rgba(232,163,61,0.06); }
+  .dropzone .dz-icon{
+    width:38px; height:38px; margin:0 auto 12px; opacity:0.8;
+  }
+  .dropzone .dz-title{ font-size:14px; font-weight:600; margin-bottom:4px; }
+  .dropzone .dz-sub{ font-size:12px; color:var(--text-dim); }
+  .dropzone.filled{ border-style:solid; border-color:var(--accent); }
+  .dropzone .dz-file{ display:none; align-items:center; justify-content:center; gap:10px; font-size:13.5px; }
+  .dropzone .dz-file .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); }
+
+  /* checkbox */
+  .consent{ display:flex; align-items:flex-start; gap:12px; }
+  .consent input{ appearance:none; width:19px; height:19px; margin-top:1px; flex:0 0 auto;
+    border:1.5px solid var(--line-strong); border-radius:5px; background:var(--bg-raised);
+    display:grid; place-items:center; cursor:pointer;
+  }
+  .consent input::after{ content:""; width:10px; height:10px; border-radius:2px; background:var(--accent); transform:scale(0); transition:transform .15s ease; }
+  .consent input:checked::after{ transform:scale(1); }
+  .consent label{ font-size:13px; color:var(--text-dim); line-height:1.5; cursor:pointer; }
+
+  .submit-row{ display:flex; justify-content:flex-end; margin-top:8px; }
+
+  /* footer */
+  footer{
+    border-top:1px solid var(--line); padding:40px clamp(20px,5vw,64px);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+    position:relative; z-index:1;
+  }
+  .socials{ display:flex; gap:10px; }
+  .socials a{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line-strong); display:grid; place-items:center;
+    transition:border-color .2s ease, background .2s ease, transform .15s ease;
+  }
+  .socials a:hover{ border-color:var(--accent); background:rgba(232,163,61,0.08); transform:translateY(-2px); }
+  .socials svg{ width:16px; height:16px; }
+  .footer-note{ font-size:12px; color:var(--text-dim); }
+
+  /* modal (success + admin login) */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(8,8,9,0.7); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:var(--bg-panel-2); border:1px solid var(--line-strong); border-radius:16px;
+    padding:36px; max-width:400px; width:100%; text-align:center; box-shadow:var(--shadow);
+    animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(10px) scale(0.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .modal .check{
+    width:56px; height:56px; border-radius:50%; margin:0 auto 18px;
+    background:rgba(232,163,61,0.12); border:1px solid rgba(232,163,61,0.4);
+    display:grid; place-items:center;
+  }
+  .modal h3{ font-family:'Oswald'; font-weight:600; font-size:19px; margin-bottom:10px; }
+  .modal p{ font-size:13.5px; color:var(--text-dim); margin-bottom:22px; line-height:1.6; }
+  .modal .btn-primary{ width:100%; text-align:center; display:block; }
+
+  .admin-modal .field{ margin-bottom:16px; text-align:left; }
+
+  @media (max-width: 880px){
+    .hero{ grid-template-columns:1fr; }
+    .hero-visual{ order:-1; }
+    .form-grid{ grid-template-columns:1fr; }
+    .auth-panel{ flex-direction:column; align-items:stretch; text-align:center; }
+    .hero-eq-strip{ display:none; }
+  }
+
+  /* --- İçe aktarılan Admin ve Player Stilleri --- */
+  /* ════ MODALS ════ */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(8,7,6,0.92); backdrop-filter: blur(14px); z-index: 9000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .modal-box { background: var(--card); border: 1.5px solid var(--border2); border-radius: 22px; width: 100%; box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 80px var(--glow); animation: scaleUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes scaleUp { from { transform:scale(0.92); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; border-bottom: 1.5px solid var(--border); }
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+    .modal-close { background: none; border: none; color: var(--txt2); font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; transition: color 0.2s; }
+    .modal-close:hover { color: var(--txt); }
+    .modal-body { padding: 24px 28px; }
+
+    /* ── Welcome Modal ── */
+    #welcome-overlay { z-index: 9500; }
+    #welcome-overlay .modal-box { max-width: 440px; text-align: center; padding: 40px 32px; }
+    .welcome-icon { font-size: 3rem; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
+
+    /* ── Staff Login Modal ── */
+    #login-modal .modal-box { max-width: 400px; }
+    .login-field { margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 0.73rem; font-weight: 700; color: var(--txt); margin-bottom: 7px; text-align: left; }
+    .login-field input { width: 100%; background: #0a0908; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--txt); font-family: var(--font); font-size: 0.86rem; outline: none; transition: all 0.2s; }
+    .login-field input:focus { border-color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.07); }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--txt3); cursor: pointer; font-size: 1rem; padding: 0; }
+    .login-err { background: rgba(239,68,68,0.08); border: 1px dashed rgba(239,68,68,0.25); border-radius: 8px; color: #f87171; padding: 9px 13px; font-size: 0.78rem; margin-bottom: 14px; display: none; }
+    .login-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; background: var(--gold); color: #080706; border: none; border-radius: 10px; padding: 13px; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+    .login-btn:hover { background: var(--gold2); box-shadow: 0 0 15px rgba(251,191,36,0.4); transform: scale(1.02); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Staff Panel Modal ── */
+    #panel-modal .modal-box { max-width: 820px; max-height: 88vh; overflow-y: auto; }
+    .tab-bar { display: flex; gap: 4px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
+    .tab-btn { background: none; border: none; color: var(--txt2); padding: 10px 14px; font-weight: 600; font-size: 0.78rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--txt); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeUp 0.25s ease; }
+    .pane-desc { font-size: 0.78rem; color: var(--txt2); margin-bottom: 14px; line-height: 1.6; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .data-table th { padding: 9px 10px; color: var(--txt3); font-weight: 600; text-align: left; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.015); }
+    .table-wrap { border: 1px solid var(--border); border-radius: 12px; background: #0a0a0a; overflow: hidden; max-height: 460px; overflow-y: auto; }
+    .tag { font-size: 0.65rem; background: rgba(251,191,36,0.1); color: var(--gold); padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .tag.archived { background: rgba(255,255,255,0.05); color: var(--txt2); }
+    .action-btn { background: none; border: 1px solid; border-radius: 6px; padding: 5px 10px; font-size: 0.72rem; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+    .action-btn.approve { border-color: var(--gold); color: var(--gold); }
+    .action-btn.approve:hover { background: var(--gold); color: #080706; }
+    .action-btn.reject { border-color: #f87171; color: #f87171; }
+    .action-btn.reject:hover { background: #f87171; color: #080706; }
+    .action-btn.danger { border-color: #f87171; color: #f87171; }
+    .action-btn.danger:hover { background: rgba(248,113,113,0.12); }
+    .action-btn.neutral { border-color: var(--border2); color: var(--txt2); }
+    .action-btn.neutral:hover { border-color: var(--txt2); color: var(--txt); }
+    .panel-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .panel-input { flex: 1; background: #0a0908; border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px; color: var(--txt); font-family: var(--font); font-size: 0.83rem; outline: none; }
+    .panel-input:focus { border-color: var(--gold); }
+    
+  .panel-btn { background: rgba(255,255,255,0.03); color: var(--txt); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+  .panel-btn:hover { background: rgba(255,255,255,0.08); }
+
+    .panel-btn:hover { background: var(--gold2); }
+    .empty-state { color: var(--txt3); text-align: center; padding: 24px; font-size: 0.82rem; }
+    .logout-btn { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 6px 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .logout-btn:hover { background: #f87171; color: #080706; }
+
+    .note-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border2); border-radius: 8px; padding: 10px; font-size: 0.75rem; color: var(--txt2); margin-top: 8px; font-style: italic; display: none; }
+    .show-note { font-size: 0.65rem; color: var(--gold); text-decoration: underline; cursor: pointer; margin-left: 6px; }
+
+    /* ── Playlist Modal ── */
+    #playlist-modal .modal-box { max-width: 680px; max-height: 90vh; overflow-y: auto; }
+    .playlist-item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 10px; background: #0e0d0b; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+    .playlist-item:hover { background: #121110; border-color: rgba(251,191,36,0.2); transform: translateY(-1px); }
+    .playlist-item:last-child { margin-bottom: 0; }
+    .pl-num { font-size: 0.82rem; color: var(--txt3); font-weight: 600; width: 20px; text-align: right; flex-shrink: 0; }
+    .pl-info { flex: 1; overflow: hidden; }
+    .pl-title { font-size: 0.86rem; font-weight: 600; color: var(--txt); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-artist { font-size: 0.73rem; color: var(--txt2); }
+    .pl-play { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: #080808; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; box-shadow: 0 0 8px rgba(251,191,36,0.2); }
+
+    /* ── Success Modal ── */
+    #success-modal .modal-box { max-width: 420px; text-align: center; padding: 40px 32px; }
+    .success-icon { width: 68px; height: 68px; border-radius: 50%; border: 2.5px solid var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: var(--gold); box-shadow: 0 0 20px rgba(251,191,36,0.25); }
+    .success-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 14px; }
+    .success-text { font-size: 0.84rem; color: var(--txt2); line-height: 1.8; margin-bottom: 24px; }
+
+    /* ── Global Audio Player ── */
+    #audio-bar { 
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px); 
+      width: 90%; max-width: 900px; 
+      background: rgba(10, 9, 8, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); 
+      border: 1px solid var(--border); border-radius: 100px; 
+      padding: 12px 24px; z-index: 9999; 
+      display: flex; align-items: center; gap: 16px; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--glow); 
+      opacity: 0; pointer-events: none; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    }
+    #audio-bar.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+    #audio-bar.visible { display: flex; }
+    .ab-art { width: 44px; height: 44px; background: var(--border2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .ab-info { flex: 1.5; min-width: 120px; }
+    .ab-title { font-size: 0.84rem; font-weight: 600; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ab-artist { font-size: 0.72rem; color: var(--txt2); }
+    .ab-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 2; max-width: 400px; }
+    .ab-btn { background: none; border: none; color: var(--txt2); font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    .ab-btn:hover { color: var(--gold); transform: scale(1.1); }
+    .ab-play { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: none; color: #080808; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+    .ab-play:hover { transform: scale(1.08); }
+    .ab-seek-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+    .ab-time { font-size: 0.68rem; color: var(--txt3); width: 32px; text-align: right; }
+    .ab-dur { font-size: 0.68rem; color: var(--txt3); width: 32px; }
+    .ab-seek { flex: 1; accent-color: var(--gold); height: 3px; cursor: pointer; }
+    .ab-close { background: none; border: none; color: var(--txt3); font-size: 1.3rem; cursor: pointer; padding: 0; flex-shrink: 0; }
+    .ab-close:hover { color: var(--txt); }
+    .ab-btns-row { display: flex; align-items: center; gap: 8px; }
+    .ab-btn { background: none; border: none; color: var(--txt2); font-size: 1.1rem; cursor: pointer; padding: 4px; transition: all 0.15s ease; border-radius: 50%; }
+    .ab-btn:hover { color: var(--gold); transform: scale(1.15); }
+    @media (max-width: 600px) {
+      #audio-bar { flex-wrap: wrap; padding: 16px; gap: 10px; border-radius: 20px; bottom: 20px; }
+      .ab-controls { width: 100%; max-width: 100%; flex: unset; width: 100%; }
+      .ab-info { flex: 1; }
+    }
+  
+    .admin-dashboard {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px 0 100px 0;
+      animation: fadeUp 0.3s ease;
+    }
+    /* .admin-dashboard .modal-header styles replaced by inline styles */
+    .admin-dashboard .modal-title { font-size:1.3rem; font-weight:600; color:#fff; display:flex; align-items:center; }
+    .admin-dashboard .tab-bar { display:flex; gap:10px; flex-wrap:wrap; }
+    .admin-dashboard .table-wrap { overflow-x:auto; background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border:1px solid var(--border); border-radius:12px; }
+    .admin-dashboard .data-table th, .admin-dashboard .data-table td { padding:14px 16px; font-size:0.9rem; }
+    .admin-dashboard .pane-desc { font-size:0.85rem; color:var(--txt2); margin-bottom:15px; }
+
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(251,191,36,0.5); }
+  
+    .play-circle-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: rgba(251,191,36,0.1); color: var(--gold);
+      font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      opacity: 0.7; margin: 0 auto;
+    }
+    .data-table tbody tr:hover .play-circle-btn {
+      background: var(--gold); color: #000; opacity: 1; transform: scale(1.15); box-shadow: 0 0 15px rgba(251,191,36,0.5);
+    }
+    .data-table tbody tr td { border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+  
+    .mode-switcher {
+      display: flex; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 4px; margin: 0 auto 30px; width: fit-content;
+      border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .mode-btn {
+      padding: 10px 24px; font-size: 0.85rem; font-weight: 700; color: var(--txt3); border-radius: 8px; cursor: pointer;
+      transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.05em; background: transparent; border: none;
+    }
+    .mode-btn.active { background: var(--gold); color: #000; box-shadow: 0 4px 12px rgba(251,191,36,0.3); }
+    .special-badge { display:none; background: linear-gradient(45deg, #ef4444, #f97316); color:#fff; font-size:0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+    .mode-btn.active .special-badge { background: #000; color: var(--gold); }
+
+
+</style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">Mİ</div>
+    <div>
+      <div class="brand-name">MUSTAFA İNCE</div>
+      <div class="brand-sub">MAIS Studio Yönetimi</div>
+    </div>
+  </div>
+  <button class="btn-ghost" id="staff-btn" onclick="handleStaffBtnClick()">Yetkili Girişi</button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="rec-badge"><span class="rec-dot"></span> Sezon 2 · Canlı Başvuru</div>
+      <h1 class="display">Sizden<br><span>Gelenler</span></h1>
+      <p class="lead">Yapay zeka ile ürettiğin parçanı gönder, dinleyelim. Her hafta yeni bir başvuru hakkın var — en iyi parçalar Mustafa İnce'nin kanallarında yayınlanıyor.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#basvuru">Başvuruyu Başlat</a>
+        <div class="readout">
+          <div>
+            <div class="readout-label">Kalan Gönderim Hakkı</div>
+            <div class="readout-value mono" id="quotaValue">1 / 1</div>
+          </div>
+          <div class="eq" aria-hidden="true">
+            <span style="animation-delay:0s"></span>
+            <span style="animation-delay:.15s"></span>
+            <span style="animation-delay:.3s"></span>
+            <span style="animation-delay:.45s"></span>
+            <span style="animation-delay:.1s"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-eq-strip">
+        <span style="font-size:11px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;">On Air</span>
+        <div class="eq" aria-hidden="true">
+          <span style="animation-delay:.2s"></span>
+          <span style="animation-delay:.05s"></span>
+          <span style="animation-delay:.35s"></span>
+          <span style="animation-delay:.15s"></span>
+        </div>
+      </div>
+      <div class="portrait-frame">
+        <img src="https://mais.thendisch.com/host.jpg" alt="Mustafa İnce">
+        <div class="portrait-caption">
+          <div class="name display">Mustafa İnce</div>
+          <div class="role">MAIS Studio Yönetimi</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="basvuru">
+    <div class="step-label">
+      <span class="step-num">01</span>
+      <span class="step-title display">Kimlik Doğrulama</span>
+      <span class="step-line"></span>
+    </div>
+    <div class="panel auth-panel">
+      <div class="auth-copy">
+        <p>Devam etmek için Google hesabınızla giriş yapın. Bu adım, sistemin haftalık başvuru kotasını doğru şekilde takip edebilmesi için gerekli.</p>
+        <p class="rule">Her katılımcıdan haftalık yalnızca 1 başvuru kabul edilmektedir.</p>
+      </div>
+      <div id="gsi-btn" style="display:inline-block;"></div><div id="gsi-loading" style="display:none; font-size:0.8rem; color:var(--accent); margin-top:12px; font-weight:600;"><span class="spin"></span>Doğrulanıyor...</div>
+      <div class="countdown-tile" id="countdown">
+        <div class="num mono" id="countdown-days">4g 12s</div>
+        <div class="lbl">Kalan Süre</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">
+      <span class="step-num">02</span>
+      <span class="step-title display">Parça Bilgileri</span>
+      <span class="step-line"></span>
+    </div>
+    <div class="panel" id="submissionForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="fullname">Ad Soyad *</label>
+          <input type="text" id="fullName" required placeholder="Adınız Soyadınız">
+        </div>
+        <div class="field">
+          <label for="social">Sosyal Medya Hesabı *</label>
+          <input type="text" id="social" required placeholder="@kullaniciadi">
+        </div>
+        <div class="field">
+          <label for="aitool">Kullanılan Yapay Zeka Aracı *</label>
+          <select id="aiTool" required>
+            <option value="">Seçiniz</option>
+            <option>Suno</option>
+            <option>Udio</option>
+            <option>AIVA</option>
+            <option>Boomy</option>
+            <option>Mureka</option>
+            <option>Stable Audio</option>
+            <option>ElevenLabs Music</option>
+            <option>Soundraw</option>
+            <option>Beatoven.ai</option>
+            <option>Minimax Music</option>
+            <option>Google Lyria</option>
+            <option>Sonauto</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="trackname">Parça Adı *</label>
+          <input type="text" id="trackName" required placeholder="Parçanızın adı">
+        </div>
+        <div class="field full">
+          <label for="note">Parça Hakkında Not *</label>
+          <textarea id="note" maxlength="210" required placeholder="Parçan hakkında kısa bir not bırak..."></textarea>
+          <span class="char-count"><span id="charNum">0</span> / 210</span>
+        </div>
+        <div class="field full">
+          <label>MP3 Dosyası * <span style="text-transform:none;font-weight:400;">— maks. 20 MB</span></label>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept=".mp3" style="display:none">
+            <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="#e8a33d" stroke-width="1.4">
+              <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+            </svg>
+            <div class="dz-title">MP3 dosyanı sürükle veya tıkla</div>
+            <div class="dz-sub">Yalnızca .mp3, en fazla 20 MB</div>
+            <div class="dz-file"><span class="dot"></span><span id="fileName"></span></div>
+          </div>
+        </div>
+        <div class="field full">
+          <div class="consent">
+            <input type="checkbox" id="chk" required>
+            <label for="consent">Bu parçanın tüm telif ve kullanım haklarının şahsıma ait olduğunu beyan ederim. Gönderimimin stüdyo tarafından incelenmesini onaylıyorum.</label>
+          </div>
+        </div>
+      </div>
+      <div class="submit-row">
+        <button class="btn-primary" id="btn-submit" onclick="submitForm()">Başvuruyu Tamamla</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-note">© 2026 Mustafa İnce · MAIS Studio — Sizden Gelenler Sezon 2</div>
+  <div class="socials">
+    <a href="https://www.instagram.com/mustafaincemuzik/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@mustafaincemuzik" target="_blank" rel="noopener" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://open.spotify.com/intl-tr/artist/5xcsIUfaETr2SFBiGtemrp" target="_blank" rel="noopener" aria-label="Spotify">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M7 10c3-1 7-1 10 1M7.5 13c2.5-.8 5.5-.8 8 .6M8 16c2-.6 4.5-.6 6.5.6" stroke-linecap="round"/></svg>
+    </a>
+  </div>
+</footer>
+
+<!-- success modal -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal">
+    <div class="check">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8a33d" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 class="display">Başvurunuz Alındı</h3>
+    <p>Teşekkürler. Parçan değerlendirme listemize eklendi, tüm başvuruları titizlikle dinliyoruz. Önümüzdeki haftadan itibaren yeni başvuru yapabilirsin.</p>
+    <button class="btn-primary" onclick="closeModal('success-modal'); goBack()">Kapat</button>
+  </div>
+</div>
+
+<!-- admin login modal -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal admin-modal">
+    <h3 class="display" style="margin-bottom:20px;">Yetkili Girişi</h3>
+    <div class="field">
+      <label>Kullanıcı Adı</label>
+      <input type="text" id="login-username" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="field">
+      <label>Şifre</label>
+      <input type="text" id="login-password" type="password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;">Giriş Yap</button>
+    <button onclick="closeModal('login-modal')" style="margin-top:14px;font-size:12.5px;color:var(--text-dim);">Vazgeç</button>
+  </div>
+</div>
+
+
+
+
+<!-- ═══ STAFF PANEL MODAL ═════════════════════════════════════════════ -->
+  <div id="admin-dashboard" class="admin-dashboard" style="display:none;">
+      <div class="modal-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:30px;">
+        <div class="navbar-brand" style="font-size: 1.1rem; color: var(--gold); letter-spacing: 0.1em; white-space:nowrap; margin-right: 20px;">
+          MUSTAFA İNCE 
+          <span id="panel-username" style="display:none; margin-left:12px; background:rgba(255,255,255,0.05); padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; color:var(--gold); border:1px solid rgba(251,191,36,0.3); text-transform:none; letter-spacing:normal; box-shadow:0 0 10px rgba(251,191,36,0.1);"></span>
+        </div>
+        
+        <div class="tab-bar" style="flex:1; justify-content:flex-start; margin-bottom:0; gap:8px;">
+          <button class="tab-btn active" onclick="switchTab('inbox')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg> Gelen Kutusu</button>
+          <button class="tab-btn" onclick="switchTab('reviewed')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Geçmiş</button>
+          <button class="tab-btn" onclick="switchTab('limits')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Bekleme Süresi</button>
+          <button class="tab-btn" onclick="switchTab('accounts')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Hesaplar</button>
+          <button class="tab-btn" id="special-tab-btn" onclick="switchTab('special')" style="display:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Özel Gelenler</button>
+          <button class="tab-btn" id="settings-tab-btn" onclick="switchTab('settings')" style="display:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Sistem Araçları</button>
+        </div>
+
+        <div style="white-space:nowrap; margin-left: 20px;">
+          <button class="logout-btn" onclick="hideAdminDashboard()" style="margin-right:10px; background:rgba(255,255,255,0.1); border-color:transparent; color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Ana Sayfaya Dön</button>
+          <button class="logout-btn" onclick="clearStaff()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Çıkış Yap</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <!-- TAB BAR IS NOW MOVED TO HEADER -->
+
+        <!-- INBOX -->
+        <div class="tab-pane active" id="tab-inbox">
+          <p class="pane-desc">Gelen başvurular. Parçayı dinlemek için satıra tıklayın. "İncelendi" olarak işaretleyerek arşive taşıyabilirsiniz.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="inbox-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REVIEWED -->
+        <!-- REVIEWED -->
+        <div class="tab-pane" id="tab-reviewed">
+          <p class="pane-desc">Daha önce "İncelendi" olarak işaretlenen son 15 parça. Yanlışlıkla elediğiniz parçaları "Geri Al" butonuna basarak Gelen Kutusu'na döndürebilirsiniz.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="reviewed-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LIMITS -->
+        <div class="tab-pane" id="tab-limits">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <p class="pane-desc" style="margin-bottom:0;">Aktif bekleme süresi olan IP adresleri/Kullanıcılar. Sıfırladığınızda yeni parça gönderebilirler.</p>
+            <button class="action-btn danger" onclick="resetAllLimits()" style="padding:8px 16px;">Tümünü Sıfırla</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>E-posta</th><th>Son Başvuru</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="limits-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ACCOUNTS -->
+        <div class="tab-pane" id="tab-accounts">
+          <p class="pane-desc">Yetkili personel hesapları. Yeni çalışan eklemek veya hesabını kaldırmak için bu sekmeyi kullanın.</p>
+          <div id="accounts-owner-section">
+            <div class="panel-input-row">
+              <input type="text" class="panel-input" id="new-username" placeholder="Kullanıcı adı" />
+              <input type="password" class="panel-input" id="new-password" placeholder="Şifre (min. 6 karakter)" />
+              <button class="panel-btn" onclick="addAccount()">Ekle</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Kullanıcı Adı</th><th>Yetki</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="accounts-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+          <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+            <p style="font-size:0.75rem; color:var(--txt2); margin-bottom:10px; font-weight:600;">Şifremi Değiştir</p>
+            <div class="panel-input-row" style="flex-wrap:wrap; gap:8px;">
+              <input type="password" class="panel-input" id="cur-pw" placeholder="Mevcut şifre" style="min-width:160px;" />
+              <input type="password" class="panel-input" id="new-pw" placeholder="Yeni şifre" style="min-width:160px;" />
+              <button class="panel-btn" onclick="changePassword()">Güncelle</button>
+            </div>
+            <div class="login-err" id="pw-change-err" style="margin-top:8px;"></div>
+            <div id="pw-change-ok" style="display:none; color:#4ade80; font-size:0.78rem; margin-top:8px;">✓ Şifre başarıyla güncellendi.</div>
+          </div>
+        </div>
+
+        <!-- SPECIAL -->
+        <div class="tab-pane" id="tab-special">
+          <p class="pane-desc">Özel bölümden gelen parçalar. Normal gelen kutusundan ayrıdır.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th style="width:60px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="special-body"><tr><td colspan="2" class="empty-state">Yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="tab-pane" id="tab-settings">
+          <p class="pane-desc">Özel bölüm ayarları. Sadece kurucu (owner) görebilir.</p>
+          <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Durum:</label>
+              <select class="panel-input" id="cfg-active" style="max-width:140px;">
+                <option value="true">Açık</option>
+                <option value="false">Kapalı</option>
+              </select>
+            </div>
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Başlık:</label>
+              <input type="text" class="panel-input" id="cfg-title" placeholder="Özel Konsept" />
+            </div>
+            <div class="panel-input-row">
+              <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Max Kota:</label>
+              <input type="number" class="panel-input" id="cfg-quota" value="50" style="max-width:100px;" />
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button class="panel-btn" style="background:var(--gold); border-color:var(--gold); color:#000;" onclick="saveSpecialCfg()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Kaydet</button>
+              <button class="panel-btn" style="background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2);color:#ef4444;" onclick="resetSpecialQuota()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg> Kotayı Sıfırla</button>
+            </div>
+            <div id="cfg-msg" style="display:none; font-size:0.78rem; color:#4ade80; margin-top:6px;">✓ Ayarlar kaydedildi.</div>
+
+            <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+              <div class="panel-input-row">
+                <label style="font-size:0.78rem; color:var(--txt2); min-width:100px;">Drive Eşitleme:</label>
+                <button class="panel-btn" onclick="syncDrive()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Eski Parçaları Çek</button>
+              </div>
+              <div style="font-size:0.7rem; color:var(--txt3); margin-top:6px;">Daha önce Drive'a gelen ve listede olmayan parçaları ekler, kotadan düşer.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </div>
+
+
+
+  
+<!-- ═══ GLOBAL AUDIO BAR ══════════════════════════════════════════════ -->
+  <div id="audio-bar">
+    <div class="ab-art" id="ab-art">🎵</div>
+    <div class="ab-info">
+      <div class="ab-title" id="ab-title">Parça seçilmedi</div>
+      <div class="ab-artist" id="ab-artist">Sanatçı yok</div>
+    </div>
+    <div class="ab-controls">
+      <div class="ab-btns-row">
+        <button class="ab-btn" onclick="skipBackward()" title="10s Geri">⏪</button>
+        <button class="ab-btn" onclick="prevTrack()" title="Önceki Parça">⏮</button>
+        <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
+        <button class="ab-btn" onclick="nextTrack()" title="Sonraki Parça">⏭</button>
+        <button class="ab-btn" onclick="skipForward()" title="10s İleri">⏩</button>
+      </div>
+      <div class="ab-seek-row">
+        <span class="ab-time" id="ab-cur">0:00</span>
+        <input type="range" class="ab-seek" id="ab-seek" min="0" max="100" value="0" oninput="seek(this.value)" />
+        <span class="ab-dur" id="ab-dur">0:00</span>
+      </div>
+    </div>
+    <span class="tag" id="ab-tag" style="margin-right:auto;">—</span>
+    <div style="display:flex; align-items:center; gap:8px; margin-right:15px; color:#fff;">
+      <button class="ab-btn" onclick="toggleMute()" id="ab-mute" style="font-size:1.1rem; padding:0 5px;">🔊</button>
+      <input type="range" class="ab-seek" id="ab-vol" min="0" max="100" value="100" oninput="changeVol(this.value)" style="width:70px; margin:0;" />
+    </div>
+    <button class="ab-close" onclick="closePlayer()">×</button>
+  </div>
+  <audio id="player" style="display:none;"></audio>
+
+<script>
+const fs = require('fs');
+const path = require('path');
+
+const htmlFile = path.join(__dirname, 'public', 'index.html');
+
+const html = \`<!DOCTYPE html>
+<html lang="tr">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sizden Gelenler Mustafa İnce</title>
@@ -736,844 +1602,10 @@ const html = `<!DOCTYPE html>
   <audio id="player" style="display:none;"></audio>
 
   <script>
-    // ═══ STATE ═══════════════════════════════════════════════════════════════
-    let googleToken = '';
-    let consentChecked = false;
-    let googleClientId = '';
-    let gsiReady = false;
-    let staffToken = localStorage.getItem('staff_token') || '';
-    let staffUsername = localStorage.getItem('staff_username') || '';
-    
-    let staffRole = localStorage.getItem('staff_role') || '';
-    let isSpecialMode = false;
-
-    function updateMainQuota() {
-      if(!window.siteConfig) return;
-      const q = isSpecialMode ? window.siteConfig.specialConfig : window.siteConfig.quota;
-      if(q) {
-        const max = q.maxQuota || 50;
-        const used = q.usedQuota || 0;
-        const remain = Math.max(0, max - used);
-        const txt = remain + ' / ' + max;
-        document.getElementById('main-quota').textContent = txt;
-        document.getElementById('welcome-quota-val').textContent = txt;
-      }
-    }
-
-    function setMode(mode) {
-      isSpecialMode = (mode === 'special');
-      
-      goBack();
-      document.getElementById('btn-mode-normal').classList.toggle('active', !isSpecialMode);
-      document.getElementById('btn-mode-special').classList.toggle('active', isSpecialMode);
-      updateMainQuota();
-      goBack(); // reset form
-    }
-
-
-    // ═══ INIT ════════════════════════════════════════════════════════════════
-    (async function init() {
-      try {
-        
-        const cfg = await fetch('/config').then(r => r.json());
-        window.siteConfig = cfg;
-
-        
-        
-        if (cfg.specialConfig && cfg.specialConfig.active) {
-          document.getElementById('mode-switcher-container').style.display = 'block';
-          if(cfg.specialConfig.title) document.getElementById('special-mode-title').textContent = cfg.specialConfig.title;
-        }
-        updateMainQuota();
-
-        googleClientId = cfg.googleClientId;
-        
-        
-
-        if (!staffToken) {
-          setTimeout(() => openModal('welcome-overlay'), 300);
-        }
-
-      } catch(e) {
-        showErr('err-email', 'Sunucu bağlantısı kurulamadı.');
-        return;
-      }
-
-      // Verify staff session
-      if (staffToken) {
-        try {
-          const vr = await authFetch('/api/staff/verify', null);
-          if (vr.valid) {
-            setStaffLoggedIn(vr.username, staffRole);
-          } else {
-            clearStaff();
-          }
-        } catch(e) { clearStaff(); }
-      }
-
-      // Start GSI polling
-      startGSI();
-    })();
-
-    // ═══ GSI (Google Sign-In) ════════════════════════════════════════════════
-    function startGSI() {
-      if (tryGSI()) return;
-      let n = 0;
-      const iv = setInterval(() => {
-        n++;
-        if (tryGSI()) {
-          clearInterval(iv);
-        } else if (n > 80) {
-          clearInterval(iv);
-          if (!googleClientId) {
-            showErr('err-email', 'Sistem Hatası: Google Client ID ayarlanmamış.');
-          } else {
-            showErr('err-email', 'Google Sign-in yüklenemedi. Adblocker kullanıyorsanız devre dışı bırakın.');
-          }
-        }
-      }, 200);
-    }
-
-    function tryGSI() {
-      if (gsiReady) return true;
-      if (!googleClientId || typeof google === 'undefined' || !google.accounts) return false;
-      gsiReady = true;
-      try {
-        google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleLogin });
-        google.accounts.id.renderButton(
-          document.getElementById('gsi-btn'),
-          { theme: 'filled_black', size: 'large', width: 280, locale: 'tr' }
-        );
-        return true;
-      } catch (e) {
-        console.error("GSI render error:", e);
-        return false;
-      }
-    }
-
-    function onGoogleLogin(resp) {
-      googleToken = resp.credential;
-      document.getElementById('gsi-loading').style.display = 'block';
-      document.getElementById('gsi-btn').style.opacity = '0.5';
-      document.getElementById('gsi-btn').style.pointerEvents = 'none';
-      fetch(isSpecialMode ? '/check-special-limit' : '/check-limit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: googleToken })
-      })
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById('gsi-loading').style.display = 'none';
-        document.getElementById('gsi-btn').style.opacity = '1';
-        document.getElementById('gsi-btn').style.pointerEvents = 'auto';
-        if (data.error) { showErr('err-email', data.error); return; }
-        if (!data.allowed) {
-          localStorage.setItem(isSpecialMode ? 'special_cooldown_until' : 'cooldown_until', Date.now() + (data.days * 24 * 60 * 60 * 1000) + (data.hours * 60 * 60 * 1000));
-          document.getElementById('countdown-days').textContent = String(data.days).padStart(2, '0');
-          document.getElementById('countdown-hours').textContent = String(data.hours).padStart(2, '0');
-          showStep('step-blocked');
-        } else {
-          if (data.name) document.getElementById('fullName').value = data.name;
-          showStep('step-form');
-        }
-      })
-      .catch(() => { showErr('err-email', 'Bağlantı hatası.'); });
-    }
-
-    // ═══ STEP NAVIGATION ════════════════════════════════════════════════════
-    function showStep(id) {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      const map = { 'step-email': 0, 'step-form': 1 };
-      const cur = map[id] ?? -1;
-      ['email', 'form'].forEach((name, i) => {
-        const d = document.getElementById('dot-' + name);
-        if (!d) return;
-        d.classList.remove('active', 'done');
-        if (i < cur) d.classList.add('done');
-        else if (i === cur) d.classList.add('active');
-      });
-      if (id === 'step-blocked') document.getElementById('dots').style.display = 'none';
-      else document.getElementById('dots').style.display = 'flex';
-    }
-
-    function goBack() { googleToken = ''; showStep('step-email'); }
-    function showErr(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.style.display = 'block'; }
-    function hideErr(id) { document.getElementById(id).style.display = 'none'; }
-
-    // ═══ UPLOAD / FORM ══════════════════════════════════════════════════════
-    function handleFile(input) {
-      const file = input.files[0];
-      if (!file) return;
-      if (file.size > 20 * 1024 * 1024) { showErr('err-form', 'Dosya 20 MB sınırını aşıyor.'); input.value = ''; return; }
-      hideErr('err-form');
-      document.getElementById('file-name').textContent = '✓ ' + file.name;
-      document.getElementById('upload-zone').style.borderColor = 'var(--gold)';
-    }
-
-    const uz = document.getElementById('upload-zone');
-    uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('over'); });
-    uz.addEventListener('dragleave', () => uz.classList.remove('over'));
-    uz.addEventListener('drop', e => {
-      e.preventDefault(); uz.classList.remove('over');
-      const f = e.dataTransfer.files[0];
-      if (f) { document.getElementById('mp3file').files = e.dataTransfer.files; handleFile(document.getElementById('mp3file')); }
-    });
-
-    function toggleConsent() {
-      consentChecked = !consentChecked;
-      document.getElementById('chk').classList.toggle('checked', consentChecked);
-    }
-
-    function updateCharCount(el) {
-      const len = el.value.length;
-      const countEl = document.getElementById('note-count');
-      countEl.textContent = len + ' / 210';
-      if (len >= 200) countEl.classList.add('warn');
-      else countEl.classList.remove('warn');
-    }
-
-    async function submitForm() {
-      const fullName = document.getElementById('fullName').value.trim();
-      const social = document.getElementById('social').value.trim();
-      const aiTool = document.getElementById('aiTool').value;
-      const trackName = document.getElementById('trackName').value.trim();
-      const note = document.getElementById('note').value.trim();
-      const mp3 = document.getElementById('mp3file').files[0];
-      hideErr('err-form');
-
-      if (!fullName || !social || !aiTool || !trackName || !note) return showErr('err-form', 'Lütfen tüm alanları doldurun.');
-      if (note.length < 30) return showErr('err-form', 'Parça notu en az 30 karakter olmalıdır.');
-      if (note.length > 210) return showErr('err-form', 'Parça notu en fazla 210 karakter olabilir.');
-      if (!mp3) return showErr('err-form', 'Lütfen bir MP3 dosyası seçin.');
-      if (!consentChecked) return showErr('err-form', 'Gönderim koşullarını onaylamanız gerekmektedir.');
-
-      const btn = document.getElementById('btn-submit');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spin"></span>Gönderiliyor...';
-
-      const fd = new FormData();
-      fd.append('token', googleToken);
-      fd.append('fullName', fullName);
-      fd.append('social', social);
-      fd.append('aiTool', aiTool);
-      fd.append('trackName', trackName);
-      fd.append('note', note);
-      fd.append('consent', 'true');
-      fd.append('mp3', mp3);
-
-      try {
-        const res = await fetch(isSpecialMode ? '/submit-special' : '/submit', { method: 'POST', body: fd });
-        const data = await res.json();
-        
-        if (res.status === 403) {
-          showErr('err-form', data.error);
-          return;
-        }
-        if (res.status === 429) {
-          document.getElementById('countdown').textContent = data.days + ' gün ' + data.hours + ' saat kaldı';
-          showStep('step-blocked'); return;
-        }
-        if (!res.ok) { showErr('err-form', data.error || 'Bir hata oluştu.'); return; }
-        
-        // Reset form completely
-        document.getElementById('fullName').value = '';
-        document.getElementById('social').value = '';
-        document.getElementById('aiTool').value = '';
-        document.getElementById('trackName').value = '';
-        document.getElementById('note').value = '';
-        document.getElementById('note-count').textContent = '0 / 210';
-        document.getElementById('mp3file').value = '';
-        document.getElementById('file-name').textContent = '';
-        document.getElementById('upload-zone').style.borderColor = 'var(--border2)';
-        if(consentChecked) toggleConsent();
-        
-        // Update quota visually
-        fetch('/config').then(r=>r.json()).then(cfg => {
-          if (cfg.quota) {
-            const remain = Math.max(0, cfg.quota.maxQuota - cfg.quota.usedQuota);
-            document.getElementById('main-quota').textContent = remain + ' / ' + cfg.quota.maxQuota;
-          }
-        });
-
-        openModal('success-modal');
-      } catch(e) { showErr('err-form', 'Bağlantı hatası. Tekrar deneyin.'); }
-      finally { btn.disabled = false; btn.textContent = 'Başvuruyu Tamamla'; }
-    }
-
-    // ═══ MODAL HELPERS ══════════════════════════════════════════════════════
-    
-    function showAdminDashboard() {
-      document.querySelector('.navbar').style.display = 'none';
-      document.querySelector('.wrap').style.display = 'none';
-      document.getElementById('admin-dashboard').style.display = 'block';
-    }
-    function hideAdminDashboard() {
-      document.querySelector('.navbar').style.display = '';
-      document.querySelector('.wrap').style.display = '';
-      document.getElementById('admin-dashboard').style.display = 'none';
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-    // ═══ STAFF AUTH ══════════════════════════════════════════════════════════
-    function handleStaffBtnClick() {
-      if (staffToken) {
-        openPanelModal();
-      } else {
-        document.getElementById('login-err').style.display = 'none';
-        document.getElementById('login-username').value = '';
-        document.getElementById('login-password').value = '';
-        openModal('login-modal');
-        setTimeout(() => document.getElementById('login-username').focus(), 100);
-      }
-    }
-
-    async function doLogin() {
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-      const btn = document.getElementById('login-btn');
-      const err = document.getElementById('login-err');
-      err.style.display = 'none';
-      if (!username || !password) { err.textContent = 'Kullanıcı adı ve şifre gereklidir.'; err.style.display = 'block'; return; }
-      btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
-      try {
-        const res = await fetch('/api/staff/login', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (!res.ok) { err.textContent = data.error || 'Giriş başarısız.'; err.style.display = 'block'; return; }
-        staffToken = data.token;
-        staffUsername = data.username;
-        staffRole = data.role;
-        localStorage.setItem('staff_token', staffToken);
-        localStorage.setItem('staff_username', staffUsername);
-        localStorage.setItem('staff_role', staffRole);
-        setStaffLoggedIn(staffUsername, staffRole);
-        closeModal('login-modal');
-        openPanelModal();
-      } catch(e) { err.textContent = 'Bağlantı hatası.'; err.style.display = 'block'; }
-      finally { btn.disabled = false; btn.textContent = 'Giriş Yap'; }
-    }
-
-    function setStaffLoggedIn(username, role) {
-      const btn = document.getElementById('staff-btn');
-      btn.textContent = '⚙️ ' + username;
-      btn.classList.add('active');
-    }
-
-    function clearStaff() {
-      staffToken = ''; staffUsername = ''; staffRole = '';
-      localStorage.removeItem('staff_token');
-      localStorage.removeItem('staff_username');
-      localStorage.removeItem('staff_role');
-      const btn = document.getElementById('staff-btn');
-      btn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg> Yetkili Girişi';
-      btn.classList.remove('active');
-      hideAdminDashboard();
-    }
-
-    // ═══ STAFF PANEL ═════════════════════════════════════════════════════════
-    async function authFetch(url, body) {
-      const res = await fetch(url, {
-        method: body !== null ? 'POST' : 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffToken },
-        body: body !== null ? JSON.stringify(body) : undefined
-      });
-      if (res.status === 401) { clearStaff(); throw new Error('Oturum sona erdi. Lütfen tekrar giriş yapın.'); }
-      return res.json();
-    }
-
-    function openPanelModal() {
-      document.getElementById('panel-username').textContent = staffUsername + (staffRole === 'owner' ? ' (Kurucu)' : '');
-      document.getElementById('accounts-owner-section').style.display = staffRole === 'owner' ? 'block' : 'none';
-      showAdminDashboard();
-      loadPanelData();
-    }
-
-    let panelData = { submissions: [], accounts: [] };
-
-    
-  async function loadPanelData() {
-    try {
-      const res = await fetch('/api/admin/submissions', { headers: { 'Authorization': 'Bearer '+staffToken }});
-      if(res.status === 401 || res.status === 403) { logout(); return; }
-      const data = await res.json();
-      panelData = data;
-
-      const ab = document.getElementById('accounts-body');
-      ab.innerHTML = '';
-      if(data.accounts && data.accounts.length > 0) {
-        data.accounts.forEach(function(acc) {
-          let act = acc.role !== 'owner' && staffRole === 'owner' ? '<button class="action-btn danger" onclick="deleteAccount(\\\'' + acc.username + '\\\')">Sil</button>' : '-';
-          let role = acc.role === 'owner' ? 'Kurucu' : 'Çalışan';
-          ab.innerHTML += '<tr><td>' + acc.username + '</td><td>' + role + '</td><td style="text-align:right;">' + act + '</td></tr>';
-        });
-      } else {
-        ab.innerHTML = '<tr><td colspan="3" class="empty-state">Hesap bulunamadı.</td></tr>';
-      }
-
-      document.getElementById('special-tab-btn').style.display = 'inline-block';
-      if (staffRole === 'owner') {
-        document.getElementById('settings-tab-btn').style.display = 'inline-block';
-        if (data.specialConfig) {
-          document.getElementById('cfg-active').value = data.specialConfig.active ? 'true' : 'false';
-          document.getElementById('cfg-title').value = data.specialConfig.title || '';
-          document.getElementById('cfg-quota').value = data.specialConfig.maxQuota || 50;
-        }
-      }
-
-      
-      const ib = document.getElementById('inbox-body');
-      ib.innerHTML = '';
-      currentInboxList.length = 0;
-      data.submissions.forEach(function(s) {
-        if(s.status === 'pending') currentInboxList.push(s);
-      });
-
-      if (currentInboxList.length === 0) ib.innerHTML = '<tr><td colspan="4" class="empty-state">Yeni parça yok.</td></tr>';
-      else {
-        currentInboxList.forEach(function(s, idx) {
-          let action = '<button class="action-btn approve" onclick="event.stopPropagation(); updateStatus(\\'' + esc(s.id) + '\\',\\'reviewed\\')">İncelendi</button>';
-          let playBtn = '<td style="width: 60px; text-align: center;"><button class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\'inbox\\', ' + idx + ')">▶</button></td>';
-          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
-          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
-          let dateStr = new Date(s.timestamp).toLocaleDateString();
-          let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
-          let rowNote = '';
-          if (s.note && s.note !== 'Bilinmiyor') {
-            rowNote = '<tr><td colspan="4" style="padding:0; border:none;"><div style="font-size:0.8rem;color:var(--txt3);margin:0 20px 10px 76px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.05);">' + esc(s.note) + '</div></td></tr>';
-          }
-          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\\'inbox\\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
-          ib.innerHTML += rowHtml;
-        });
-      }
-
-
-      const rb = document.getElementById('reviewed-body');
-      rb.innerHTML = '';
-      currentReviewedList.length = 0;
-      
-      // Get reviewed items, sort them to get the latest 15 (if timestamp exists, assume they are chronological)
-      let allReviewed = data.submissions.filter(function(s) { return s.status === 'reviewed'; });
-      let last15 = allReviewed.slice(-15);
-      
-      last15.forEach(function(s) {
-        currentReviewedList.push(s);
-      });
-
-      if (currentReviewedList.length === 0) rb.innerHTML = '<tr><td colspan="4" class="empty-state">Geçmiş boş.</td></tr>';
-      else {
-        currentReviewedList.forEach(function(s, idx) {
-          let action = '<button class="action-btn danger" onclick="event.stopPropagation(); unreviewTrack(\\\'' + esc(s.id) + '\\\')">Geri Al</button>';
-          let playBtn = '<td style="width: 60px; text-align: center;"><button id="btn-play-reviewed-' + idx + '" class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\\'reviewed\\\', ' + idx + ')">▶</button></td>';
-          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
-          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
-          let dateStr = new Date(s.timestamp).toLocaleDateString();
-          let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
-          let rowNote = '';
-          if (s.note && s.note !== 'Bilinmiyor') {
-            rowNote = '<tr><td colspan="4" style="padding:0; border:none;"><div style="font-size:0.8rem;color:var(--txt3);margin:0 20px 10px 76px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.05);">' + esc(s.note) + '</div></td></tr>';
-          }
-          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\\\'reviewed\\\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
-          rb.innerHTML += rowHtml;
-        });
-      }
-
-
-      const spb = document.getElementById('special-body');
-      spb.innerHTML = '';
-      currentSpecialList = data.specialSubmissions || [];
-      if(currentSpecialList.length > 0) {
-        currentSpecialList.forEach(function(s, idx) {
-          let action = s.status === 'pending'
-            ? '<button class="action-btn approve" onclick="event.stopPropagation(); updateSpecialStatus(\\'' + s.id + '\\',\\'reviewed\\')">İncelendi</button>'
-            : '<button class="action-btn danger" onclick="event.stopPropagation(); updateSpecialStatus(\\'' + s.id + '\\',\\'pending\\')">Geri Al</button>';
-          let playBtn = '<td style="width: 60px; text-align: center;"><button class="play-circle-btn" onclick="event.stopPropagation(); playFromList(\\'special\\', ' + idx + ')">▶</button></td>';
-          let aiToolStr = (s.aiTool && s.aiTool !== 'Bilinmiyor') ? '&nbsp;•&nbsp; <span style="color:var(--gold);">' + esc(s.aiTool) + '</span>' : '';
-          let trackInfo = '<td><div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 4px;">' + esc(s.trackName) + '</div><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.fullName) + aiToolStr + '</div></td>';
-          let dateStr = new Date(s.timestamp).toLocaleDateString();
-          let extraInfo = '<td><div style="font-size: 0.8rem; color: var(--txt2);">' + esc(s.email) + '</div><div style="font-size: 0.75rem; color: var(--txt3); margin-top: 4px;">' + esc(dateStr) + '</div></td>';
-          let rowNote = '';
-          if (s.note && s.note !== 'Bilinmiyor') {
-            rowNote = '<tr><td colspan="4" style="padding:0; border:none;"><div style="font-size:0.8rem;color:var(--txt3);margin:0 20px 10px 76px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.05);">' + esc(s.note) + '</div></td></tr>';
-          }
-          let rowHtml = '<tr style="cursor:pointer;" onclick="playFromList(\\'special\\', ' + idx + ')">' + playBtn + trackInfo + extraInfo + '<td style="text-align:right;">' + action + '</td></tr>' + rowNote;
-          spb.innerHTML += rowHtml;
-        });
-      } else {
-        spb.innerHTML = '<tr><td colspan="2" class="empty-state">Özel bölümde gönderilmiş parça yok.</td></tr>';
-      }
-
-      if (typeof renderLimits === 'function') renderLimits();
-
-
-    } catch(e) {
-      console.error(e);
-    }
-  }
-
-
-    async function resetUser(ip, email) {
-      if (!confirm(email + ' için bekleme süresini sıfırlamak istiyor musunuz?')) return;
-      try {
-        await authFetch('/api/admin/reset-user', { targetIp: ip, targetEmail: email });
-        alert(email + ' kullanıcısının bekleme süresi başarıyla sıfırlandı!');
-        loadPanelData();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function resetAllLimits() {
-      if (!confirm('TÜM kullanıcıların bekleme süresini sıfırlamak istiyor musunuz?')) return;
-      try {
-        await authFetch('/api/admin/reset-all-limits', {});
-        alert('Sistemdeki tüm aktif bekleme süreleri (IP ve E-posta) başarıyla sıfırlandı!');
-        loadPanelData();
-      } catch(e) { alert(e.message); }
-    }
-
-    function renderLimits() {
-      const lb = document.getElementById('limits-body');
-      if (!panelData.limits || panelData.limits.length === 0) {
-        lb.innerHTML = '<tr><td colspan="3" class="empty-state">Aktif kısıtlama bulunmuyor.</td></tr>';
-        return;
-      }
-      lb.innerHTML = '';
-      panelData.limits.forEach(function(l) {
-        let tr = document.createElement('tr');
-        let emailHtml = '<td><div style="font-weight: 700; color: #fff;">' + esc(l.email) + '</div><div style="font-size: 0.8rem; color: var(--txt3); margin-top: 4px;">Mod: ' + esc(l.type) + '</div></td>';
-        let dateStr = new Date(l.timestamp).toLocaleString();
-        let dateHtml = '<td><div style="font-size: 0.85rem; color: var(--txt2);">' + esc(dateStr) + '</div></td>';
-        let actionHtml = '<td style="text-align:right;"><button class="action-btn danger" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
-        tr.innerHTML = emailHtml + dateHtml + actionHtml;
-        lb.appendChild(tr);
-      });
-    }
-
-  async function addAccount() {
-      const username = document.getElementById('new-username').value.trim();
-      const password = document.getElementById('new-password').value;
-      if (!username || !password) { alert('Kullanıcı adı ve şifre gereklidir.'); return; }
-      try {
-        const data = await authFetch('/api/staff/add-account', { username, password });
-        if (data.error) { alert(data.error); return; }
-        panelData.accounts = data.accounts;
-        document.getElementById('new-username').value = '';
-        document.getElementById('new-password').value = '';
-        renderAccounts();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function removeAccount(username) {
-      if (!confirm(username + ' hesabını kaldırmak istediğinize emin misiniz?')) return;
-      try {
-        const data = await authFetch('/api/staff/remove-account', { username });
-        if (data.error) { alert(data.error); return; }
-        panelData.accounts = data.accounts;
-        renderAccounts();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function changePassword() {
-      const cur = document.getElementById('cur-pw').value;
-      const nw = document.getElementById('new-pw').value;
-      const err = document.getElementById('pw-change-err');
-      const ok = document.getElementById('pw-change-ok');
-      err.style.display = 'none'; ok.style.display = 'none';
-      if (!cur || !nw) { err.textContent = 'Her iki alanı da doldurun.'; err.style.display = 'block'; return; }
-      try {
-        const data = await authFetch('/api/staff/change-password', { currentPassword: cur, newPassword: nw });
-        if (data.error) { err.textContent = data.error; err.style.display = 'block'; return; }
-        ok.style.display = 'block';
-        document.getElementById('cur-pw').value = '';
-        document.getElementById('new-pw').value = '';
-      } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
-    }
-
-    // ═══ MISSING FUNCTION DEFINITIONS (AUTO-PATCHED) ════════════════════════
-    let currentInboxList = [];
-    let currentSpecialList = [];
-    let currentReviewedList = [];
-
-    function esc(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    function fmt(dateStr) {
-      if (!dateStr) return '';
-      try { return new Date(dateStr).toLocaleDateString('tr-TR'); } catch(e) { return dateStr; }
-    }
-
-    async function resetSpecialQuota() {
-      if(!confirm('Özel gönderim kotası sıfırlanacak. Emin misiniz?')) return;
-      try {
-        const res = await authFetch('/api/admin/save-special-config', { resetQuota: true });
-        if(res.success) { alert('Kota sıfırlandı.'); loadPanelData(); }
-      } catch(e) { alert('Hata.'); }
-    }
-
-    async function syncDrive() {
-      if (!confirm('Drive klasörünüz taranıp, listede olmayan tüm eski parçalar eklenecek ve kalan kotadan düşülecektir. Onaylıyor musunuz?')) return;
-      try {
-        const res = await authFetch('/api/admin/sync-drive', {});
-        if (res.success) {
-          alert(res.count + ' adet yeni parça eklendi! Kalan kota: ' + (200 - res.usedQuota));
-          loadPanelData();
-        } else {
-          alert(res.error || 'Hata oluştu.');
-        }
-      } catch(e) { alert('Bağlantı hatası.'); }
-    }
-
-    function switchTab(name) {
-      document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
-      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-      var pane = document.getElementById('tab-' + name);
-      if (pane) pane.classList.add('active');
-      var keywords = { inbox: 'gelen', reviewed: 'incelen', limits: 'bekleme', accounts: 'hesap', special: 'özel', settings: 'ayar' };
-      var kw = keywords[name] || '---';
-      document.querySelectorAll('.tab-btn').forEach(function(b) {
-        if (b.textContent.toLowerCase().indexOf(kw) !== -1) b.classList.add('active');
-      });
-    }
-
-    function logout() { clearStaff(); }
-
-    async function updateStatus(id, status) {
-      try { await authFetch('/api/admin/update-status', { fileId: id, status: status }); loadPanelData(); }
-      catch(e) { alert(e.message); }
-    }
-
-    async function updateSpecialStatus(id, status) {
-      try { await authFetch('/api/admin/update-special-status', { id: id, status: status }); loadPanelData(); }
-      catch(e) { alert(e.message); }
-    }
-
-    async function deleteAccount(username) {
-      if (!confirm(username + ' hesabini silmek istediginize emin misiniz?')) return;
-      try {
-        var data = await authFetch('/api/staff/remove-account', { username: username });
-        if (data.error) { alert(data.error); return; }
-        loadPanelData();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function saveSpecialCfg() {
-      try {
-        var active = document.getElementById('cfg-active').value === 'true';
-        var title = document.getElementById('cfg-title').value;
-        var maxQuota = document.getElementById('cfg-quota').value;
-        await authFetch('/api/admin/save-special-config', { active: active, title: title, maxQuota: maxQuota });
-        var msg = document.getElementById('cfg-msg');
-        msg.textContent = '\u2713 Ayarlar kaydedildi.';
-        msg.style.display = 'block';
-        setTimeout(function() { msg.style.display = 'none'; }, 3000);
-      } catch(e) { alert(e.message); }
-    }
-
-    async function resetSpecialQuota() {
-      if (!confirm('Ozel bolum kotasini sifirlamak istediginize emin misiniz?')) return;
-      try {
-        await authFetch('/api/admin/save-special-config', { resetQuota: true });
-        var msg = document.getElementById('cfg-msg');
-        msg.textContent = '\u2713 Kota sifirlandi.';
-        msg.style.display = 'block';
-        setTimeout(function() { msg.style.display = 'none'; }, 3000);
-      } catch(e) { alert(e.message); }
-    }
-
-    async function resetUser(ip, email) {
-      if (!confirm(email + ' için bekleme süresini sıfırlamak istiyor musunuz?')) return;
-      try {
-        await authFetch('/api/admin/reset-user', { targetIp: ip, targetEmail: email });
-        loadPanelData();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function resetAllLimits() {
-      if (!confirm('TÜM kullanıcıların bekleme süresini sıfırlamak istiyor musunuz?')) return;
-      try {
-        await authFetch('/api/admin/reset-all-limits', {});
-        loadPanelData();
-      } catch(e) { alert(e.message); }
-    }
-
-    function renderLimits() {
-      const lb = document.getElementById('limits-body');
-      if (!panelData.limits || panelData.limits.length === 0) {
-        lb.innerHTML = '<tr><td colspan="3" class="empty-state">Aktif kısıtlama bulunmuyor.</td></tr>';
-        return;
-      }
-      lb.innerHTML = '';
-      panelData.limits.forEach(function(l) {
-        let tr = document.createElement('tr');
-        let emailHtml = '<td><div style="font-weight: 700; color: #fff;">' + esc(l.email) + '</div><div style="font-size: 0.8rem; color: var(--txt3); margin-top: 4px;">Mod: ' + esc(l.type) + '</div></td>';
-        let dateStr = new Date(l.timestamp).toLocaleString();
-        let dateHtml = '<td><div style="font-size: 0.85rem; color: var(--txt2);">' + esc(dateStr) + '</div></td>';
-        let actionHtml = '<td style="text-align:right;"><button class="action-btn danger" onclick="resetUser(\\\'' + esc(l.ip) + '\\\', \\\'' + esc(l.email) + '\\\')">Sıfırla</button></td>';
-        tr.innerHTML = emailHtml + dateHtml + actionHtml;
-        lb.appendChild(tr);
-      });
-    }
-
-    function renderAccounts() { loadPanelData(); }
-
-    // ═══ PLAYLIST QUEUE & ADVANCED AUDIO ═════════════════════════════════════
-    var playlist = [];
-    var playlistIndex = -1;
-
-    
-    function toggleMute() {
-      if (playerEl.muted) {
-        playerEl.muted = false;
-        document.getElementById('ab-mute').textContent = '🔊';
-        document.getElementById('ab-vol').value = playerEl.volume * 100;
-      } else {
-        playerEl.muted = true;
-        document.getElementById('ab-mute').textContent = '🔇';
-        document.getElementById('ab-vol').value = 0;
-      }
-    }
-    
-    function changeVol(val) {
-      playerEl.volume = val / 100;
-      if (playerEl.volume === 0) {
-        playerEl.muted = true;
-        document.getElementById('ab-mute').textContent = '🔇';
-      } else {
-        playerEl.muted = false;
-        document.getElementById('ab-mute').textContent = '🔊';
-      }
-    }
-
-    let currentListType = '';
-    function playFromList(listName, idx) {
-      if (currentListType === listName && playlistIndex === idx && playerEl.src) {
-        togglePlay();
-        return;
-      }
-      currentListType = listName;
-
-      var srcList = listName === 'inbox' ? currentInboxList : (listName === 'reviewed' ? currentReviewedList : currentSpecialList);
-      playlist = srcList.map(function(s) {
-        return { audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || 'Bilinmiyor', aiTool: s.aiTool || '' };
-      });
-      playlistIndex = idx;
-      playCurrent();
-    }
-
-    function playCurrent() {
-      if (playlistIndex < 0 || playlistIndex >= playlist.length) return;
-      var track = playlist[playlistIndex];
-      playTrack(track.audioUrl, track.title, track.artist, track.aiTool);
-    }
-
-    function nextTrack() {
-      if (playlistIndex + 1 < playlist.length) { playlistIndex++; playCurrent(); }
-    }
-
-    function prevTrack() {
-      if (playerEl.currentTime > 3) { playerEl.currentTime = 0; return; }
-      if (playlistIndex > 0) { playlistIndex--; playCurrent(); }
-    }
-
-    function skipForward() {
-      if (playerEl.duration) playerEl.currentTime = Math.min(playerEl.duration, playerEl.currentTime + 10);
-    }
-
-    function skipBackward() {
-      playerEl.currentTime = Math.max(0, playerEl.currentTime - 10);
-    }
-
-
-    // ═══ AUDIO PLAYER ════════════════════════════════════════════════════════
-    const playerEl = document.getElementById('player');
-
-    function playTrack(url, title, artist, aiTool) {
-      document.getElementById('ab-title').textContent = title;
-      document.getElementById('ab-artist').textContent = artist;
-      document.getElementById('ab-tag').textContent = aiTool;
-      // Use fetch with JWT auth to get audio as blob
-      fetch(url, { headers: { 'Authorization': 'Bearer ' + staffToken } })
-        .then(function(res) {
-          if (!res.ok) throw new Error('Audio fetch failed');
-          return res.blob();
-        })
-        .then(function(blob) {
-          var blobUrl = URL.createObjectURL(blob);
-          playerEl.src = blobUrl;
-          playerEl.load();
-          playerEl.play().then(function() {
-            document.getElementById('ab-play').textContent = '⏸';
-            document.getElementById('audio-bar').classList.add('visible');
-            updateListPlayBtns();
-          }).catch(function() { alert('Ses dosyası oynatılamadı.'); });
-        })
-        .catch(function() { alert('Ses dosyası yüklenemedi. Yetkinizi kontrol edin.'); });
-    }
-
-    function playTrackById(fileId, title, artist, aiTool) {
-      playTrack('/api/stream-audio?fileId=' + fileId, title, artist, aiTool);
-    }
-
-    function updateListPlayBtns() {
-      document.querySelectorAll('.play-circle-btn').forEach(function(btn) { btn.textContent = '▶'; });
-      if (currentListType && playlistIndex >= 0) {
-        var btn = document.getElementById('btn-play-' + currentListType + '-' + playlistIndex);
-        if (btn) btn.textContent = playerEl.paused ? '▶' : '⏸';
-      }
-    }
-
-    function togglePlay() {
-      if (playerEl.paused) { playerEl.play(); document.getElementById('ab-play').textContent = '⏸'; }
-      else { playerEl.pause(); document.getElementById('ab-play').textContent = '▶'; }
-      updateListPlayBtns();
-    }
-
-    function seek(val) {
-      if (playerEl.duration) playerEl.currentTime = (val / 100) * playerEl.duration;
-    }
-
-    function closePlayer() {
-      playerEl.pause();
-      document.getElementById('audio-bar').classList.remove('visible');
-      currentListType = '';
-      playlistIndex = -1;
-      updateListPlayBtns();
-    }
-
-    function fmtTime(s) {
-      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
-      return m + ':' + String(sec).padStart(2, '0');
-    }
-
-    playerEl.addEventListener('timeupdate', () => {
-      if (playerEl.duration) {
-        document.getElementById('ab-seek').value = (playerEl.currentTime / playerEl.duration) * 100;
-        document.getElementById('ab-cur').textContent = fmtTime(playerEl.currentTime);
-        document.getElementById('ab-dur').textContent = fmtTime(playerEl.duration);
-      }
-    });
-    playerEl.addEventListener('ended', function() { if (playlistIndex + 1 < playlist.length) { nextTrack(); } else { document.getElementById('ab-play').textContent = '\u25b6'; } });
-
-    // ═══ MISC ════════════════════════════════════════════════════════════════
-    function togglePw(inputId, btn) {
-      const input = document.getElementById(inputId);
-      input.type = input.type === 'password' ? 'text' : 'password';
-      btn.textContent = input.type === 'password' ? '👁' : '🙈';
-    }
-
-    // Close modals on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay && overlay.id !== 'welcome-overlay') overlay.classList.remove('open');
-      });
-    });
-  <\/script>
+</script>
 </body>
-</html>`;
+</html>
+`;
 
-fs.writeFileSync(htmlFile, html, 'utf8');
+fs.writeFileSync(htmlFile, html);
 console.log('SUCCESS: Overwritten index.html directly with new UI.');
