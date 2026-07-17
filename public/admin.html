@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yönetim Paneli · MAIS Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050505; --panel: #111111; --surface: #1a1a1a; --border: rgba(255,255,255,0.08);
+  --gold: #c8a84b; --gold-dim: rgba(200,168,75,0.15); --text: #f0f0f0; --dim: #888;
+  --ok: #4ade80; --err: #ef4444; --font: 'Montserrat', sans-serif; --mono: 'JetBrains Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+button { background: none; border: none; cursor: pointer; color: inherit; font-family: inherit; }
+a { color: var(--gold); text-decoration: none; }
+
+/* Sidebar */
+.sidebar { width: 260px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 16px; }
+.logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 12px; }
+.logo img { height: 18px; }
+.nav-item { padding: 12px 16px; margin-bottom: 4px; border-radius: 8px; color: var(--dim); font-weight: 600; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active { background: var(--gold-dim); color: var(--gold); }
+.nav-badge { margin-left: auto; background: var(--gold); color: #000; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 800; font-family: var(--mono); }
+.user-card { margin-top: auto; padding: 16px; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; gap: 12px; background: var(--surface); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold-dim); border: 1px solid rgba(200,168,75,0.3); display: grid; place-items: center; color: var(--gold); font-weight: 700; }
+.u-info { flex: 1; overflow: hidden; }
+.u-name { font-weight: 700; color: #fff; font-size: 13px; }
+.u-role { font-size: 11px; color: var(--dim); }
+.logout-btn { color: var(--dim); transition: color 0.2s; }
+.logout-btn:hover { color: var(--err); }
+
+/* Main Area */
+.main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; padding: 40px; }
+.top-bar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+.page-title { font-size: 24px; font-weight: 800; color: #fff; }
+.stats { display: flex; gap: 16px; }
+.stat-box { background: var(--panel); border: 1px solid var(--border); padding: 16px 24px; border-radius: 12px; min-width: 140px; }
+.stat-val { font-size: 28px; font-weight: 700; color: var(--gold); font-family: var(--mono); }
+.stat-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dim); margin-top: 4px; }
+
+/* Tables */
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th { padding: 16px 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dim); border-bottom: 1px solid var(--border); }
+td { padding: 16px 24px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover { background: rgba(255,255,255,0.02); }
+.track-name { font-weight: 700; color: #fff; font-size: 15px; margin-bottom: 4px; }
+.artist-name { font-size: 12px; color: var(--dim); }
+.artist-name span { color: var(--gold); }
+.date-str { font-size: 11px; color: var(--dim); margin-top: 4px; }
+.play-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--gold); display: grid; place-items: center; transition: all 0.2s; }
+.play-btn:hover { background: var(--gold); color: #000; }
+.action-btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
+.action-btn.ok { background: rgba(74,222,128,0.1); color: var(--ok); border: 1px solid rgba(74,222,128,0.2); }
+.action-btn.ok:hover { background: rgba(74,222,128,0.2); }
+.action-btn.danger { background: rgba(239,68,68,0.1); color: var(--err); border: 1px solid rgba(239,68,68,0.2); }
+.action-btn.danger:hover { background: rgba(239,68,68,0.2); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fade 0.3s ease; }
+@keyframes fade { from {opacity:0;} to {opacity:1;} }
+
+.empty { padding: 40px; text-align: center; color: var(--dim); font-size: 14px; }
+.note-box { font-size: 12px; color: var(--dim); background: var(--surface); padding: 12px 16px; border-radius: 8px; margin-top: 8px; border: 1px dashed var(--border); }
+
+/* Settings / Forms */
+.form-group { margin-bottom: 20px; max-width: 400px; }
+.form-group label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 8px; }
+.form-group input, .form-group select { width: 100%; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-family: inherit; outline: none; }
+.form-group input:focus { border-color: var(--gold); }
+.btn-save { background: var(--gold); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: 700; }
+
+/* Audio Bar */
+.audio-bar { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(150px); width: 90%; max-width: 800px; background: rgba(10,10,10,0.9); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); transition: transform 0.4s; opacity: 0; z-index: 100; }
+.audio-bar.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.ab-info { flex: 1; overflow: hidden; }
+.ab-title { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px; }
+.ab-artist { font-size: 12px; color: var(--dim); }
+.ab-controls { display: flex; align-items: center; gap: 16px; }
+.ab-ctrl-btn { color: var(--dim); font-size: 18px; transition: color 0.2s; }
+.ab-ctrl-btn:hover { color: var(--gold); }
+.ab-play-big { width: 44px; height: 44px; border-radius: 50%; background: var(--gold); color: #000; display: grid; place-items: center; font-size: 16px; }
+.ab-timeline { flex: 2; display: flex; align-items: center; gap: 12px; }
+.ab-time { font-family: var(--mono); font-size: 11px; color: var(--dim); width: 40px; }
+.ab-slider { flex: 1; accent-color: var(--gold); height: 4px; cursor: pointer; }
+.ab-close { color: var(--dim); font-size: 24px; margin-left: 16px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo"><img src="assets/mais-logo.png" alt="MAIS" style="filter:drop-shadow(0 0 10px rgba(255,255,255,0.2))"></div>
+  <button class="nav-item active" onclick="switchTab('inbox', this)">📥 Gelen Kutusu <span class="nav-badge" id="badge-inbox">0</span></button>
+  <button class="nav-item" onclick="switchTab('reviewed', this)">✅ İncelenenler</button>
+  <button class="nav-item" onclick="switchTab('limits', this)">⏳ Bekleme Süreleri</button>
+  <button class="nav-item" onclick="switchTab('accounts', this)">👥 Hesaplar</button>
+  <button class="nav-item" id="nav-special" onclick="switchTab('special', this)" style="display:none;">⭐ Özel Gelenler</button>
+  <button class="nav-item" id="nav-settings" onclick="switchTab('settings', this)" style="display:none;">⚙️ Sistem Ayarları</button>
+  
+  <div class="user-card">
+    <div class="avatar" id="u-ava">M</div>
+    <div class="u-info">
+      <div class="u-name" id="u-name">Kullanıcı</div>
+      <div class="u-role" id="u-role">Yetkili</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Çıkış Yap">🚪</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="top-bar">
+    <div>
+      <h1 class="page-title" id="page-title">Gelen Kutusu</h1>
+      <p style="color:var(--dim); margin-top:4px;">Sezon 2 • Sizden Gelenler</p>
+    </div>
+    <div class="stats">
+      <div class="stat-box"><div class="stat-val" id="stat-pending">-</div><div class="stat-lbl">Bekleyen</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-reviewed">-</div><div class="stat-lbl">İncelendi</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-total">-</div><div class="stat-lbl">Toplam</div></div>
+    </div>
+  </div>
+
+  <!-- INBOX -->
+  <div class="tab-content active" id="tab-inbox">
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody id="inbox-list"><tr><td colspan="4" class="empty">Yükleniyor...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REVIEWED -->
+  <div class="tab-content" id="tab-reviewed">
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody id="reviewed-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LIMITS -->
+  <div class="tab-content" id="tab-limits">
+    <div class="card" style="margin-bottom:24px;">
+      <div style="padding:24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="color:#fff; margin-bottom:4px;">Aktif Kısıtlamalar</h3>
+          <p style="color:var(--dim); font-size:12px;">Haftalık 1 parça sınırına takılan kullanıcılar.</p>
+        </div>
+        <button class="action-btn danger" onclick="resetAllLimits()">Tüm Sınırları Sıfırla (Herkesi Serbest Bırak)</button>
+      </div>
+      <table>
+        <thead><tr><th>Google Hesabı</th><th>Kısıtlama Tarihi</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody id="limits-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACCOUNTS -->
+  <div class="tab-content" id="tab-accounts">
+    <div class="card" style="margin-bottom:24px;">
+      <table>
+        <thead><tr><th>Kullanıcı Adı</th><th>Yetki</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody id="accounts-list"></tbody>
+      </table>
+    </div>
+    <div class="card" style="padding:24px; max-width:400px;" id="add-account-section">
+      <h3 style="color:#fff; margin-bottom:16px;">Yeni Yetkili Ekle</h3>
+      <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="new-user" placeholder="kullanici.adi"></div>
+      <div class="form-group"><label>Şifre</label><input type="password" id="new-pass" placeholder="••••••••"></div>
+      <button class="btn-save" onclick="addAccount()">Hesabı Oluştur</button>
+    </div>
+  </div>
+
+  <!-- SPECIAL -->
+  <div class="tab-content" id="tab-special">
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody id="special-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="tab-content" id="tab-settings">
+    <div class="card" style="padding:32px;">
+      <h3 style="color:#fff; margin-bottom:24px;">Özel Başvuru Ayarları</h3>
+      <div class="form-group">
+        <label>Özel Başvuru Modu</label>
+        <select id="cfg-active"><option value="true">Açık</option><option value="false">Kapalı</option></select>
+      </div>
+      <div class="form-group">
+        <label>Başlık</label>
+        <input type="text" id="cfg-title" placeholder="Örn: Yılbaşı Özel">
+      </div>
+      <div class="form-group">
+        <label>Özel Mod Kotası</label>
+        <input type="number" id="cfg-quota" value="50">
+      </div>
+      <div style="display:flex; gap:16px; margin-top:32px;">
+        <button class="btn-save" onclick="saveSpecialCfg()">Ayarları Kaydet</button>
+        <button class="action-btn danger" style="padding:12px 24px;" onclick="resetSpecialQuota()">Kotayı Sıfırla</button>
+      </div>
+    </div>
+    
+    <div class="card" style="padding:32px; margin-top:24px;">
+      <h3 style="color:#fff; margin-bottom:16px;">Google Drive Senkronizasyonu</h3>
+      <p style="color:var(--dim); margin-bottom:24px; line-height:1.6;">Daha önce Drive klasörüne yüklenmiş ancak panelde görünmeyen eski parçaları sisteme çeker. Kotadan düşülür.</p>
+      <button class="btn-save" style="background:var(--surface); color:#fff; border:1px solid var(--border);" onclick="syncDrive()">🔄 Eksik Parçaları Senkronize Et</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- AUDIO PLAYER -->
+<div class="audio-bar" id="audio-bar">
+  <div class="ab-info">
+    <div class="ab-title" id="ab-title">Parça Adı</div>
+    <div class="ab-artist" id="ab-artist">Sanatçı</div>
+  </div>
+  <div class="ab-controls">
+    <button class="ab-ctrl-btn" onclick="seekBy(-10)">⏪</button>
+    <button class="ab-play-big" id="ab-play" onclick="togglePlay()">⏸</button>
+    <button class="ab-ctrl-btn" onclick="seekBy(10)">⏩</button>
+  </div>
+  <div class="ab-timeline">
+    <span class="ab-time" id="ab-cur">0:00</span>
+    <input type="range" class="ab-slider" id="ab-seek" min="0" max="100" value="0" oninput="seekTo(this.value)">
+    <span class="ab-time" id="ab-dur">0:00</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; margin-left:16px;">
+    <button class="ab-ctrl-btn" onclick="toggleMute()" id="ab-mute">🔊</button>
+    <input type="range" class="ab-slider" id="ab-vol" min="0" max="100" value="100" oninput="changeVol(this.value)" style="width:60px;">
+  </div>
+  <button class="ab-close" onclick="closePlayer()">×</button>
+  <audio id="player" style="display:none;"></audio>
+</div>
+
+<script>
+let token = localStorage.getItem('staff_token') || '';
+let username = localStorage.getItem('staff_username') || '';
+let role = localStorage.getItem('staff_role') || '';
+
+if(!token) { window.location.href = '/index.html'; }
+
+document.getElementById('u-name').textContent = username;
+document.getElementById('u-role').textContent = role === 'owner' ? 'Kurucu' : 'Yönetici';
+document.getElementById('u-ava').textContent = username.charAt(0).toUpperCase();
+
+if(role === 'owner') {
+  document.getElementById('nav-special').style.display = 'flex';
+  document.getElementById('nav-settings').style.display = 'flex';
+} else {
+  document.getElementById('add-account-section').style.display = 'none';
+}
+
+function escapeHtml(str) { return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+async function req(path, method='GET', body=null) {
+  const opt = { method, headers: { 'Authorization': 'Bearer '+token }};
+  if(body) { opt.headers['Content-Type']='application/json'; opt.body = JSON.stringify(body); }
+  const res = await fetch(path, opt);
+  if(res.status===401||res.status===403) { logout(); throw new Error('Auth'); }
+  return res.json();
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  const titles = {inbox:'Gelen Kutusu', reviewed:'İncelenenler', limits:'Bekleme Süreleri', accounts:'Hesaplar', special:'Özel Gelenler', settings:'Sistem Ayarları'};
+  document.getElementById('page-title').textContent = titles[tab];
+}
+
+function logout() {
+  localStorage.removeItem('staff_token'); localStorage.removeItem('staff_username'); localStorage.removeItem('staff_role');
+  window.location.href = '/index.html';
+}
+
+let inboxData = [], reviewedData = [], specialData = [];
+
+async function loadData() {
+  try {
+    const data = await req('/api/admin/submissions');
+    
+    // Stats
+    const pCount = data.submissions.filter(s=>s.status==='pending').length;
+    const rCount = data.submissions.filter(s=>s.status==='reviewed').length;
+    document.getElementById('stat-pending').textContent = pCount;
+    document.getElementById('stat-reviewed').textContent = rCount;
+    document.getElementById('stat-total').textContent = data.submissions.length;
+    document.getElementById('badge-inbox').textContent = pCount;
+
+    // Inbox
+    inboxData = data.submissions.filter(s=>s.status==='pending');
+    renderTable('inbox-list', inboxData, 'inbox');
+    
+    // Reviewed
+    reviewedData = data.submissions.filter(s=>s.status==='reviewed').reverse().slice(0,30); // son 30
+    renderTable('reviewed-list', reviewedData, 'reviewed');
+
+    // Special
+    if(role==='owner' && data.specialSubmissions) {
+      specialData = data.specialSubmissions;
+      renderTable('special-list', specialData, 'special');
+      if(data.specialConfig) {
+        document.getElementById('cfg-active').value = data.specialConfig.active ? 'true' : 'false';
+        document.getElementById('cfg-title').value = data.specialConfig.title || '';
+        document.getElementById('cfg-quota').value = data.specialConfig.maxQuota || 50;
+      }
+    }
+
+    // Limits
+    const lb = document.getElementById('limits-list');
+    if(!data.limits || !data.limits.length) lb.innerHTML = '<tr><td colspan="3" class="empty">Kısıtlama yok.</td></tr>';
+    else {
+      lb.innerHTML = data.limits.map(l => `
+        <tr>
+          <td><div class="track-name">${escapeHtml(l.email)}</div><div class="artist-name">${l.type}</div></td>
+          <td><div class="date-str">${new Date(l.timestamp).toLocaleString('tr-TR')}</div></td>
+          <td style="text-align:right;"><button class="action-btn danger" onclick="resetUser('${l.ip}','${l.email}')">Sıfırla</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Accounts
+    const ab = document.getElementById('accounts-list');
+    if(data.accounts) {
+      ab.innerHTML = data.accounts.map(a => `
+        <tr>
+          <td><div class="track-name">${a.username}</div></td>
+          <td><div class="artist-name">${a.role==='owner'?'Kurucu':'Yönetici'}</div></td>
+          <td style="text-align:right;">${a.role!=='owner' && role==='owner' ? `<button class="action-btn danger" onclick="delAccount('${a.username}')">Sil</button>` : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+  } catch(e) {}
+}
+
+function renderTable(id, list, type) {
+  const el = document.getElementById(id);
+  if(!list.length) { el.innerHTML = `<tr><td colspan="4" class="empty">Veri bulunamadı.</td></tr>`; return; }
+  
+  el.innerHTML = list.map((s, idx) => {
+    let actionBtn = '';
+    if(type==='inbox') actionBtn = `<button class="action-btn ok" onclick="updStatus('${s.id}','reviewed')">Onayla</button>`;
+    if(type==='reviewed') actionBtn = `<button class="action-btn danger" onclick="unreview('${s.id}')">Geri Al</button>`;
+    if(type==='special') {
+      if(s.status==='pending') actionBtn = `<button class="action-btn ok" onclick="updSpecial('${s.id}','reviewed')">Onayla</button>`;
+      else actionBtn = `<button class="action-btn danger" onclick="updSpecial('${s.id}','pending')">Geri Al</button>`;
+    }
+    
+    let noteHtml = s.note && s.note !== 'Bilinmiyor' ? `<div class="note-box">${escapeHtml(s.note)}</div>` : '';
+
+    return `
+      <tr>
+        <td><button class="play-btn" onclick="playTrack('${type}',${idx})">▶</button></td>
+        <td>
+          <div class="track-name">${escapeHtml(s.trackName)}</div>
+          <div class="artist-name">${escapeHtml(s.fullName)} ${s.aiTool && s.aiTool !== 'Bilinmiyor' ? `<span>• ${escapeHtml(s.aiTool)}</span>` : ''}</div>
+          ${noteHtml}
+        </td>
+        <td>
+          <div class="artist-name" style="color:#fff;">${escapeHtml(s.email)}</div>
+          <div class="date-str">${new Date(s.timestamp).toLocaleDateString('tr-TR')}</div>
+        </td>
+        <td style="text-align:right;">${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// API Calls
+async function updStatus(id, st) { await req('/api/admin/update-status','POST',{fileId:id, status:st}); loadData(); }
+async function unreview(id) { await req('/api/admin/unreview','POST',{fileId:id}); loadData(); }
+async function updSpecial(id, st) { await req('/api/admin/update-special-status','POST',{id:id, status:st}); loadData(); }
+async function resetUser(ip, email) { if(confirm('Sıfırlansın mı?')) { await req('/api/admin/reset-user','POST',{targetIp:ip,targetEmail:email}); loadData(); } }
+async function resetAllLimits() { if(confirm('TÜMÜ sıfırlansın mı?')) { await req('/api/admin/reset-all-limits','POST'); loadData(); } }
+async function addAccount() { 
+  const u=document.getElementById('new-user').value, p=document.getElementById('new-pass').value;
+  if(u&&p) { await req('/api/staff/add-account','POST',{username:u, password:p}); document.getElementById('new-user').value=''; document.getElementById('new-pass').value=''; loadData(); }
+}
+async function delAccount(u) { if(confirm('Silinsin mi?')) { await req('/api/staff/remove-account','POST',{username:u}); loadData(); } }
+async function saveSpecialCfg() {
+  const active = document.getElementById('cfg-active').value==='true';
+  const title = document.getElementById('cfg-title').value;
+  const maxQuota = document.getElementById('cfg-quota').value;
+  await req('/api/admin/save-special-config','POST',{active, title, maxQuota}); alert('Kaydedildi');
+}
+async function resetSpecialQuota() { if(confirm('Sıfırlansın mı?')) { await req('/api/admin/save-special-config','POST',{resetQuota:true}); alert('Sıfırlandı'); loadData(); } }
+async function syncDrive() { if(confirm('Senkronize edilsin mi?')) { const r = await req('/api/admin/sync-drive','POST'); alert(r.count+' eklendi'); loadData(); } }
+
+// Audio Player
+const player = document.getElementById('player');
+let currentList = [], currentIndex = -1;
+
+function playTrack(type, idx) {
+  const list = type==='inbox'?inboxData : type==='reviewed'?reviewedData : specialData;
+  const track = list[idx];
+  document.getElementById('ab-title').textContent = track.trackName;
+  document.getElementById('ab-artist').textContent = track.fullName;
+  
+  fetch('/api/stream-audio?fileId='+track.fileId, {headers:{'Authorization':'Bearer '+token}})
+    .then(r=>r.blob()).then(blob=>{
+      player.src = URL.createObjectURL(blob);
+      player.play();
+      document.getElementById('ab-play').textContent = '⏸';
+      document.getElementById('audio-bar').classList.add('visible');
+    });
+}
+function togglePlay() { if(player.paused){player.play();document.getElementById('ab-play').textContent='⏸';}else{player.pause();document.getElementById('ab-play').textContent='▶';} }
+function closePlayer() { player.pause(); document.getElementById('audio-bar').classList.remove('visible'); }
+function seekBy(s) { player.currentTime += s; }
+function seekTo(v) { if(player.duration) player.currentTime = (v/100)*player.duration; }
+function toggleMute() { player.muted = !player.muted; document.getElementById('ab-mute').textContent = player.muted ? '🔇' : '🔊'; }
+function changeVol(v) { player.volume = v/100; if(v==0){player.muted=true;document.getElementById('ab-mute').textContent='🔇';}else{player.muted=false;document.getElementById('ab-mute').textContent='🔊';} }
+
+player.addEventListener('timeupdate', () => {
+  if(!player.duration) return;
+  const pct = (player.currentTime / player.duration) * 100;
+  document.getElementById('ab-seek').value = pct;
+  document.getElementById('ab-cur').textContent = fmtTime(player.currentTime);
+  document.getElementById('ab-dur').textContent = fmtTime(player.duration);
+});
+
+function fmtTime(s) {
+  if(isNaN(s)) return '0:00';
+  const m = Math.floor(s/60);
+  const sc = Math.floor(s%60);
+  return m+':'+(sc<10?'0':'')+sc;
+}
+
+loadData();
+</script>
+</body>
+</html>

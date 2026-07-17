@@ -3,1573 +3,653 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mustafa İnce · Sizden Gelenler — Sezon 2</title>
-<meta name="description" content="Yapay zeka ile ürettiğin parçanı Mustafa İnce'ye gönder. Sizden Gelenler Sezon 2 başvuruları açık — her hafta yeni bir gönderim hakkın var.">
-<meta name="theme-color" content="#0d0d0e">
-<link rel="canonical" href="https://mais.thendisch.com/">
+<title>Sizden Gelenler · MAIS Studio</title>
+<meta name="description" content="Yapay zeka ile ürettiğin parçanı gönder, Mustafa İnce dinlesin.">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #0d0d0e;
-    --panel: #1c1b1c;
-    --panel-2: #232224;
-    --raised: #2a292b;
-    --yellow: #f2c230;
-    --yellow-deep: #d9a91b;
-    --cream: #f3eee1;
-    --text: #f3eee1;
-    --text-dim: #9c968b;
-    --line: rgba(243,238,225,0.10);
-    --line-strong: rgba(243,238,225,0.20);
-    --radius: 16px;
-    --shadow: 0 24px 70px -24px rgba(0,0,0,0.7);
-    /* Legacy vars for admin panel compat */
-    --bg2: #1c1b1c;
-    --border: rgba(243,238,225,0.10);
-    --border2: rgba(243,238,225,0.20);
-    --txt: #f3eee1;
-    --txt2: #9c968b;
-    --txt3: #5e5b55;
-    --gold: #f2c230;
-    --gold2: #d9a91b;
-    --glow: rgba(242,194,48,0.06);
-    --font: 'Montserrat', sans-serif;
-  }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  html{ scroll-behavior:smooth; }
-  body{
-    background:var(--bg); color:var(--text); font-family:'Montserrat', sans-serif;
-    line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  }
-  .display{ font-family:'Montserrat', sans-serif; font-weight:900; text-transform:uppercase; letter-spacing:0.01em; }
-  .script{ font-family:'Caveat',cursive; }
-  .mono{ font-family:'JetBrains Mono',monospace; }
-  a{ color:inherit; text-decoration:none; }
-  button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
-  ::selection{ background:var(--yellow); color:#141116; }
-  :focus-visible{ outline:2px solid var(--yellow); outline-offset:3px; border-radius:4px; }
-  img{ display:block; max-width:100%; }
+:root {
+  --bg-dark: #050505;
+  --bg-panel: #0a0a0a;
+  --surface: #121212;
+  --surface-hover: #1a1a1a;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(200, 168, 75, 0.5);
+  --gold: #c8a84b;
+  --gold-glow: rgba(200, 168, 75, 0.15);
+  --text-main: #f0f0f0;
+  --text-muted: #888888;
+  --text-dim: #555555;
+  --error: #e06c6c;
+  --success: #6ce08b;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
 
-  .noise{
-    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.03; mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; width: 100%; background: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); font-size: 15px; -webkit-font-smoothing: antialiased; overflow: hidden; }
+a { color: var(--gold); text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+img { max-width: 100%; display: block; }
+::selection { background: var(--gold); color: #000; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-  /* ---------- plate chip ---------- */
-  .plate{
-    display:inline-flex; align-items:stretch; border-radius:9px; overflow:hidden;
-    border:1.5px solid var(--cream); background:#111;
-  }
-  .plate .p-tag{
-    background:var(--yellow); color:#141116; font-family:'Montserrat'; font-weight:900;
-    font-size:12px; padding:7px 10px; display:flex; align-items:center; letter-spacing:0.01em;
-    border-right:1.5px solid var(--cream);
-  }
-  .plate .p-txt{
-    padding:7px 12px; font-family:'Montserrat'; font-weight:700; font-size:11px; letter-spacing:0.06em;
-    display:flex; align-items:center; color:var(--cream); text-transform:uppercase;
-  }
+/* ── LAYOUT ── */
+.app-container { display: flex; height: 100vh; width: 100vw; }
 
-  /* ---------- nav ---------- */
-  header{
-    position:sticky; top:0; z-index:40;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px clamp(20px,5vw,64px);
-    background:rgba(13,13,14,0.78); backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line);
-  }
-  .brand{ display:flex; align-items:center; gap:12px; }
-  .logo-chip{
-    background:var(--cream); border-radius:8px; padding:6px 12px; display:flex; align-items:center;
-  }
-  .logo-chip img{ height:22px; width:auto; }
-  .brand-sub{ font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; }
+/* ── LEFT PANE (VISUAL) ── */
+.left-pane {
+  flex: 1; position: relative; overflow: hidden;
+  background: #000 url('assets/season-plate-v2.jpg') center/cover no-repeat;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 40px; border-right: 1px solid var(--border);
+}
+.left-pane::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(5,5,5,0.7) 0%, rgba(5,5,5,0.95) 100%);
+  backdrop-filter: blur(8px);
+}
+.left-content { position: relative; z-index: 10; display: flex; flex-direction: column; height: 100%; }
+.brand-header { display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 12px; }
+/* Logodaki beyaz arka plan kaldırıldı, doğrudan şeffaf PNG kullanılıyor */
+.logo img { height: 22px; filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
+.season-tag {
+  background: var(--gold-glow); border: 1px solid var(--border-focus);
+  color: var(--gold); padding: 6px 14px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
 
-  .btn-ghost{
-    padding:10px 18px; border:1px solid var(--line-strong); border-radius:999px;
-    font-size:13px; font-weight:700; letter-spacing:0.02em;
-    transition:border-color .2s ease, background .2s ease;
-  }
-  .btn-ghost:hover{ border-color:var(--yellow); background:rgba(242,194,48,0.08); }
-  .btn-ghost.active{ background:var(--yellow); color:#141116; border-color:var(--yellow); }
+.hero-text { margin: auto 0; }
+.hero-text h1 { font-size: clamp(48px, 6vw, 84px); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px; color: #fff; }
+.hero-text h1 span { color: var(--gold); }
+.hero-text p { font-size: 16px; line-height: 1.8; color: var(--text-muted); max-width: 480px; }
 
-  /* ---------- hero ---------- */
-  .hero{
-    position:relative; z-index:1;
-    display:grid; grid-template-columns:1.05fr 0.95fr; gap:48px; align-items:center;
-    padding:clamp(44px,7vw,84px) clamp(20px,5vw,64px) clamp(48px,6vw,72px);
-    max-width:1280px; margin:0 auto;
-  }
-  .hero h1{
-    font-size:clamp(38px,6vw,66px); line-height:0.96; margin:18px 0 16px; color:var(--cream);
-  }
-  .hero h1 .accent{ color:var(--yellow); }
-  .hero p.lead{ color:var(--text-dim); font-size:16px; max-width:46ch; margin-bottom:30px; }
-  .hero-actions{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.host-profile { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); }
+.host-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-focus); }
+.host-info h4 { font-size: 15px; font-weight: 700; color: #fff; }
+.host-info p { font-size: 13px; color: var(--text-muted); }
 
-  .btn-primary{
-    padding:15px 28px; border-radius:10px; background:var(--yellow); color:#141116;
-    font-weight:800; font-size:14px; letter-spacing:0.01em;
-    box-shadow:0 12px 30px -10px rgba(242,194,48,0.55);
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .btn-primary:hover{ transform:translateY(-2px); }
-  .btn-primary:active{ transform:translateY(0); }
-  .btn-primary:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+/* ── RIGHT PANE (INTERACTIVE) ── */
+.right-pane {
+  width: 100%; max-width: 680px; background: var(--bg-panel);
+  display: flex; flex-direction: column; position: relative;
+}
+.pane-header {
+  padding: 24px 40px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: flex-end; align-items: center;
+  background: rgba(10,10,10,0.8); backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 20;
+}
+.staff-trigger {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; color: var(--text-muted);
+  padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.staff-trigger:hover { color: #fff; border-color: var(--gold); background: var(--gold-glow); }
+.staff-trigger svg { width: 14px; height: 14px; }
 
-  .readout{
-    display:inline-flex; align-items:center; gap:14px;
-    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 18px;
-  }
-  .readout-label{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); }
-  .readout-value{ font-size:20px; font-weight:700; color:var(--yellow); }
+.scroll-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-  .hero-visual{ display:flex; justify-content:center; position:relative; }
-  .portrait-frame{
-    position:relative; width:min(360px,90%); aspect-ratio:1/1.08; border-radius:20px; overflow:hidden;
-    border:1px solid var(--line-strong); box-shadow:var(--shadow); background:var(--panel-2);
-  }
-  .portrait-frame img{ width:100%; height:100%; object-fit:cover; }
-  .portrait-frame::after{
-    content:""; position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(13,13,14,0) 58%, rgba(13,13,14,0.9) 100%);
-  }
-  .portrait-caption{ position:absolute; left:20px; right:20px; bottom:18px; z-index:2; }
-  .portrait-caption .name{ font-family:'Caveat'; font-weight:700; font-size:34px; color:var(--yellow); line-height:1; }
-  .portrait-caption .role{ font-size:12px; color:var(--text-dim); margin-top:2px; }
-  .portrait-badge{ position:absolute; top:-14px; left:-14px; z-index:3; }
+/* Warning for local file */
+#local-warning {
+  background: rgba(224, 108, 108, 0.1); border: 1px solid rgba(224, 108, 108, 0.3);
+  color: var(--error); padding: 16px; border-radius: var(--radius-md);
+  font-size: 13px; margin-bottom: 32px; display: none; line-height: 1.6;
+}
 
-  /* ---------- campaign keyart banner ---------- */
-  .keyart{
-    max-width:1280px; margin:0 auto; padding:0 clamp(20px,5vw,64px) clamp(56px,7vw,88px);
-    position:relative; z-index:1;
-  }
-  .keyart-frame{
-    border-radius:20px; overflow:hidden; border:1px solid var(--line-strong);
-    box-shadow:var(--shadow); background:#000;
-  }
-  .keyart-frame img{ width:100%; display:block; }
+/* Steps Progress */
+.step-tracker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; position: relative; }
+.step-tracker::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); z-index: 0; }
+.st-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--bg-panel); padding: 0 10px; }
+.st-circle {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border);
+  display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--text-dim); transition: all 0.3s;
+}
+.st-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); transition: color 0.3s; }
+.st-item.active .st-circle { background: var(--gold); border-color: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
+.st-item.active .st-label { color: #fff; }
+.st-item.done .st-circle { background: var(--surface-hover); border-color: var(--gold); color: var(--gold); }
+.st-item.done .st-label { color: var(--gold); }
 
-  /* ---------- section shell ---------- */
-  section.block{ max-width:1280px; margin:0 auto; padding:56px clamp(20px,5vw,64px); position:relative; z-index:1; }
-  .step-label{ display:flex; align-items:center; gap:14px; margin-bottom:28px; }
-  .step-title{ font-family:'Montserrat'; font-weight:800; font-size:18px; letter-spacing:0.01em; color:var(--cream); }
-  .step-line{ flex:1; height:1px; background:var(--line); }
+/* Step Panels */
+.panel { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.panel.active { display: block; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:clamp(24px,4vw,40px); }
+.panel-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.panel-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 32px; }
 
-  /* Step 1 auth */
-  .auth-panel{ display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap; }
-  .auth-copy p{ color:var(--text-dim); font-size:14px; max-width:48ch; }
-  .auth-copy p.rule{ margin-top:10px; font-size:12.5px; color:#7d786e; }
+/* Auth Area */
+.auth-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px;
+}
+.auth-box p { font-size: 13px; color: var(--text-muted); }
+.gsi-wrapper { min-height: 44px; display: flex; justify-content: center; width: 100%; color-scheme: dark; }
 
-  .google-btn-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
-  .gsi-loading-txt{ font-size:13px; color:var(--yellow); font-weight:600; display:none; }
+/* Blocked Area */
+.blocked-box { text-align: center; padding: 40px 20px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); }
+.b-icon { font-size: 48px; margin-bottom: 20px; }
+.countdown { display: flex; justify-content: center; gap: 16px; margin: 32px 0; }
+.cd-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; min-width: 100px; }
+.cd-val { font-size: 32px; font-family: var(--font-mono); font-weight: 700; color: var(--gold); }
+.cd-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-top: 8px; }
 
-  .countdown-tile{
-    display:none; text-align:center; background:var(--raised); border:1px solid var(--line);
-    border-radius:10px; padding:16px 22px; min-width:120px;
-  }
-  .countdown-tile .num{ font-family:'JetBrains Mono'; font-size:24px; font-weight:700; color:var(--yellow); }
-  .countdown-tile .lbl{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-top:4px; }
+/* Form Elements */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.field input, .field select, .field textarea {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 16px; color: #fff; font-family: inherit; font-size: 14px; transition: all 0.2s; outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: var(--surface-hover); }
+.field textarea { resize: vertical; min-height: 100px; }
+.field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+.char-count { align-self: flex-end; font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }
 
-  .step-status{
-    display:none; align-items:center; gap:6px; font-size:11px; font-weight:700;
-    color:#7ddc8f; background:rgba(125,220,143,0.12); border:1px solid rgba(125,220,143,0.35);
-    padding:5px 10px; border-radius:999px; letter-spacing:0.03em;
-  }
-  .step-status.show{ display:inline-flex; }
-  .auth-panel.verified .google-btn-wrap{ display:none; }
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 40px 24px;
+  text-align: center; cursor: pointer; position: relative; transition: all 0.2s; background: var(--surface);
+}
+.dropzone:hover, .dropzone.drag { border-color: var(--gold); background: var(--gold-glow); }
+.dropzone.filled { border-style: solid; border-color: var(--gold); }
+.dz-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.dz-content svg { width: 40px; height: 40px; color: var(--gold); margin-bottom: 16px; }
+.dz-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+.dz-sub { font-size: 13px; color: var(--text-muted); }
+.dz-file-info { display: none; align-items: center; justify-content: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--gold); }
 
-  .err-box{
-    background:rgba(232,103,79,0.10); border:1px solid rgba(232,103,79,0.35); border-radius:10px;
-    padding:10px 14px; font-size:13px; color:#e8674f; display:none; margin-bottom:12px;
-  }
+/* Checkboxes */
+.checkbox-wrap { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: border 0.2s; }
+.checkbox-wrap:hover { border-color: rgba(255,255,255,0.2); }
+.checkbox-wrap input {
+  appearance: none; width: 20px; height: 20px; border: 2px solid var(--text-dim); border-radius: 6px;
+  margin-top: 2px; flex: 0 0 auto; display: grid; place-items: center; cursor: pointer; transition: all 0.2s;
+}
+.checkbox-wrap input::after { content: ''; width: 10px; height: 10px; background: var(--bg-panel); border-radius: 2px; transform: scale(0); transition: transform 0.2s; }
+.checkbox-wrap input:checked { background: var(--gold); border-color: var(--gold); }
+.checkbox-wrap input:checked::after { transform: scale(1); }
+.checkbox-wrap span { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
-  /* Step 2 form */
-  .step2-wrap{ position:relative; }
-  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
-  .field{ display:flex; flex-direction:column; gap:8px; }
-  .field.full{ grid-column:1 / -1; }
-  .field label{ font-size:12px; font-weight:700; letter-spacing:0.03em; color:var(--text-dim); text-transform:uppercase; }
-  .field input[type="text"], .field select, .field textarea{
-    background:var(--raised); border:1px solid var(--line-strong); border-radius:9px;
-    padding:13px 14px; color:var(--text); font-size:14px; font-family:'Montserrat', sans-serif;
-    transition:border-color .2s ease, box-shadow .2s ease;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{
-    border-color:var(--yellow); box-shadow:0 0 0 3px rgba(242,194,48,0.15); outline:none;
-  }
-  .field select{ appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239c968b'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right 14px center;
-  }
-  .field textarea{ resize:vertical; min-height:88px; }
-  .char-count{ align-self:flex-end; font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono'; }
-  .char-count.warn{ color:#e8674f; }
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 32px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700;
+  transition: all 0.2s; cursor: pointer; text-align: center;
+}
+.btn-primary { background: var(--gold); color: #000; box-shadow: 0 8px 20px rgba(200, 168, 75, 0.25); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(200, 168, 75, 0.35); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-secondary { background: var(--surface); color: #fff; border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface-hover); border-color: var(--gold); }
+.action-row { display: flex; gap: 16px; margin-top: 32px; }
+.action-row .btn { flex: 1; }
 
-  .dropzone{
-    border:1.5px dashed var(--line-strong); border-radius:12px; padding:30px 20px; text-align:center; cursor:pointer;
-    transition:border-color .2s ease, background .2s ease; position:relative;
-  }
-  .dropzone:hover, .dropzone.drag{ border-color:var(--yellow); background:rgba(242,194,48,0.06); }
-  .dropzone input[type="file"]{ position:absolute; inset:0; opacity:0; width:100%; height:100%; cursor:pointer; }
-  .dropzone .dz-icon{ width:38px; height:38px; margin:0 auto 12px; }
-  .dropzone .dz-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
-  .dropzone .dz-sub{ font-size:12px; color:var(--text-dim); }
-  .dropzone.filled{ border-style:solid; border-color:var(--yellow); }
-  .dropzone .dz-file{ display:none; align-items:center; justify-content:center; gap:10px; font-size:13.5px; }
-  .dropzone .dz-file .dot{ width:8px; height:8px; border-radius:50%; background:var(--yellow); }
+.error-banner { background: rgba(224, 108, 108, 0.1); border: 1px solid rgba(224, 108, 108, 0.3); color: var(--error); padding: 16px; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 24px; display: none; }
 
-  .consent{ display:flex; align-items:flex-start; gap:12px; }
-  .consent input{
-    appearance:none; width:19px; height:19px; margin-top:1px; flex:0 0 auto;
-    border:1.5px solid var(--line-strong); border-radius:5px; background:var(--raised);
-    display:grid; place-items:center; cursor:pointer;
-  }
-  .consent input::after{ content:""; width:10px; height:10px; border-radius:2px; background:var(--yellow); transform:scale(0); transition:transform .15s ease; }
-  .consent input:checked::after{ transform:scale(1); }
-  .consent label{ font-size:13px; color:var(--text-dim); line-height:1.5; cursor:pointer; }
+/* ── OVERLAYS & MODALS ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  width: 100%; max-width: 440px; padding: 40px; text-align: center;
+  transform: scale(0.95) translateY(20px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.overlay.open .modal { transform: scale(1) translateY(0); }
+.modal-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--gold-glow); border: 1px solid var(--border-focus); display: grid; place-items: center; margin: 0 auto 24px; color: var(--gold); font-size: 24px; }
+.modal h2 { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.modal p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
 
-  .lock-overlay{
-    position:absolute; inset:0; z-index:5; border-radius:var(--radius);
-    background:rgba(13,13,14,0.72); backdrop-filter:blur(3px);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
-    text-align:center; padding:20px; transition:opacity .25s ease, visibility .25s ease;
-  }
-  .lock-overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
-  .lock-icon{
-    width:44px; height:44px; border-radius:50%; background:var(--raised);
-    border:1px solid var(--line-strong); display:grid; place-items:center;
-  }
-  .lock-overlay p{ font-size:13.5px; color:var(--text-dim); max-width:34ch; }
-  .lock-overlay .plate{ cursor:pointer; }
+/* Admin Modal Specific */
+.admin-login-modal { text-align: left; }
+.admin-login-modal h2 { text-align: center; }
+.admin-login-modal p { text-align: center; }
 
-  .blocked-section{ display:none; }
-  .blocked-section.show{ display:block; }
-  .blocked-section .panel{ text-align:center; padding:48px; }
-  .blocked-section .b-icon{ font-size:2.5rem; margin-bottom:16px; }
-  .blocked-section h3{ font-size:1.2rem; font-weight:800; margin-bottom:10px; }
-  .blocked-section p{ color:var(--text-dim); font-size:14px; margin-bottom:20px; }
-  .countdown-row{ display:flex; justify-content:center; gap:16px; margin-bottom:20px; }
-
-  .submit-row{ display:flex; justify-content:flex-end; margin-top:16px; }
-  .spin{ display:inline-block; width:13px; height:13px; border:2px solid rgba(20,17,22,0.2); border-top-color:#141116; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-
-  /* ---------- mode switcher ---------- */
-  .mode-switcher{
-    display:none; background:rgba(0,0,0,0.5); border-radius:12px; padding:4px; margin-bottom:30px; width:fit-content;
-    border:1px solid rgba(255,255,255,0.05);
-  }
-  .mode-switcher.show{ display:flex; }
-  .mode-btn{
-    padding:10px 24px; font-size:0.85rem; font-weight:700; color:var(--txt3); border-radius:8px; cursor:pointer;
-    transition:all 0.3s ease; text-transform:uppercase; letter-spacing:0.05em; background:transparent; border:none;
-  }
-  .mode-btn.active{ background:var(--yellow); color:#000; box-shadow:0 4px 12px rgba(242,194,48,0.3); }
-
-  /* ---------- footer ---------- */
-  footer{
-    border-top:1px solid var(--line); padding:40px clamp(20px,5vw,64px);
-    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
-    position:relative; z-index:1;
-  }
-  .socials{ display:flex; gap:10px; }
-  .socials a{
-    width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
-    display:grid; place-items:center; transition:border-color .2s ease, background .2s ease, transform .15s ease;
-  }
-  .socials a:hover{ border-color:var(--yellow); background:rgba(242,194,48,0.08); transform:translateY(-2px); }
-  .socials svg{ width:16px; height:16px; }
-  .footer-note{ font-size:12px; color:var(--text-dim); }
-
-  /* ---------- modals ---------- */
-  .modal-overlay{
-    position:fixed; inset:0; background:rgba(6,6,7,0.78); backdrop-filter:blur(6px);
-    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
-  }
-  .modal-overlay.open{ display:flex; animation:fadeIn .2s ease; }
-  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-  .modal{
-    background:var(--panel-2); border:1px solid var(--line-strong); border-radius:20px;
-    padding:36px; max-width:420px; width:100%; text-align:center; box-shadow:var(--shadow);
-    animation:modalIn .25s ease;
-  }
-  @keyframes modalIn{ from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
-  .modal .check{
-    width:56px; height:56px; border-radius:50%; margin:0 auto 18px;
-    background:rgba(242,194,48,0.12); border:1px solid rgba(242,194,48,0.4); display:grid; place-items:center;
-  }
-  .modal h3{ font-family:'Montserrat'; font-weight:900; font-size:17px; margin-bottom:10px; color:var(--cream); text-transform:uppercase; }
-  .modal p{ font-size:13.5px; color:var(--text-dim); margin-bottom:22px; line-height:1.6; }
-  .modal .btn-primary{ width:100%; text-align:center; display:block; cursor:pointer; }
-  .admin-modal{ max-width:380px; }
-  .admin-modal .field{ margin-bottom:14px; text-align:left; }
-  .admin-modal .field label{ display:block; font-size:11px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-dim); margin-bottom:7px; }
-  .admin-modal .field input{ width:100%; background:var(--raised); border:1px solid var(--line-strong); border-radius:9px; padding:12px 14px; color:var(--text); font-family:'Montserrat'; font-size:14px; outline:none; transition:border-color .2s; }
-  .admin-modal .field input:focus{ border-color:var(--yellow); }
-  .login-err{ font-size:12.5px; color:#e8674f; margin-bottom:10px; display:none; text-align:left; }
-
-  /* ---------- Admin Dashboard ---------- */
-  .admin-dashboard{
-    display:none; min-height:100vh; position:fixed; inset:0; z-index:200;
-    background:var(--bg); overflow-y:auto;
-  }
-  .admin-dashboard.open{ display:grid; grid-template-columns:240px 1fr; }
-  .admin-sidebar{
-    background:var(--panel); border-right:1px solid var(--line);
-    padding:22px 16px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh;
-  }
-  .admin-sidebar .logo-chip{ background:var(--cream); border-radius:8px; padding:8px 12px; display:inline-flex; margin-bottom:26px; }
-  .admin-sidebar .logo-chip img{ height:20px; }
-  .nav-item{
-    display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:9px;
-    font-size:13.5px; font-weight:600; color:var(--text-dim);
-    transition:background .15s ease, color .15s ease; cursor:pointer;
-  }
-  .nav-item svg{ width:17px; height:17px; flex:0 0 auto; }
-  .nav-item:hover{ background:var(--raised); color:var(--text); }
-  .nav-item.active{ background:rgba(242,194,48,0.10); color:var(--yellow); }
-  .nav-count{
-    margin-left:auto; background:var(--yellow); color:#141116; font-size:10.5px; font-weight:800;
-    padding:2px 7px; border-radius:999px;
-  }
-  .nav-divider{ height:1px; background:var(--line); margin:14px 0; }
-  .sidebar-footer{
-    margin-top:auto; display:flex; align-items:center; gap:10px; padding:12px; border-radius:10px;
-    border:1px solid var(--line);
-  }
-  .avatar-chip{
-    width:32px; height:32px; border-radius:50%; background:var(--yellow); color:#141116;
-    display:grid; place-items:center; font-weight:900; font-size:12px; flex:0 0 auto;
-  }
-  .sidebar-footer .who{ font-size:12.5px; font-weight:700; }
-  .sidebar-footer .role-txt{ font-size:10.5px; color:var(--text-dim); }
-  .logout-btn{ margin-left:auto; color:var(--text-dim); }
-  .logout-btn:hover{ color:#e8674f; }
-  .admin-main{ padding:28px 32px 100px; }
-  .admin-topbar{ display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:28px; flex-wrap:wrap; }
-  .admin-topbar h1{ font-family:'Montserrat'; font-weight:900; font-size:22px; text-transform:uppercase; }
-  .admin-topbar .sub{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
-  .admin-search{
-    display:flex; align-items:center; gap:9px; background:var(--panel); border:1px solid var(--line);
-    border-radius:10px; padding:10px 14px; min-width:260px;
-  }
-  .admin-search input{ background:none; border:none; color:var(--text); font-size:13.5px; width:100%; font-family:'Montserrat'; }
-  .admin-search input:focus{ outline:none; }
-  .admin-search svg{ width:15px; height:15px; color:var(--text-dim); flex:0 0 auto; }
-  .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
-  .stat-card{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .stat-card .label{ font-size:11.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; font-weight:700; }
-  .stat-card .value{ font-family:'JetBrains Mono'; font-size:28px; font-weight:700; margin-top:6px; }
-  .stat-icon{
-    width:38px; height:38px; border-radius:10px; display:grid; place-items:center;
-    background:rgba(242,194,48,0.10); color:var(--yellow); flex:0 0 auto;
-  }
-  .stat-icon svg{ width:18px; height:18px; }
-  .data-panel{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:20px; }
-  .data-panel-head{
-    display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:10px;
-  }
-  .data-panel-head h2{ font-family:'Montserrat'; font-weight:900; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; }
-  .admin-tabs{ display:flex; gap:4px; background:var(--raised); border-radius:999px; padding:4px; }
-  .admin-tab{ padding:7px 14px; font-size:12px; font-weight:700; border-radius:999px; color:var(--text-dim); cursor:pointer; transition:all .15s; }
-  .admin-tab:hover{ color:var(--text); }
-  .admin-tab.active{ background:var(--yellow); color:#141116; }
-  .admin-tab-pane{ display:none; }
-  .admin-tab-pane.active{ display:block; }
-  table{ width:100%; border-collapse:collapse; }
-  thead th{
-    text-align:left; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim);
-    padding:12px 22px; border-bottom:1px solid var(--line); font-weight:700;
-  }
-  tbody td{ padding:14px 22px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle; }
-  tbody tr:last-child td{ border-bottom:none; }
-  tbody tr:hover{ background:rgba(243,238,225,0.02); }
-  .user-cell{ display:flex; align-items:center; gap:10px; }
-  .mini-avatar{
-    width:30px; height:30px; border-radius:50%; background:var(--raised); border:1px solid var(--line-strong);
-    display:grid; place-items:center; font-size:11px; font-weight:800; color:var(--yellow); flex:0 0 auto;
-  }
-  .uname{ font-weight:700; font-size:13px; }
-  .uhandle{ font-size:11.5px; color:var(--text-dim); }
-  .pill{
-    display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
-    font-size:11px; font-weight:700;
-  }
-  .pill .dot{ width:6px; height:6px; border-radius:50%; }
-  .pill.wait{ background:rgba(242,194,48,0.12); color:var(--yellow); border:1px solid rgba(242,194,48,0.35); }
-  .pill.wait .dot{ background:var(--yellow); }
-  .pill.ok{ background:rgba(125,220,143,0.12); color:#7ddc8f; border:1px solid rgba(125,220,143,0.35); }
-  .pill.ok .dot{ background:#7ddc8f; }
-  .pill.no{ background:rgba(232,103,79,0.12); color:#e8674f; border:1px solid rgba(232,103,79,0.35); }
-  .pill.no .dot{ background:#e8674f; }
-  .play-btn{
-    width:32px; height:32px; border-radius:50%; background:var(--raised); border:1px solid var(--line-strong);
-    display:grid; place-items:center; transition:border-color .15s ease, background .15s ease; cursor:pointer;
-  }
-  .play-btn:hover{ border-color:var(--yellow); background:rgba(242,194,48,0.08); }
-  .play-btn svg{ width:12px; height:12px; }
-  .row-actions{ display:flex; gap:8px; }
-  .icon-btn{
-    width:30px; height:30px; border-radius:8px; border:1px solid var(--line-strong);
-    display:grid; place-items:center; color:var(--text-dim); transition:all .15s ease; cursor:pointer;
-  }
-  .icon-btn:hover{ color:var(--text); border-color:var(--line-strong); background:var(--raised); }
-  .icon-btn.approve:hover{ color:#7ddc8f; border-color:rgba(125,220,143,0.4); }
-  .icon-btn.reject:hover{ color:#e8674f; border-color:rgba(232,103,79,0.4); }
-  .icon-btn svg{ width:14px; height:14px; }
-  .panel-input-row{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-  .panel-input{
-    flex:1; background:var(--raised); border:1px solid var(--line-strong); border-radius:9px;
-    padding:10px 12px; color:var(--text); font-family:'Montserrat'; font-size:13px; outline:none; min-width:140px;
-  }
-  .panel-input:focus{ border-color:var(--yellow); }
-  .panel-btn{
-    background:rgba(242,194,48,0.10); color:var(--yellow); border:1px solid rgba(242,194,48,0.3);
-    padding:10px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:700; transition:0.2s;
-  }
-  .panel-btn:hover{ background:var(--yellow); color:#141116; }
-  .danger-btn{
-    background:rgba(232,103,79,0.10); color:#e8674f; border:1px solid rgba(232,103,79,0.3);
-    padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:0.2s;
-  }
-  .danger-btn:hover{ background:#e8674f; color:#fff; }
-  .empty-state{ color:var(--text-dim); text-align:center; padding:36px; font-size:13.5px; }
-
-  /* ---------- Global Audio Player ---------- */
-  #audio-bar{
-    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(120px);
-    width:90%; max-width:900px;
-    background:rgba(28,27,28,0.92); backdrop-filter:blur(20px);
-    border:1px solid var(--line-strong); border-radius:100px;
-    padding:12px 24px; z-index:9999;
-    display:flex; align-items:center; gap:16px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--glow);
-    opacity:0; pointer-events:none; transition:transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease;
-  }
-  #audio-bar.visible{ transform:translateX(-50%) translateY(0); opacity:1; pointer-events:auto; }
-  .ab-art{ width:44px; height:44px; background:var(--raised); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
-  .ab-info{ flex:1.5; min-width:120px; }
-  .ab-title{ font-size:0.84rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .ab-artist{ font-size:0.72rem; color:var(--text-dim); }
-  .ab-controls{ display:flex; flex-direction:column; align-items:center; gap:6px; flex:2; max-width:400px; }
-  .ab-btn{ background:none; border:none; color:var(--text-dim); font-size:1.1rem; cursor:pointer; padding:4px; transition:all .15s ease; border-radius:50%; }
-  .ab-btn:hover{ color:var(--yellow); transform:scale(1.15); }
-  .ab-play{ width:38px; height:38px; border-radius:50%; background:var(--yellow); border:none; color:#141116; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
-  .ab-play:hover{ transform:scale(1.08); }
-  .ab-seek-row{ display:flex; align-items:center; gap:8px; width:100%; }
-  .ab-time{ font-size:0.68rem; color:var(--text-dim); width:32px; text-align:right; font-family:'JetBrains Mono'; }
-  .ab-dur{ font-size:0.68rem; color:var(--text-dim); width:32px; font-family:'JetBrains Mono'; }
-  .ab-seek{ flex:1; accent-color:var(--yellow); height:3px; cursor:pointer; }
-  .ab-close{ background:none; border:none; color:var(--text-dim); font-size:1.3rem; cursor:pointer; padding:0; flex-shrink:0; }
-  .ab-close:hover{ color:var(--text); }
-  .ab-btns-row{ display:flex; align-items:center; gap:8px; }
-  .play-circle-btn{
-    width:34px; height:34px; border-radius:50%; border:1px solid var(--line-strong);
-    background:var(--raised); color:var(--yellow); font-size:0.9rem; display:grid; place-items:center;
-    cursor:pointer; transition:all .2s;
-  }
-  .play-circle-btn:hover{ background:var(--yellow); color:#141116; border-color:var(--yellow); }
-  @media (max-width:600px){
-    #audio-bar{ flex-wrap:wrap; padding:16px; gap:10px; border-radius:20px; bottom:20px; }
-    .ab-controls{ width:100%; max-width:100%; flex:unset; }
-    .ab-info{ flex:1; }
-  }
-
-  /* ---------- Responsive ---------- */
-  @media (max-width:880px){
-    .hero{ grid-template-columns:1fr; }
-    .hero-visual{ order:-1; }
-    .form-grid{ grid-template-columns:1fr; }
-    .auth-panel{ flex-direction:column; align-items:stretch; text-align:center; }
-    .portrait-badge{ display:none; }
-    .admin-dashboard.open{ grid-template-columns:1fr; }
-    .admin-sidebar{ display:none; }
-    #audio-bar{ border-radius:20px; }
-    .stats-row{ grid-template-columns:1fr; }
-  }
+/* ── RESPONSIVE ── */
+@media (max-width: 992px) {
+  .app-container { flex-direction: column; overflow: auto; height: auto; min-height: 100vh; }
+  .left-pane { flex: none; min-height: 400px; padding: 32px 24px; }
+  .hero-text h1 { font-size: 40px; }
+  .right-pane { max-width: 100%; border-left: none; border-top: 1px solid var(--border); flex: 1; }
+  .scroll-area { overflow-y: visible; padding: 32px 24px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .action-row { flex-direction: column; }
+}
 </style>
 </head>
 <body>
 
-<div class="noise"></div>
-
-<header>
-  <div class="brand">
-    <div class="logo-chip">
-      <picture>
-        <source srcset="assets/mais-logo.webp" type="image/webp">
-        <img src="assets/mais-logo.png" alt="MAIS Studio logosu" width="120" height="22" loading="eager">
-      </picture>
-    </div>
-  </div>
-  <button class="btn-ghost" id="staff-btn" onclick="handleStaffBtnClick()">Yetkili Girişi</button>
-</header>
-
-<main>
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-copy">
-      <div class="plate">
-        <span class="p-tag">Sezon 2</span>
-        <span class="p-txt">Canlı Başvuru</span>
+<div class="app-container">
+  
+  <!-- VISUAL PANE -->
+  <div class="left-pane">
+    <div class="left-content">
+      <div class="brand-header">
+        <div class="logo">
+          <img src="assets/mais-logo.png" alt="MAIS Studio">
+        </div>
+        <div class="season-tag">Sezon 2 • Canlı</div>
       </div>
-      <h1 class="display">Sizden<br><span class="accent">Gelenler</span></h1>
-      <p class="lead">Yapay zeka ile ürettiğin parçanı gönder, dinleyelim. Her hafta yeni bir başvuru hakkın var — en iyi parçalar Mustafa İnce'nin kanallarında yayınlanıyor.</p>
-      <div class="hero-actions">
-        <a class="btn-primary" href="#basvuru">Başvuruyu Başlat</a>
-        <div class="readout">
-          <div>
-            <div class="readout-label">Kalan Gönderim Hakkı</div>
-            <div class="readout-value mono" id="main-quota">—</div>
-          </div>
+      
+      <div class="hero-text">
+        <h1>Sizden<br><span>Gelenler</span></h1>
+        <p>Selam! Yapay zeka ile müzik mi üretiyorsun? Harika, tam yerine geldin! Mustafa İnce her hafta sizden gelen parçaları tek tek dinliyor ve en iyilerini binlerce kişiyle paylaşıyor. Hadi, vakit kaybetmeden parçanı bize gönder!</p>
+      </div>
+      
+      <div class="host-profile">
+        <img src="assets/host.jpg" alt="Mustafa İnce" class="host-avatar">
+        <div class="host-info">
+          <h4>Mustafa İnce</h4>
+          <p>MAIS Studio • Müzik Prodüktörü</p>
         </div>
       </div>
-    </div>
-
-    <div class="hero-visual">
-      <div class="portrait-badge">
-        <div class="plate">
-          <span class="p-tag">Mais</span>
-          <span class="p-txt">Studio</span>
-        </div>
-      </div>
-      <div class="portrait-frame">
-        <picture>
-          <source srcset="assets/host.webp" type="image/webp">
-          <img src="assets/host.jpg" alt="Mustafa İnce, MAIS Studio kurucusu" width="900" height="972" loading="eager" fetchpriority="high">
-        </picture>
-        <div class="portrait-caption">
-          <div class="name script">Mustafa İnce</div>
-          <div class="role">MAIS Studio Yönetimi</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CAMPAIGN KEYART -->
-  <div class="keyart">
-    <div class="keyart-frame">
-      <picture>
-        <source srcset="assets/season-plate.webp" type="image/webp">
-        <img src="assets/season-plate.jpg" alt="Sezon 2 · Sizden Gelenler kampanya görseli" width="1600" height="1067" loading="lazy">
-      </picture>
     </div>
   </div>
 
-  <!-- STEP 1: KİMLİK DOĞRULAMA -->
-  <section class="block" id="basvuru">
-    <div class="step-label">
-      <div class="plate"><span class="p-tag">01</span><span class="p-txt">Kimlik Doğrulama</span></div>
-      <span class="step-status" id="step1Status">✓ Doğrulandı</span>
-      <span class="step-line"></span>
-    </div>
-
-    <!-- Mode switcher (special mode) -->
-    <div class="mode-switcher" id="mode-switcher-container">
-      <button class="mode-btn active" id="btn-mode-normal" onclick="setMode('normal')">Normal Başvuru</button>
-      <button class="mode-btn" id="btn-mode-special" onclick="setMode('special')"><span id="special-mode-title">Özel Konsept</span></button>
-    </div>
-
-    <div class="err-box" id="err-email"></div>
-
-    <div class="panel auth-panel" id="authPanel">
-      <div class="auth-copy">
-        <p id="authCopyText">Devam etmek için Google hesabınızla giriş yapın. Bu adım, sistemin haftalık başvuru kotasını doğru şekilde takip edebilmesi için gerekli.</p>
-        <p class="rule" id="authRuleText">Her katılımcıdan haftalık yalnızca 1 başvuru kabul edilmektedir.</p>
-      </div>
-      <div class="google-btn-wrap">
-        <div id="gsi-btn"></div>
-        <div class="gsi-loading-txt" id="gsi-loading">
-          <span class="spin"></span>Doğrulanıyor...
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- BLOCKED -->
-  <section class="block blocked-section" id="step-blocked-section">
-    <div class="panel">
-      <div class="b-icon">⏳</div>
-      <h3>Bu hafta zaten bir parça gönderdiniz</h3>
-      <p>Sistem suistimalini önlemek adına haftalık kısıtlamalar aktiftir.</p>
-      <div class="countdown-row">
-        <div class="countdown-tile" style="display:inline-block;">
-          <div class="num" id="countdown-days">--</div>
-          <div class="lbl">Gün</div>
-        </div>
-        <div class="countdown-tile" style="display:inline-block;">
-          <div class="num" id="countdown-hours">--</div>
-          <div class="lbl">Saat</div>
-        </div>
-      </div>
-      <p>Süre dolduğunda yeni bir parçayla tekrar başvurabilirsiniz.</p>
-    </div>
-  </section>
-
-  <!-- STEP 2: PARÇA BİLGİLERİ -->
-  <section class="block step2-wrap" id="step2Section">
-    <div class="step-label">
-      <div class="plate"><span class="p-tag">02</span><span class="p-txt">Parça Bilgileri</span></div>
-      <span class="step-line"></span>
-    </div>
-    <div class="err-box" id="err-form"></div>
-    <div class="panel" id="submissionPanel" style="position:relative;">
-      <div class="lock-overlay" id="lockOverlay">
-        <div class="lock-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
-        </div>
-        <p>Bu adıma geçmeden önce Google hesabınla giriş yapmalısın.</p>
-        <div class="plate" id="goToStep1"><span class="p-tag">01</span><span class="p-txt">Giriş Yap</span></div>
-      </div>
-      <fieldset id="step2Fields" disabled style="border:none;padding:0;margin:0;">
-      <div class="form-grid">
-        <div class="field">
-          <label for="fullName">Ad Soyad *</label>
-          <input type="text" id="fullName" required placeholder="Adınız Soyadınız">
-        </div>
-        <div class="field">
-          <label for="social">Sosyal Medya Hesabı *</label>
-          <input type="text" id="social" required placeholder="@kullaniciadi">
-        </div>
-        <div class="field">
-          <label for="aiTool">Kullanılan Yapay Zeka Aracı *</label>
-          <select id="aiTool" required>
-            <option value="">Seçiniz</option>
-            <option>Suno</option><option>Udio</option><option>AIVA</option><option>Boomy</option>
-            <option>Mureka</option><option>Stable Audio</option><option>ElevenLabs Music</option>
-            <option>Soundraw</option><option>Beatoven.ai</option><option>Minimax Music</option>
-            <option>Google Lyria</option><option>Sonauto</option><option>Diğer</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="trackName">Parça Adı *</label>
-          <input type="text" id="trackName" required placeholder="Parçanızın adı">
-        </div>
-        <div class="field full">
-          <label for="note">Parça Hakkında Not * <span style="text-transform:none;font-weight:400;">— maks. 210 karakter</span></label>
-          <textarea id="note" maxlength="210" required placeholder="Parçan hakkında kısa bir not bırak..." oninput="updateCharCount(this)"></textarea>
-          <span class="char-count"><span id="charNum">0</span> / 210</span>
-        </div>
-        <div class="field full">
-          <label>MP3 Dosyası * <span style="text-transform:none;font-weight:400;">— maks. 20 MB</span></label>
-          <div class="dropzone" id="upload-zone">
-            <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)">
-            <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.4">
-              <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-            </svg>
-            <div class="dz-title">MP3 dosyanı sürükle veya tıkla</div>
-            <div class="dz-sub">Yalnızca .mp3, en fazla 20 MB</div>
-            <div class="dz-file"><span class="dot"></span><span id="file-name"></span></div>
-          </div>
-        </div>
-        <div class="field full">
-          <div class="consent">
-            <input type="checkbox" id="chk">
-            <label for="chk">Bu parçanın tüm telif ve kullanım haklarının şahsıma ait olduğunu beyan ederim. Gönderimimin stüdyo tarafından incelenmesini ve seçilmesi halinde ilgili platformlarda yayınlanmasını onaylıyorum.</label>
-          </div>
-        </div>
-        <div class="field full">
-          <div class="consent">
-            <input type="checkbox" id="kvkk">
-            <label for="kvkk"><a href="privacy.html" target="_blank" style="color:var(--yellow);text-decoration:underline;">Aydınlatma Metni</a>'ni okudum, kişisel verilerimin bu başvuru kapsamında işlenmesine 6698 sayılı KVKK uyarınca açık rıza gösteriyorum.</label>
-          </div>
-        </div>
-      </div>
-      <div class="submit-row">
-        <button class="btn-primary" id="btn-submit" onclick="submitForm()">Başvuruyu Tamamla</button>
-      </div>
-      </fieldset>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div>
-    <div class="footer-note">© 2026 Mustafa İnce · MAIS Studio — Sizden Gelenler Sezon 2</div>
-    <div class="footer-note" style="margin-top:6px;">
-      <a href="privacy.html" style="text-decoration:underline;">Gizlilik Politikası</a>
-      &nbsp;·&nbsp;
-      <a href="terms.html" style="text-decoration:underline;">Kullanım Şartları</a>
-    </div>
-  </div>
-  <div class="socials">
-    <a href="https://www.instagram.com/mustafaincemuzik/" target="_blank" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-    </a>
-    <a href="https://www.youtube.com/@mustafaincemuzik" target="_blank" rel="noopener" aria-label="YouTube">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <a href="https://open.spotify.com/intl-tr/artist/5xcsIUfaETr2SFBiGtemrp" target="_blank" rel="noopener" aria-label="Spotify">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M7 10c3-1 7-1 10 1M7.5 13c2.5-.8 5.5-.8 8 .6M8 16c2-.6 4.5-.6 6.5.6" stroke-linecap="round"/></svg>
-    </a>
-    <a href="https://www.instagram.com/mustiaistudyo/" target="_blank" rel="noopener" aria-label="MAIS Studio">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-    </a>
-  </div>
-</footer>
-
-<!-- ═══ SUCCESS MODAL ═══ -->
-<div class="modal-overlay" id="success-modal" role="dialog" aria-modal="true">
-  <div class="modal">
-    <div class="check"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg></div>
-    <h3>Başvurunuz Alındı</h3>
-    <p>Teşekkürler. Parçan değerlendirme listemize eklendi, tüm başvuruları titizlikle dinliyoruz. Önümüzdeki haftadan itibaren yeni başvuru yapabilirsin.</p>
-    <button class="btn-primary" onclick="closeModal('success-modal'); goBack()">Kapat</button>
-  </div>
-</div>
-
-<!-- ═══ STAFF LOGIN MODAL ═══ -->
-<div class="modal-overlay" id="login-modal" role="dialog" aria-modal="true">
-  <div class="modal admin-modal">
-    <h3>Yetkili Girişi</h3>
-    <p style="margin-bottom:20px;font-size:13px;">Yönetim paneline erişmek için giriş yapın.</p>
-    <div class="login-err" id="login-err"></div>
-    <div class="field"><label>Kullanıcı Adı</label><input type="text" id="login-username" placeholder="kullanici.adi" autocomplete="username" onkeydown="if(event.key==='Enter') doLogin()"></div>
-    <div class="field" style="margin-top:12px;"><label>Şifre</label><input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()"></div>
-    <button class="btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;margin-top:20px;">Giriş Yap</button>
-    <button onclick="closeModal('login-modal')" style="margin-top:14px;font-size:12.5px;color:var(--text-dim);display:block;width:100%;">Vazgeç</button>
-  </div>
-</div>
-
-<!-- ═══ ADMIN DASHBOARD ═══ -->
-<div class="admin-dashboard" id="admin-dashboard">
-  <aside class="admin-sidebar">
-    <div class="logo-chip">
-      <picture>
-        <source srcset="assets/mais-logo.webp" type="image/webp">
-        <img src="assets/mais-logo.png" alt="MAIS Studio" width="100" height="20">
-      </picture>
-    </div>
-    <div class="nav-item active" onclick="switchAdminTab('inbox')" id="nav-inbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
-      Gelen Kutusu <span class="nav-count" id="inbox-count">0</span>
-    </div>
-    <div class="nav-item" onclick="switchAdminTab('reviewed')" id="nav-reviewed">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-      Geçmiş
-    </div>
-    <div class="nav-item" onclick="switchAdminTab('limits')" id="nav-limits">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Bekleme Süresi
-    </div>
-    <div class="nav-item" onclick="switchAdminTab('accounts')" id="nav-accounts">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      Hesaplar
-    </div>
-    <div class="nav-item" onclick="switchAdminTab('special')" id="nav-special" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Özel Gelenler
-    </div>
-    <div class="nav-divider"></div>
-    <div class="nav-item" onclick="switchAdminTab('settings')" id="nav-settings" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Ayarlar
-    </div>
-    <div class="sidebar-footer">
-      <div class="avatar-chip">Mİ</div>
-      <div>
-        <div class="who" id="panel-username">Yetkili</div>
-        <div class="role-txt">MAIS Studio</div>
-      </div>
-      <button class="logout-btn" title="Çıkış yap" onclick="clearStaff()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-      </button>
-    </div>
-  </aside>
-
-  <div class="admin-main">
-    <div class="admin-topbar">
-      <div>
-        <h1 id="admin-page-title">Gelen Kutusu</h1>
-        <div class="sub">Sezon 2 · Sizden Gelenler</div>
-      </div>
-      <button class="btn-ghost" onclick="hideAdminDashboard()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Ana Sayfaya Dön
+  <!-- INTERACTIVE PANE -->
+  <div class="right-pane">
+    <div class="pane-header">
+      <button class="staff-trigger" onclick="openStaffLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Yetkili Girişi
       </button>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div><div class="label">Gelen Kutusu</div><div class="value mono" id="stat-inbox">0</div></div>
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>
+    <div class="scroll-area">
+      
+      <div id="local-warning">
+        <strong>⚠️ Uyarı:</strong> Bu dosyayı doğrudan bilgisayarınızdan (file://) açtığınız için Google ile Giriş gibi sunucu gerektiren özellikler çalışmayacaktır. Lütfen projeyi Node.js sunucusu (npm start) üzerinden çalıştırın.
       </div>
-      <div class="stat-card">
-        <div><div class="label">İncelendi</div><div class="value mono" id="stat-reviewed">0</div></div>
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-      </div>
-      <div class="stat-card">
-        <div><div class="label">Toplam Gönderim</div><div class="value mono" id="stat-total">0</div></div>
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-      </div>
-    </div>
 
-    <!-- INBOX TAB -->
-    <div class="admin-tab-pane active" id="tab-inbox">
-      <div class="data-panel">
-        <div class="data-panel-head"><h2>Bekleyen Başvurular</h2></div>
-        <table><thead><tr><th style="width:50px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
-        <tbody id="inbox-body"><tr><td colspan="4" class="empty-state">Yükleniyor...</td></tr></tbody></table>
+      <div class="step-tracker">
+        <div class="st-item active" id="st-1"><div class="st-circle">1</div><div class="st-label">Önce Sen 🤝</div></div>
+        <div class="st-item" id="st-2"><div class="st-circle">2</div><div class="st-label">Parçanın Sesi 🎧</div></div>
+        <div class="st-item" id="st-3"><div class="st-circle">3</div><div class="st-label">İşte Bu! 🎉</div></div>
       </div>
-    </div>
 
-    <!-- REVIEWED TAB -->
-    <div class="admin-tab-pane" id="tab-reviewed">
-      <div class="data-panel">
-        <div class="data-panel-head"><h2>İncelenen Parçalar</h2></div>
-        <table><thead><tr><th style="width:50px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
-        <tbody id="reviewed-body"><tr><td colspan="4" class="empty-state">Yükleniyor...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- LIMITS TAB -->
-    <div class="admin-tab-pane" id="tab-limits">
-      <div class="data-panel">
-        <div class="data-panel-head">
-          <h2>Bekleme Süresi Olanlar</h2>
-          <button class="danger-btn" onclick="resetAllLimits()">Tümünü Sıfırla</button>
-        </div>
-        <table><thead><tr><th>E-posta</th><th>Son Başvuru</th><th style="text-align:right;">İşlem</th></tr></thead>
-        <tbody id="limits-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- ACCOUNTS TAB -->
-    <div class="admin-tab-pane" id="tab-accounts">
-      <div class="data-panel">
-        <div class="data-panel-head"><h2>Yetkili Hesaplar</h2></div>
-        <div id="accounts-owner-section" style="padding:18px 22px; border-bottom:1px solid var(--line);">
-          <div class="panel-input-row">
-            <input type="text" class="panel-input" id="new-username" placeholder="Kullanıcı adı">
-            <input type="password" class="panel-input" id="new-password" placeholder="Şifre (min. 6 karakter)">
-            <button class="panel-btn" onclick="addAccount()">Ekle</button>
+      <!-- STEP 1: AUTH -->
+      <div class="panel active" id="panel-auth">
+        <h2 class="panel-title">Önce Seni Tanıyalım</h2>
+        <p class="panel-desc">Haftalık kontenjanları adil bir şekilde dağıtabilmemiz için ufak bir güvenlik adımımız var. Google hesabınla güvenli bir şekilde giriş yap ve hemen başvuruna başlayalım!</p>
+        
+        <div class="auth-box">
+          <div class="gsi-wrapper" id="gsi-btn">
+            <!-- Google Button renders here -->
           </div>
+          <p>Not: Herkese şans verebilmek için haftada sadece 1 başvuru kabul ediyoruz.</p>
+          <div class="error-banner" id="err-auth" style="margin:0; width:100%;"></div>
         </div>
-        <table><thead><tr><th>Kullanıcı Adı</th><th>Yetki</th><th style="text-align:right;">İşlem</th></tr></thead>
-        <tbody id="accounts-body"><tr><td colspan="3" class="empty-state">Yükleniyor...</td></tr></tbody></table>
-        <div style="padding:18px 22px; border-top:1px solid var(--line);">
-          <p style="font-size:11.5px;color:var(--text-dim);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Şifremi Değiştir</p>
-          <div class="panel-input-row">
-            <input type="password" class="panel-input" id="cur-pw" placeholder="Mevcut şifre">
-            <input type="password" class="panel-input" id="new-pw" placeholder="Yeni şifre">
-            <button class="panel-btn" onclick="changePassword()">Güncelle</button>
+      </div>
+
+      <!-- STEP 1B: BLOCKED -->
+      <div class="panel" id="panel-blocked">
+        <div class="blocked-box">
+          <div class="b-icon">⏳</div>
+          <h2 class="panel-title">Eyvah, Hakkını Doldurdun!</h2>
+          <p class="panel-desc" style="margin-bottom:0;">Harika parçalar ürettiğini biliyoruz ama herkese şans verebilmek için haftada sadece 1 başvuru kabul edebiliyoruz. Süren dolduğunda seni burada bekliyor olacağız!</p>
+          <div class="countdown">
+            <div class="cd-item"><div class="cd-val" id="cd-days">00</div><div class="cd-lbl">Gün</div></div>
+            <div class="cd-item"><div class="cd-val" id="cd-hours">00</div><div class="cd-lbl">Saat</div></div>
           </div>
-          <div class="err-box" id="pw-change-err" style="margin-top:8px;"></div>
-          <div id="pw-change-ok" style="display:none;color:#7ddc8f;font-size:12px;margin-top:8px;">✓ Şifre başarıyla güncellendi.</div>
+          <button class="btn btn-secondary" onclick="resetFlow()">Başa Dön</button>
         </div>
       </div>
-    </div>
 
-    <!-- SPECIAL TAB -->
-    <div class="admin-tab-pane" id="tab-special">
-      <div class="data-panel">
-        <div class="data-panel-head"><h2>Özel Bölüm Başvuruları</h2></div>
-        <table><thead><tr><th style="width:50px;"></th><th>Parça / Sanatçı</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
-        <tbody id="special-body"><tr><td colspan="4" class="empty-state">Yükleniyor...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- SETTINGS TAB -->
-    <div class="admin-tab-pane" id="tab-settings">
-      <div class="data-panel">
-        <div class="data-panel-head"><h2>Özel Bölüm Ayarları</h2></div>
-        <div style="padding:24px 22px; display:flex; flex-direction:column; gap:14px;">
-          <div class="panel-input-row">
-            <label style="font-size:12px;color:var(--text-dim);min-width:100px;align-self:center;">Durum:</label>
-            <select class="panel-input" id="cfg-active" style="max-width:140px;">
-              <option value="true">Açık</option>
-              <option value="false">Kapalı</option>
+      <!-- STEP 2: FORM -->
+      <div class="panel" id="panel-form">
+        <h2 class="panel-title">Parçanın Detayları Neler?</h2>
+        <p class="panel-desc">Müziğini dinlemek için sabırsızlanıyoruz! Bize biraz parçandan ve kendinden bahset.</p>
+        
+        <div class="error-banner" id="err-form"></div>
+        
+        <div class="form-grid">
+          <div class="field">
+            <label>Adın Soyadın (Nasıl hitap edelim?) *</label>
+            <input type="text" id="fullName" placeholder="Adın Soyadın">
+          </div>
+          <div class="field">
+            <label>Sosyal Medya (Seni nerede bulabiliriz?) *</label>
+            <input type="text" id="social" placeholder="@kullaniciadi">
+          </div>
+          <div class="field">
+            <label>Hangi Yapay Zeka Aracını Kullandın? *</label>
+            <select id="aiTool">
+              <option value="">Araç Seçiniz...</option>
+              <option>Suno</option><option>Udio</option><option>AIVA</option>
+              <option>Boomy</option><option>Mureka</option><option>Stable Audio</option>
+              <option>Diğer</option>
             </select>
           </div>
-          <div class="panel-input-row">
-            <label style="font-size:12px;color:var(--text-dim);min-width:100px;align-self:center;">Başlık:</label>
-            <input type="text" class="panel-input" id="cfg-title" placeholder="Özel Konsept">
+          <div class="field">
+            <label>Parçanın Adı Ne? *</label>
+            <input type="text" id="trackName" placeholder="Eserin adı">
           </div>
-          <div class="panel-input-row">
-            <label style="font-size:12px;color:var(--text-dim);min-width:100px;align-self:center;">Max Kota:</label>
-            <input type="number" class="panel-input" id="cfg-quota" value="50" style="max-width:100px;">
+          <div class="field full">
+            <label>Bize Biraz Parçandan Bahset * (maks 210 karakter)</label>
+            <textarea id="note" maxlength="210" placeholder="Bu parça nasıl ortaya çıktı? Hissi, hikayesi nedir?..." oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 210</div>
           </div>
-          <div style="display:flex;gap:10px;margin-top:6px;">
-            <button class="panel-btn" onclick="saveSpecialCfg()">Kaydet</button>
-            <button class="danger-btn" onclick="resetSpecialQuota()">Kotayı Sıfırla</button>
+          
+          <div class="field full" style="margin-top: 10px;">
+            <label>MP3 Şaheserini Buraya Bırak 🎶 * (maks 20MB)</label>
+            <label class="dropzone" id="dz-area">
+              <input type="file" class="dz-input" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFileSelect(this)">
+              <div class="dz-content" id="dz-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div class="dz-title">Tıkla veya sürükleyip bırak</div>
+                <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz</div>
+              </div>
+              <div class="dz-file-info" id="dz-file-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <span id="dz-filename">dosya_adi.mp3</span>
+              </div>
+            </label>
           </div>
-          <div id="cfg-msg" style="display:none;color:#7ddc8f;font-size:12px;"></div>
-          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line);">
-            <div class="panel-input-row">
-              <label style="font-size:12px;color:var(--text-dim);min-width:120px;align-self:center;">Drive Eşitleme:</label>
-              <button class="panel-btn" onclick="syncDrive()">Eski Parçaları Çek</button>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">Daha önce Drive'a gelen ve listede olmayan parçaları ekler.</div>
+
+          <div class="field full" style="margin-top: 10px;">
+            <label class="checkbox-wrap">
+              <input type="checkbox" id="chk">
+              <span>Gönderdiğim bu şaheserin tüm telif haklarının bana ait olduğunu onaylıyorum. Parçam seçilirse, MAIS Studio ve Mustafa İnce kanallarında gururla yayınlanmasına izin veriyorum! 🚀</span>
+            </label>
+          </div>
+          <div class="field full">
+            <label class="checkbox-wrap">
+              <input type="checkbox" id="kvkk">
+              <span><a href="privacy.html" target="_blank" onclick="event.stopPropagation()">Aydınlatma Metni</a>'ni okudum, anladım ve kişisel verilerimin işlenmesine gönül rahatlığıyla onay veriyorum.</span>
+            </label>
           </div>
         </div>
+
+        <div class="action-row">
+          <button class="btn btn-secondary" onclick="resetFlow()">Geri Dön</button>
+          <button class="btn btn-primary" id="btn-submit" onclick="submitForm()">Parçamı Gönder! 🚀</button>
+        </div>
       </div>
+      
+      <!-- Footer links inside scroll area -->
+      <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-dim);">
+        <div>© 2026 MAIS Studio</div>
+        <div style="display:flex;gap:16px;">
+          <a href="privacy.html" style="color:var(--text-dim);">Gizlilik</a>
+          <a href="terms.html" style="color:var(--text-dim);">Şartlar</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- ═══ GLOBAL AUDIO BAR ═══ -->
-<div id="audio-bar">
-  <div class="ab-art" id="ab-art">🎵</div>
-  <div class="ab-info">
-    <div class="ab-title" id="ab-title">Parça seçilmedi</div>
-    <div class="ab-artist" id="ab-artist">—</div>
-  </div>
-  <div class="ab-controls">
-    <div class="ab-btns-row">
-      <button class="ab-btn" onclick="skipBackward()">⏪</button>
-      <button class="ab-btn" onclick="prevTrack()">⏮</button>
-      <button class="ab-play" id="ab-play" onclick="togglePlay()">▶</button>
-      <button class="ab-btn" onclick="nextTrack()">⏭</button>
-      <button class="ab-btn" onclick="skipForward()">⏩</button>
-    </div>
-    <div class="ab-seek-row">
-      <span class="ab-time" id="ab-cur">0:00</span>
-      <input type="range" class="ab-seek" id="ab-seek" min="0" max="100" value="0" oninput="seek(this.value)">
-      <span class="ab-dur" id="ab-dur">0:00</span>
+<!-- Modals -->
+
+<!-- Welcome Splash Modal -->
+<div class="modal-overlay" id="modal-welcome">
+  <div class="modal-box" style="max-width:500px; padding:0; overflow:hidden;">
+    <div style="height:200px; background:linear-gradient(to bottom, transparent, var(--panel)), url('assets/season-plate-v2.jpg') center/cover;"></div>
+    <div style="padding:32px;">
+      <h2 style="font-size:24px; font-weight:800; color:#fff; margin-bottom:12px;">Sezon 2'ye Hoş Geldin! 🚀</h2>
+      <p style="color:var(--dim); line-height:1.6; margin-bottom:24px;">
+        Yeni sezonda MAIS Studio ailesi olarak daha büyük hedeflerle karşınızdayız. Parçanızı gönderin, değerlendirmeye alalım ve müziğinizi milyonlara duyuralım. <br><br>
+        <span style="color:var(--gold); font-weight:600;">Kurallar basit:</span> Özgün ol, yaratıcı ol, ve en önemlisi kendin ol!
+      </p>
+      <button class="btn primary" style="width:100%; margin-top:0;" onclick="closeModal('modal-welcome')">Hemen Başvur!</button>
     </div>
   </div>
-  <span style="font-size:11px;color:var(--text-dim);margin-right:auto;font-family:'JetBrains Mono';" id="ab-tag">—</span>
-  <div style="display:flex;align-items:center;gap:8px;margin-right:15px;">
-    <button class="ab-btn" onclick="toggleMute()" id="ab-mute" style="font-size:1.1rem;padding:0 5px;">🔊</button>
-    <input type="range" class="ab-seek" id="ab-vol" min="0" max="100" value="100" oninput="changeVol(this.value)" style="width:70px;margin:0;">
-  </div>
-  <button class="ab-close" onclick="closePlayer()">×</button>
 </div>
-<audio id="player" style="display:none;"></audio>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="modal-success">
+  <div class="modal">
+    <div class="modal-icon">✓</div>
+    <h2>İşte Bu Kadar! 🎉</h2>
+    <p>Harika, parçanı teslim aldık! Şaheserin güvenli ellerde ve değerlendirme listemizde yerini aldı bile. Stüdyoda hep birlikte dinlemek için sabırsızlanıyoruz. Haftaya yepyeni bir parçayla tekrar görüşmek üzere!</p>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeModal('modal-success');resetFlow()">Harika, Görüşürüz! 👋</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="overlay" id="modal-login">
+  <div class="modal admin-login-modal">
+    <h2>Yetkili Girişi</h2>
+    <p>MAIS Studio yönetim paneline erişin.</p>
+    <div class="error-banner" id="login-err"></div>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Kullanıcı Adı</label>
+      <input type="text" id="login-user" placeholder="kullanici.adi" onkeydown="if(event.key==='Enter')doStaffLogin()">
+    </div>
+    <div class="field" style="margin-bottom:24px;">
+      <label>Şifre</label>
+      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doStaffLogin()">
+    </div>
+    <button class="btn btn-primary" id="btn-login" style="width:100%;" onclick="doStaffLogin()">Giriş Yap</button>
+    <div style="text-align:center;margin-top:16px;">
+      <button style="font-size:13px;color:var(--text-dim);" onclick="closeModal('modal-login')">Vazgeç</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // ═══ STATE ═══════════════════════════════════════════════════════════════
-  let googleToken = '';
-  let googleClientId = '';
-  let gsiReady = false;
-  let staffToken = localStorage.getItem('staff_token') || '';
-  let staffUsername = localStorage.getItem('staff_username') || '';
-  let staffRole = localStorage.getItem('staff_role') || '';
-  let isSpecialMode = false;
-  let authenticated = false;
+let googleToken = '', staffToken = localStorage.getItem('staff_token')||'';
+let isLocal = location.protocol === 'file:';
 
-  // ═══ INIT ════════════════════════════════════════════════════════════════
-  (async function init() {
-    try {
-      const cfg = await fetch('/config').then(r => r.json());
-      window.siteConfig = cfg;
-      googleClientId = cfg.googleClientId;
+if (isLocal) {
+  document.getElementById('local-warning').style.display = 'block';
+}
 
-      const q = isSpecialMode ? cfg.specialConfig : cfg.quota;
-      if (q) {
-        const remain = Math.max(0, (q.maxQuota||50) - (q.usedQuota||0));
-        document.getElementById('main-quota').textContent = remain + ' / ' + (q.maxQuota||50);
-      }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target === o) o.classList.remove('open'); });
+});
 
-      if (cfg.specialConfig && cfg.specialConfig.active) {
-        document.getElementById('mode-switcher-container').classList.add('show');
-        if (cfg.specialConfig.title) document.getElementById('special-mode-title').textContent = cfg.specialConfig.title;
-      }
-
-      if (staffToken) {
-        setStaffLoggedIn(staffUsername, staffRole);
-      }
-
-    } catch(e) {
-      showErr('err-email', 'Sunucu bağlantısı kurulamadı.');
-    }
-  })();
-
-  // ═══ GSI ═════════════════════════════════════════════════════════════════
-  window.onGoogleLibraryLoad = function() {
-    gsiReady = true;
-    try {
-      google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleLogin });
-      google.accounts.id.renderButton(
-        document.getElementById('gsi-btn'),
-        { theme: 'filled_black', size: 'large', width: 280, locale: 'tr' }
-      );
-    } catch(e) { console.error('GSI error:', e); }
-  };
-
-  function onGoogleLogin(resp) {
-    googleToken = resp.credential;
-    document.getElementById('gsi-loading').style.display = 'block';
-    document.getElementById('gsi-btn').style.opacity = '0.5';
-    document.getElementById('gsi-btn').style.pointerEvents = 'none';
-    fetch(isSpecialMode ? '/check-special-limit' : '/check-limit', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: googleToken })
-    })
-    .then(r => r.json())
-    .then(data => {
-      document.getElementById('gsi-loading').style.display = 'none';
-      document.getElementById('gsi-btn').style.opacity = '1';
-      document.getElementById('gsi-btn').style.pointerEvents = 'auto';
-      if (data.error) { showErr('err-email', data.error); return; }
-      if (!data.allowed) {
-        document.getElementById('countdown-days').textContent = String(data.days||0).padStart(2,'0');
-        document.getElementById('countdown-hours').textContent = String(data.hours||0).padStart(2,'0');
-        showBlockedScreen();
-      } else {
-        if (data.name) document.getElementById('fullName').value = data.name;
-        unlockStep2();
-      }
-    })
-    .catch(() => showErr('err-email', 'Bağlantı hatası.'));
-  }
-
-  // ═══ STEP NAVIGATION ═════════════════════════════════════════════════════
-  function unlockStep2() {
-    authenticated = true;
-    document.getElementById('step2Fields').disabled = false;
-    document.getElementById('lockOverlay').classList.add('hidden');
-    document.getElementById('authPanel').classList.add('verified');
-    document.getElementById('step1Status').classList.add('show');
-    document.getElementById('authCopyText').textContent = 'Google hesabınla başarıyla giriş yaptın. Aşağıdan parça bilgilerini doldurup başvurunu tamamlayabilirsin.';
-    document.getElementById('authRuleText').textContent = 'Bu hafta için 1 gönderim hakkın kullanılabilir durumda.';
-    document.querySelector('.step2-wrap').scrollIntoView({ behavior:'smooth', block:'start' });
-  }
-
-  function showBlockedScreen() {
-    document.getElementById('step-blocked-section').classList.add('show');
-    document.getElementById('step2Section').style.display = 'none';
-  }
-
-  function goBack() {
-    googleToken = ''; authenticated = false;
-    document.getElementById('step-blocked-section').classList.remove('show');
-    document.getElementById('step2Section').style.display = '';
-    document.getElementById('authPanel').classList.remove('verified');
-    document.getElementById('step1Status').classList.remove('show');
-    document.getElementById('step2Fields').disabled = true;
-    document.getElementById('lockOverlay').classList.remove('hidden');
-    document.getElementById('authCopyText').textContent = 'Devam etmek için Google hesabınızla giriş yapın. Bu adım, sistemin haftalık başvuru kotasını doğru şekilde takip edebilmesi için gerekli.';
-    document.getElementById('authRuleText').textContent = 'Her katılımcıdan haftalık yalnızca 1 başvuru kabul edilmektedir.';
-  }
-
-  function setMode(mode) {
-    isSpecialMode = (mode === 'special');
-    goBack();
-    document.getElementById('btn-mode-normal').classList.toggle('active', !isSpecialMode);
-    document.getElementById('btn-mode-special').classList.toggle('active', isSpecialMode);
-    const q = isSpecialMode ? window.siteConfig?.specialConfig : window.siteConfig?.quota;
-    if (q) {
-      const remain = Math.max(0, (q.maxQuota||50) - (q.usedQuota||0));
-      document.getElementById('main-quota').textContent = remain + ' / ' + (q.maxQuota||50);
-    }
-  }
-
-  function showErr(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.style.display = 'block'; }
-  function hideErr(id) { document.getElementById(id).style.display = 'none'; }
-
-  // ═══ FORM ════════════════════════════════════════════════════════════════
-  function handleFile(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 20 * 1024 * 1024) { showErr('err-form', 'Dosya 20 MB sınırını aşıyor.'); input.value = ''; return; }
-    hideErr('err-form');
-    const dz = document.getElementById('upload-zone');
-    const fn = document.getElementById('file-name');
-    dz.classList.add('filled');
-    dz.querySelector('.dz-icon').style.display = 'none';
-    dz.querySelector('.dz-title').style.display = 'none';
-    dz.querySelector('.dz-sub').style.display = 'none';
-    dz.querySelector('.dz-file').style.display = 'flex';
-    fn.textContent = file.name;
-  }
-
-  const dropZone = document.getElementById('upload-zone');
-  ['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag'); }));
-  ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag'); }));
-  dropZone.addEventListener('drop', e => {
-    const f = e.dataTransfer.files[0];
-    if (f && f.name.toLowerCase().endsWith('.mp3')) { document.getElementById('mp3file').files = e.dataTransfer.files; handleFile(document.getElementById('mp3file')); }
+function setStep(step) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('st-'+i);
+    el.classList.remove('active','done');
+    if(i < step) el.classList.add('done');
+    else if(i === step) el.classList.add('active');
   });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if(step === 1) document.getElementById('panel-auth').classList.add('active');
+  else if(step === 2) document.getElementById('panel-form').classList.add('active');
+  else if(step === 3) document.getElementById('panel-form').classList.add('active'); // Keep form visible on success under overlay
+}
 
-  function updateCharCount(el) {
-    const len = el.value.length;
-    const c = document.getElementById('charNum');
-    c.textContent = len;
-    c.parentElement.classList.toggle('warn', len >= 200);
-  }
+function resetFlow() {
+  googleToken = '';
+  document.getElementById('fullName').value = '';
+  document.getElementById('trackName').value = '';
+  document.getElementById('note').value = '';
+  document.getElementById('social').value = '';
+  document.getElementById('chk').checked = false;
+  document.getElementById('kvkk').checked = false;
+  document.getElementById('dz-content').style.display = 'block';
+  document.getElementById('dz-file-info').style.display = 'none';
+  document.getElementById('dz-area').classList.remove('filled');
+  document.getElementById('mp3file').value = '';
+  setStep(1);
+}
 
-  document.getElementById('goToStep1').addEventListener('click', () => {
-    document.getElementById('basvuru').scrollIntoView({ behavior:'smooth', block:'start' });
-  });
-
-  async function submitForm() {
-    if (!authenticated) return;
-    const fullName = document.getElementById('fullName').value.trim();
-    const social = document.getElementById('social').value.trim();
-    const aiTool = document.getElementById('aiTool').value;
-    const trackName = document.getElementById('trackName').value.trim();
-    const note = document.getElementById('note').value.trim();
-    const mp3 = document.getElementById('mp3file').files[0];
-    const consent = document.getElementById('chk').checked;
-    const kvkk = document.getElementById('kvkk').checked;
-    hideErr('err-form');
-
-    if (!fullName || !social || !aiTool || !trackName || !note) return showErr('err-form', 'Lütfen tüm alanları doldurun.');
-    if (note.length < 30) return showErr('err-form', 'Parça notu en az 30 karakter olmalıdır.');
-    if (note.length > 210) return showErr('err-form', 'Parça notu en fazla 210 karakter olabilir.');
-    if (!mp3) return showErr('err-form', 'Lütfen bir MP3 dosyası seçin.');
-    if (!consent) return showErr('err-form', 'Telif beyanını onaylamanız gerekmektedir.');
-    if (!kvkk) return showErr('err-form', 'KVKK aydınlatma metnini onaylamanız gerekmektedir.');
-
-    const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin"></span>Gönderiliyor...';
-
-    const fd = new FormData();
-    fd.append('token', googleToken);
-    fd.append('fullName', fullName);
-    fd.append('social', social);
-    fd.append('aiTool', aiTool);
-    fd.append('trackName', trackName);
-    fd.append('note', note);
-    fd.append('consent', 'true');
-    fd.append('mp3', mp3);
-
-    try {
-      const res = await fetch(isSpecialMode ? '/submit-special' : '/submit', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (res.status === 429) { showBlockedScreen(); return; }
-      if (!res.ok) { showErr('err-form', data.error || 'Bir hata oluştu.'); return; }
-      openModal('success-modal');
-      fetch('/config').then(r=>r.json()).then(cfg => {
-        const q = isSpecialMode ? cfg.specialConfig : cfg.quota;
-        if (q) document.getElementById('main-quota').textContent = Math.max(0, (q.maxQuota||50)-(q.usedQuota||0)) + ' / ' + (q.maxQuota||50);
-      });
-    } catch(e) { showErr('err-form', 'Bağlantı hatası. Tekrar deneyin.'); }
-    finally { btn.disabled = false; btn.textContent = 'Başvuruyu Tamamla'; }
-  }
-
-  // ═══ MODALS ══════════════════════════════════════════════════════════════
-  function openModal(id) { document.getElementById(id).classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-  });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open')); });
-
-  // ═══ STAFF AUTH ══════════════════════════════════════════════════════════
-  function handleStaffBtnClick() {
-    if (staffToken) {
-      openAdminDashboard();
-    } else {
-      hideErr('login-err');
-      document.getElementById('login-username').value = '';
-      document.getElementById('login-password').value = '';
-      openModal('login-modal');
-      setTimeout(() => document.getElementById('login-username').focus(), 100);
+// Init
+(async function init() {
+  try {
+    const res = await fetch('/config');
+    const cfg = await res.json();
+    isLocal = false;
+    document.getElementById('local-warning').style.display = 'none';
+    
+    // GSI Config
+    if(cfg.googleClientId && typeof google !== 'undefined') {
+      google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: onGoogleLogin });
+      google.accounts.id.renderButton(document.getElementById('gsi-btn'), { theme: 'filled_black', size: 'large', width: 300, shape: 'pill' });
     }
+  } catch(e) {
+    // Local Fallback
+    document.getElementById('local-warning').style.display = 'block';
   }
 
-  async function doLogin() {
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-    const btn = document.getElementById('login-btn');
-    const err = document.getElementById('login-err');
-    err.style.display = 'none';
-    if (!username || !password) { err.textContent = 'Kullanıcı adı ve şifre gereklidir.'; err.style.display = 'block'; return; }
-    btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
+  // Verify staff
+  if(staffToken) {
     try {
-      const res = await fetch('/api/staff/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
+      const res = await fetch('/api/staff/verify', { headers: {'Authorization': 'Bearer '+staffToken} });
       const data = await res.json();
-      if (!res.ok) { err.textContent = data.error || 'Giriş başarısız.'; err.style.display = 'block'; return; }
-      staffToken = data.token; staffUsername = data.username; staffRole = data.role;
-      localStorage.setItem('staff_token', staffToken);
-      localStorage.setItem('staff_username', staffUsername);
-      localStorage.setItem('staff_role', staffRole);
-      setStaffLoggedIn(staffUsername, staffRole);
-      closeModal('login-modal');
-      openAdminDashboard();
-    } catch(e) { err.textContent = 'Bağlantı hatası.'; err.style.display = 'block'; }
-    finally { btn.disabled = false; btn.textContent = 'Giriş Yap'; }
-  }
-
-  function setStaffLoggedIn(username, role) {
-    const btn = document.getElementById('staff-btn');
-    btn.textContent = '⚙️ ' + username;
-    btn.classList.add('active');
-  }
-
-  function clearStaff() {
-    staffToken = ''; staffUsername = ''; staffRole = '';
-    localStorage.removeItem('staff_token');
-    localStorage.removeItem('staff_username');
-    localStorage.removeItem('staff_role');
-    document.getElementById('staff-btn').textContent = 'Yetkili Girişi';
-    document.getElementById('staff-btn').classList.remove('active');
-    hideAdminDashboard();
-  }
-
-  // ═══ ADMIN DASHBOARD ═════════════════════════════════════════════════════
-  function openAdminDashboard() {
-    document.getElementById('panel-username').textContent = staffUsername + (staffRole === 'owner' ? ' (Kurucu)' : '');
-    document.getElementById('accounts-owner-section').style.display = staffRole === 'owner' ? 'block' : 'none';
-    if (staffRole === 'owner') {
-      document.getElementById('nav-special').style.display = 'flex';
-      document.getElementById('nav-settings').style.display = 'flex';
-    }
-    document.getElementById('admin-dashboard').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    loadPanelData();
-  }
-
-  function hideAdminDashboard() {
-    document.getElementById('admin-dashboard').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function showAdminDashboard() { openAdminDashboard(); }
-
-  function switchAdminTab(name) {
-    document.querySelectorAll('.admin-tab-pane').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('[id^="nav-"]').forEach(n => n.classList.remove('active'));
-    const pane = document.getElementById('tab-' + name);
-    if (pane) pane.classList.add('active');
-    const nav = document.getElementById('nav-' + name);
-    if (nav) nav.classList.add('active');
-    const titles = { inbox:'Gelen Kutusu', reviewed:'Geçmiş', limits:'Bekleme Süresi', accounts:'Hesaplar', special:'Özel Gelenler', settings:'Ayarlar' };
-    document.getElementById('admin-page-title').textContent = titles[name] || 'Yönetim';
-    if (name === 'limits') renderLimits();
-  }
-
-  // ═══ PANEL DATA ══════════════════════════════════════════════════════════
-  async function authFetch(url, body) {
-    const res = await fetch(url, {
-      method: body !== null ? 'POST' : 'GET',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffToken },
-      body: body !== null ? JSON.stringify(body) : undefined
-    });
-    if (res.status === 401) { clearStaff(); throw new Error('Oturum sona erdi.'); }
-    return res.json();
-  }
-
-  let panelData = { submissions: [], accounts: [] };
-  let currentInboxList = [];
-  let currentReviewedList = [];
-  let currentSpecialList = [];
-
-  async function loadPanelData() {
-    try {
-      const res = await fetch('/api/admin/submissions', { headers: { 'Authorization': 'Bearer ' + staffToken }});
-      if (res.status === 401 || res.status === 403) { clearStaff(); return; }
-      const data = await res.json();
-      panelData = data;
-
-      // Stats
-      const pending = data.submissions.filter(s => s.status === 'pending');
-      const reviewed = data.submissions.filter(s => s.status === 'reviewed');
-      document.getElementById('stat-inbox').textContent = pending.length;
-      document.getElementById('stat-reviewed').textContent = reviewed.length;
-      document.getElementById('stat-total').textContent = data.submissions.length;
-      document.getElementById('inbox-count').textContent = pending.length;
-
-      // Accounts
-      if (data.accounts) {
-        const ab = document.getElementById('accounts-body');
-        ab.innerHTML = '';
-        data.accounts.forEach(acc => {
-          const act = acc.role !== 'owner' && staffRole === 'owner'
-            ? '<button class="danger-btn" style="padding:5px 10px;font-size:11px;" onclick="deleteAccount(''+acc.username+'')">Sil</button>' : '—';
-          ab.innerHTML += '<tr><td><div class="user-cell"><div class="mini-avatar">'+esc(acc.username[0]||'?').toUpperCase()+'</div><div><div class="uname">'+esc(acc.username)+'</div></div></div></td><td><span class="pill ok"><span class="dot"></span>'+(acc.role==='owner'?'Kurucu':'Çalışan')+'</span></td><td style="text-align:right;">'+act+'</td></tr>';
-        });
-      }
-
-      // Inbox
-      const ib = document.getElementById('inbox-body');
-      ib.innerHTML = '';
-      currentInboxList = data.submissions.filter(s => s.status === 'pending');
-      if (!currentInboxList.length) {
-        ib.innerHTML = '<tr><td colspan="4" class="empty-state">Gelen kutunuz boş.</td></tr>';
+      if(data.valid) {
+        document.getElementById('btn-staff').textContent = '⚙️ ' + data.username;
+        document.getElementById('btn-staff').classList.add('active');
       } else {
-        currentInboxList.forEach((s, idx) => {
-          const aiStr = s.aiTool && s.aiTool !== 'Bilinmiyor' ? ' &nbsp;·&nbsp; <span style="color:var(--yellow);">'+esc(s.aiTool)+'</span>' : '';
-          const dateStr = new Date(s.timestamp).toLocaleDateString('tr-TR');
-          ib.innerHTML += '<tr style="cursor:pointer;" onclick="playFromList('inbox', '+idx+')">'
-            + '<td style="width:50px;text-align:center;"><button class="play-circle-btn" id="btn-play-inbox-'+idx+'" onclick="event.stopPropagation();playFromList('inbox','+idx+')">▶</button></td>'
-            + '<td><div style="font-weight:700;color:var(--cream);">'+esc(s.trackName)+'</div><div style="font-size:12px;color:var(--text-dim);">'+esc(s.fullName)+aiStr+'</div></td>'
-            + '<td><div style="font-size:12px;color:var(--text-dim);">'+esc(s.email)+'</div><div style="font-size:11px;color:var(--text-dim);">'+dateStr+'</div></td>'
-            + '<td style="text-align:right;"><button class="panel-btn" style="font-size:12px;padding:6px 12px;" onclick="event.stopPropagation();updateStatus(''+esc(s.id)+'','reviewed')">İncelendi ✓</button></td>'
-            + '</tr>';
-          if (s.note) ib.innerHTML += '<tr><td colspan="4" style="padding:0;border:none;"><div style="font-size:12px;color:var(--text-dim);margin:0 20px 12px 80px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed var(--line-strong);">'+esc(s.note)+'</div></td></tr>';
-        });
+        localStorage.removeItem('staff_token');
+        staffToken = '';
       }
-
-      // Reviewed
-      const rb = document.getElementById('reviewed-body');
-      rb.innerHTML = '';
-      currentReviewedList = data.submissions.filter(s => s.status === 'reviewed').slice(-15);
-      if (!currentReviewedList.length) {
-        rb.innerHTML = '<tr><td colspan="4" class="empty-state">Henüz incelenen parça yok.</td></tr>';
-      } else {
-        currentReviewedList.forEach((s, idx) => {
-          const aiStr = s.aiTool && s.aiTool !== 'Bilinmiyor' ? ' &nbsp;·&nbsp; <span style="color:var(--yellow);">'+esc(s.aiTool)+'</span>' : '';
-          const dateStr = new Date(s.timestamp).toLocaleDateString('tr-TR');
-          rb.innerHTML += '<tr style="cursor:pointer;" onclick="playFromList('reviewed', '+idx+')">'
-            + '<td style="width:50px;text-align:center;"><button class="play-circle-btn" id="btn-play-reviewed-'+idx+'" onclick="event.stopPropagation();playFromList('reviewed','+idx+')">▶</button></td>'
-            + '<td><div style="font-weight:700;color:var(--cream);">'+esc(s.trackName)+'</div><div style="font-size:12px;color:var(--text-dim);">'+esc(s.fullName)+aiStr+'</div></td>'
-            + '<td><div style="font-size:12px;color:var(--text-dim);">'+esc(s.email)+'</div><div style="font-size:11px;color:var(--text-dim);">'+dateStr+'</div></td>'
-            + '<td style="text-align:right;"><button class="danger-btn" style="font-size:11px;padding:5px 10px;" onclick="event.stopPropagation();unreviewTrack(''+esc(s.id)+'')">Geri Al</button></td>'
-            + '</tr>';
-        });
-      }
-
-      // Special
-      currentSpecialList = data.specialSubmissions || [];
-      const spb = document.getElementById('special-body');
-      spb.innerHTML = '';
-      if (!currentSpecialList.length) {
-        spb.innerHTML = '<tr><td colspan="4" class="empty-state">Özel bölümde gönderilmiş parça yok.</td></tr>';
-      } else {
-        currentSpecialList.forEach((s, idx) => {
-          const aiStr = s.aiTool && s.aiTool !== 'Bilinmiyor' ? ' &nbsp;·&nbsp; <span style="color:var(--yellow);">'+esc(s.aiTool)+'</span>' : '';
-          const dateStr = new Date(s.timestamp).toLocaleDateString('tr-TR');
-          const action = s.status === 'pending'
-            ? '<button class="panel-btn" style="font-size:12px;padding:6px 12px;" onclick="event.stopPropagation();updateSpecialStatus(''+s.id+'','reviewed')">İncelendi ✓</button>'
-            : '<button class="danger-btn" style="font-size:11px;padding:5px 10px;" onclick="event.stopPropagation();updateSpecialStatus(''+s.id+'','pending')">Geri Al</button>';
-          spb.innerHTML += '<tr style="cursor:pointer;" onclick="playFromList('special', '+idx+')">'
-            + '<td style="width:50px;text-align:center;"><button class="play-circle-btn" onclick="event.stopPropagation();playFromList('special','+idx+')">▶</button></td>'
-            + '<td><div style="font-weight:700;color:var(--cream);">'+esc(s.trackName)+'</div><div style="font-size:12px;color:var(--text-dim);">'+esc(s.fullName)+aiStr+'</div></td>'
-            + '<td><div style="font-size:12px;color:var(--text-dim);">'+esc(s.email)+'</div><div style="font-size:11px;color:var(--text-dim);">'+dateStr+'</div></td>'
-            + '<td style="text-align:right;">'+action+'</td>'
-            + '</tr>';
-        });
-      }
-
-      // Special config
-      if (staffRole === 'owner' && data.specialConfig) {
-        document.getElementById('cfg-active').value = data.specialConfig.active ? 'true' : 'false';
-        document.getElementById('cfg-title').value = data.specialConfig.title || '';
-        document.getElementById('cfg-quota').value = data.specialConfig.maxQuota || 50;
-      }
-
-      renderLimits();
-
-    } catch(e) { console.error('loadPanelData error:', e); }
+    } catch(e) { console.error('Sunucu bağlantı hatası', e); }
   }
+  // Welcome Modal Logic
+  if(!localStorage.getItem('seen_welcome')) {
+    setTimeout(() => {
+      openModal('modal-welcome');
+      localStorage.setItem('seen_welcome', 'true');
+    }, 500);
+  }
+})();
 
-  function renderLimits() {
-    const lb = document.getElementById('limits-body');
-    if (!panelData.limits || !panelData.limits.length) {
-      lb.innerHTML = '<tr><td colspan="3" class="empty-state">Aktif kısıtlama bulunmuyor.</td></tr>';
+function onGoogleLogin(resp) {
+  googleToken = resp.credential;
+  document.getElementById('gsi-btn').style.opacity = '0.5';
+  
+  fetch('/check-limit', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({token: googleToken})
+  }).then(r=>r.json()).then(data => {
+    document.getElementById('gsi-btn').style.opacity = '1';
+    if(data.error) {
+      const err = document.getElementById('err-auth');
+      err.textContent = data.error; err.style.display = 'block';
       return;
     }
-    lb.innerHTML = '';
-    panelData.limits.forEach(l => {
-      const dateStr = new Date(l.timestamp).toLocaleString('tr-TR');
-      lb.innerHTML += '<tr>'
-        + '<td><div style="font-weight:700;color:var(--cream);">'+esc(l.email)+'</div><div style="font-size:11px;color:var(--text-dim);margin-top:3px;">'+esc(l.type||'')+'</div></td>'
-        + '<td><div style="font-size:12px;color:var(--text-dim);">'+esc(dateStr)+'</div></td>'
-        + '<td style="text-align:right;"><button class="danger-btn" style="font-size:11px;padding:5px 10px;" onclick="resetUser(''+esc(l.ip)+'',''+esc(l.email)+'')">Sıfırla</button></td>'
-        + '</tr>';
-    });
-  }
-
-  function esc(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  async function updateStatus(id, status) {
-    try { await authFetch('/api/admin/update-status', { fileId: id, status }); loadPanelData(); }
-    catch(e) { alert(e.message); }
-  }
-
-  async function unreviewTrack(id) {
-    try { await authFetch('/api/admin/update-status', { fileId: id, status: 'pending' }); loadPanelData(); }
-    catch(e) { alert(e.message); }
-  }
-
-  async function updateSpecialStatus(id, status) {
-    try { await authFetch('/api/admin/update-special-status', { id, status }); loadPanelData(); }
-    catch(e) { alert(e.message); }
-  }
-
-  async function resetUser(ip, email) {
-    if (!confirm(email + ' için bekleme süresini sıfırlamak istiyor musunuz?')) return;
-    try { await authFetch('/api/admin/reset-user', { targetIp: ip, targetEmail: email }); loadPanelData(); }
-    catch(e) { alert(e.message); }
-  }
-
-  async function resetAllLimits() {
-    if (!confirm('TÜM kullanıcıların bekleme süresini sıfırlamak istiyor musunuz?')) return;
-    try { await authFetch('/api/admin/reset-all-limits', {}); loadPanelData(); }
-    catch(e) { alert(e.message); }
-  }
-
-  async function addAccount() {
-    const username = document.getElementById('new-username').value.trim();
-    const password = document.getElementById('new-password').value;
-    if (!username || !password) { alert('Kullanıcı adı ve şifre gereklidir.'); return; }
-    try {
-      const data = await authFetch('/api/staff/add-account', { username, password });
-      if (data.error) { alert(data.error); return; }
-      document.getElementById('new-username').value = '';
-      document.getElementById('new-password').value = '';
-      loadPanelData();
-    } catch(e) { alert(e.message); }
-  }
-
-  async function deleteAccount(username) {
-    if (!confirm(username + ' hesabını silmek istediğinize emin misiniz?')) return;
-    try {
-      const data = await authFetch('/api/staff/remove-account', { username });
-      if (data.error) { alert(data.error); return; }
-      loadPanelData();
-    } catch(e) { alert(e.message); }
-  }
-
-  async function changePassword() {
-    const cur = document.getElementById('cur-pw').value;
-    const nw = document.getElementById('new-pw').value;
-    const err = document.getElementById('pw-change-err');
-    const ok = document.getElementById('pw-change-ok');
-    err.style.display = 'none'; ok.style.display = 'none';
-    if (!cur || !nw) { err.textContent = 'Her iki alanı da doldurun.'; err.style.display = 'block'; return; }
-    try {
-      const data = await authFetch('/api/staff/change-password', { currentPassword: cur, newPassword: nw });
-      if (data.error) { err.textContent = data.error; err.style.display = 'block'; return; }
-      ok.style.display = 'block';
-      document.getElementById('cur-pw').value = '';
-      document.getElementById('new-pw').value = '';
-    } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
-  }
-
-  async function saveSpecialCfg() {
-    try {
-      await authFetch('/api/admin/save-special-config', {
-        active: document.getElementById('cfg-active').value === 'true',
-        title: document.getElementById('cfg-title').value,
-        maxQuota: document.getElementById('cfg-quota').value
-      });
-      const msg = document.getElementById('cfg-msg');
-      msg.textContent = '✓ Ayarlar kaydedildi.';
-      msg.style.display = 'block';
-      setTimeout(() => msg.style.display = 'none', 3000);
-    } catch(e) { alert(e.message); }
-  }
-
-  async function resetSpecialQuota() {
-    if (!confirm('Özel gönderim kotası sıfırlanacak. Emin misiniz?')) return;
-    try {
-      await authFetch('/api/admin/save-special-config', { resetQuota: true });
-      const msg = document.getElementById('cfg-msg');
-      msg.textContent = '✓ Kota sıfırlandı.';
-      msg.style.display = 'block';
-      setTimeout(() => msg.style.display = 'none', 3000);
-    } catch(e) { alert(e.message); }
-  }
-
-  async function syncDrive() {
-    if (!confirm('Drive klasörü taranıp, listede olmayan eski parçalar eklenecek. Onaylıyor musunuz?')) return;
-    try {
-      const res = await authFetch('/api/admin/sync-drive', {});
-      if (res.success) { alert(res.count + ' adet yeni parça eklendi!'); loadPanelData(); }
-      else alert(res.error || 'Hata oluştu.');
-    } catch(e) { alert('Bağlantı hatası.'); }
-  }
-
-  // ═══ AUDIO PLAYER ════════════════════════════════════════════════════════
-  const playerEl = document.getElementById('player');
-  let playlist = [];
-  let playlistIndex = -1;
-  let currentListType = '';
-
-  function playFromList(listName, idx) {
-    if (currentListType === listName && playlistIndex === idx && playerEl.src) { togglePlay(); return; }
-    currentListType = listName;
-    const srcList = listName === 'inbox' ? currentInboxList : (listName === 'reviewed' ? currentReviewedList : currentSpecialList);
-    playlist = srcList.map(s => ({ audioUrl: '/api/stream-audio?fileId=' + s.fileId, title: s.trackName, artist: s.fullName || 'Bilinmiyor', aiTool: s.aiTool || '' }));
-    playlistIndex = idx;
-    playCurrent();
-  }
-
-  function playCurrent() {
-    if (playlistIndex < 0 || playlistIndex >= playlist.length) return;
-    const track = playlist[playlistIndex];
-    playTrack(track.audioUrl, track.title, track.artist, track.aiTool);
-  }
-
-  function playTrack(url, title, artist, aiTool) {
-    document.getElementById('ab-title').textContent = title;
-    document.getElementById('ab-artist').textContent = artist;
-    document.getElementById('ab-tag').textContent = aiTool;
-    fetch(url, { headers: { 'Authorization': 'Bearer ' + staffToken } })
-      .then(res => { if (!res.ok) throw new Error('Audio fetch failed'); return res.blob(); })
-      .then(blob => {
-        const blobUrl = URL.createObjectURL(blob);
-        playerEl.src = blobUrl;
-        playerEl.load();
-        playerEl.play().then(() => {
-          document.getElementById('ab-play').textContent = '⏸';
-          document.getElementById('audio-bar').classList.add('visible');
-          updateListPlayBtns();
-        }).catch(() => alert('Ses dosyası oynatılamadı.'));
-      })
-      .catch(() => alert('Ses dosyası yüklenemedi.'));
-  }
-
-  function nextTrack() { if (playlistIndex + 1 < playlist.length) { playlistIndex++; playCurrent(); } }
-  function prevTrack() { if (playerEl.currentTime > 3) { playerEl.currentTime = 0; return; } if (playlistIndex > 0) { playlistIndex--; playCurrent(); } }
-  function skipForward() { if (playerEl.duration) playerEl.currentTime = Math.min(playerEl.duration, playerEl.currentTime + 10); }
-  function skipBackward() { playerEl.currentTime = Math.max(0, playerEl.currentTime - 10); }
-
-  function togglePlay() {
-    if (playerEl.paused) { playerEl.play(); document.getElementById('ab-play').textContent = '⏸'; }
-    else { playerEl.pause(); document.getElementById('ab-play').textContent = '▶'; }
-    updateListPlayBtns();
-  }
-
-  function seek(val) { if (playerEl.duration) playerEl.currentTime = (val / 100) * playerEl.duration; }
-
-  function closePlayer() {
-    playerEl.pause();
-    document.getElementById('audio-bar').classList.remove('visible');
-    currentListType = ''; playlistIndex = -1;
-    updateListPlayBtns();
-  }
-
-  function updateListPlayBtns() {
-    document.querySelectorAll('.play-circle-btn').forEach(btn => btn.textContent = '▶');
-    if (currentListType && playlistIndex >= 0) {
-      const btn = document.getElementById('btn-play-' + currentListType + '-' + playlistIndex);
-      if (btn) btn.textContent = playerEl.paused ? '▶' : '⏸';
+    if(!data.allowed) {
+      document.getElementById('cd-days').textContent = String(data.days||0).padStart(2,'0');
+      document.getElementById('cd-hours').textContent = String(data.hours||0).padStart(2,'0');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-blocked').classList.add('active');
+    } else {
+      if(data.name) document.getElementById('fullName').value = data.name;
+      setStep(2);
     }
-  }
-
-  function toggleMute() {
-    if (playerEl.muted) { playerEl.muted = false; document.getElementById('ab-mute').textContent = '🔊'; document.getElementById('ab-vol').value = playerEl.volume * 100; }
-    else { playerEl.muted = true; document.getElementById('ab-mute').textContent = '🔇'; document.getElementById('ab-vol').value = 0; }
-  }
-
-  function changeVol(val) {
-    playerEl.volume = val / 100;
-    if (playerEl.volume === 0) { playerEl.muted = true; document.getElementById('ab-mute').textContent = '🔇'; }
-    else { playerEl.muted = false; document.getElementById('ab-mute').textContent = '🔊'; }
-  }
-
-  function fmtTime(s) { const m = Math.floor(s / 60); return m + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
-
-  playerEl.addEventListener('timeupdate', () => {
-    if (playerEl.duration) {
-      document.getElementById('ab-seek').value = (playerEl.currentTime / playerEl.duration) * 100;
-      document.getElementById('ab-cur').textContent = fmtTime(playerEl.currentTime);
-      document.getElementById('ab-dur').textContent = fmtTime(playerEl.duration);
-    }
+  }).catch(()=>{
+    document.getElementById('err-auth').textContent = 'Bağlantı hatası. Sunucu çalışmıyor olabilir.';
+    document.getElementById('err-auth').style.display = 'block';
+    document.getElementById('gsi-btn').style.opacity = '1';
   });
-  playerEl.addEventListener('ended', () => { if (playlistIndex + 1 < playlist.length) nextTrack(); else document.getElementById('ab-play').textContent = '▶'; });
-</script>
+}
 
+function handleFileSelect(input) {
+  const f = input.files[0];
+  if(!f) return;
+  if(f.size > 20*1024*1024) {
+    document.getElementById('err-form').textContent = 'Dosya çok büyük. Maksimum 20MB yükleyebilirsiniz.';
+    document.getElementById('err-form').style.display = 'block';
+    input.value = ''; return;
+  }
+  document.getElementById('err-form').style.display = 'none';
+  document.getElementById('dz-content').style.display = 'none';
+  document.getElementById('dz-file-info').style.display = 'flex';
+  document.getElementById('dz-filename').textContent = f.name;
+  document.getElementById('dz-area').classList.add('filled');
+}
+
+async function submitForm() {
+  if(!googleToken && !isLocal) { resetFlow(); return; }
+  
+  const fullName = document.getElementById('fullName').value.trim();
+  const social = document.getElementById('social').value.trim();
+  const aiTool = document.getElementById('aiTool').value;
+  const trackName = document.getElementById('trackName').value.trim();
+  const note = document.getElementById('note').value.trim();
+  const mp3 = document.getElementById('mp3file').files[0];
+  const chk = document.getElementById('chk').checked;
+  const kvkk = document.getElementById('kvkk').checked;
+  
+  const err = document.getElementById('err-form');
+  err.style.display = 'none';
+  
+  if(!fullName || !social || !aiTool || !trackName || !note) { err.textContent='Lütfen tüm alanları doldurun.'; err.style.display='block'; return; }
+  if(!mp3) { err.textContent='Müziğini yüklemeyi unuttun! 🎶'; err.style.display='block'; return; }
+  if(!chk || !kvkk) { err.textContent='Devam edebilmek için onay kutucuklarını işaretlemelisin.'; err.style.display='block'; return; }
+  
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  
+  const fd = new FormData();
+  fd.append('token', googleToken);
+  fd.append('fullName', fullName); fd.append('social', social); fd.append('aiTool', aiTool);
+  fd.append('trackName', trackName); fd.append('note', note); fd.append('consent', 'true');
+  fd.append('mp3', mp3);
+  
+  try {
+    const res = await fetch('/submit', { method: 'POST', body: fd });
+    const data = await res.json();
+    if(res.status === 429) { 
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-blocked').classList.add('active'); 
+      return; 
+    }
+    if(!res.ok) { err.textContent = data.error || 'Bir hata oluştu.'; err.style.display='block'; return; }
+    
+    setStep(3);
+    openModal('modal-success');
+  } catch(e) {
+    err.textContent = 'Bağlantı hatası yaşandı. Lütfen tekrar dene.';
+    err.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Parçamı Gönder! 🚀';
+  }
+}
+
+// Admin Logic
+function openStaffLogin() {
+  if(staffToken) {
+    window.location.href = '/admin.html'; // Redirects to admin panel if token exists
+  } else {
+    document.getElementById('login-err').style.display='none';
+    openModal('modal-login');
+  }
+}
+
+async function doStaffLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('btn-login');
+  err.style.display = 'none';
+  if(!u || !p) { err.textContent = 'Bilgileri girin.'; err.style.display='block'; return; }
+  
+  btn.disabled = true; btn.textContent = 'Giriş Yapılıyor...';
+  try {
+    const res = await fetch('/api/staff/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p})
+    });
+    const data = await res.json();
+    if(!res.ok) { err.textContent = data.error || 'Giriş başarısız.'; err.style.display='block'; return; }
+    localStorage.setItem('staff_token', data.token);
+    localStorage.setItem('staff_username', data.username);
+    window.location.href = '/admin.html'; // Redirect to a separate admin page instead of cramming it into index.html
+  } catch(e) {
+    err.textContent = 'Bağlantı kurulamadı.'; err.style.display='block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Giriş Yap';
+  }
+}
+</script>
 </body>
 </html>
