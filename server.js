@@ -22,7 +22,7 @@ app.use(helmet({
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://accounts.google.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      frameSrc: ["https://accounts.google.com", "https://challenges.cloudflare.com"],
+      frameSrc: ["https://accounts.google.com", "https://challenges.cloudflare.com", "https://www.youtube.com", "https://youtube.com"],
       connectSrc: ["'self'", "https://accounts.google.com", "https://static.cloudflareinsights.com"],
       imgSrc: ["'self'", "data:", "https:"],
       mediaSrc: ["'self'", "blob:"],
