@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --bg-dark: #050505;
@@ -492,9 +493,16 @@ function resetFlow() {
     document.getElementById('local-warning').style.display = 'none';
     
     // GSI Config
-    if(cfg.googleClientId && typeof google !== 'undefined') {
-      google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: onGoogleLogin });
-      google.accounts.id.renderButton(document.getElementById('gsi-btn'), { theme: 'filled_black', size: 'large', width: 300, shape: 'pill' });
+    if(cfg.googleClientId) {
+      const initGSI = setInterval(() => {
+        if(typeof google !== 'undefined' && google.accounts) {
+          clearInterval(initGSI);
+          google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: onGoogleLogin });
+          google.accounts.id.renderButton(document.getElementById('gsi-btn'), { theme: 'filled_black', size: 'large', width: 300, shape: 'pill' });
+        }
+      }, 100);
+      // Timeout after 10s
+      setTimeout(() => clearInterval(initGSI), 10000);
     }
   } catch(e) {
     // Local Fallback
