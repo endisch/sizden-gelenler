@@ -1,6 +1,11 @@
 node_modules/
 uploads/
 .env
+.env.*
+!.env.example
+data/
+backups/
+*.log
 staff_credentials.json
 seed_staff.js
 stats.json

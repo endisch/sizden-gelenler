@@ -249,7 +249,7 @@ img { max-width: 100%; display: block; }
     <div class="left-content">
       <div class="brand-header">
         <div class="logo">
-          <img src="assets/mais-logo.png" alt="Mustafa İnce">
+          <img src="assets/mais-logo.webp" alt="MAİS Studio">
         </div>
         <div class="season-tag">Sezon 2 • Canlı</div>
       </div>
@@ -258,7 +258,7 @@ img { max-width: 100%; display: block; }
         <h1>Sizden<br><span>Gelenler</span></h1>
         <p>Selam! Yapay zeka ile müzik mi üretiyorsun? Harika, tam yerine geldin! Mustafa İnce her hafta sizden gelen parçaları tek tek dinliyor ve en iyilerini binlerce kişiyle paylaşıyor. Hadi, vakit kaybetmeden parçanı bize gönder!</p>
         <div class="host-profile">
-          <img src="assets/host.jpg" alt="Mustafa İnce" class="host-avatar">
+          <img src="assets/host.webp" alt="Mustafa İnce" class="host-avatar">
           <div class="host-info">
             <h4>Mustafa İnce</h4>
             <p>Müzik Prodüktörü</p>
@@ -354,13 +354,13 @@ img { max-width: 100%; display: block; }
           </div>
           
           <div class="field full" style="margin-top: 10px;">
-            <label>MP3 Şaheserini Buraya Bırak 🎶 * (maks 20MB)</label>
+            <label>MP3 Şaheserini Buraya Bırak 🎶 * (maks <span id="max-upload-label">10 MB</span>)</label>
             <label class="dropzone" id="dz-area">
               <input type="file" class="dz-input" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFileSelect(this)">
               <div class="dz-content" id="dz-content">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 <div class="dz-title">Tıkla veya sürükleyip bırak</div>
-                <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz</div>
+                <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz (en fazla <span id="max-upload-help">10 MB</span>)</div>
               </div>
               <div class="dz-file-info" id="dz-file-info">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
@@ -453,6 +453,8 @@ img { max-width: 100%; display: block; }
 <script>
 let googleToken = '', staffToken = localStorage.getItem('staff_token')||'';
 let isLocal = location.protocol === 'file:';
+let maxUploadMb = 10;
+let maxUploadBytes = 10 * 1024 * 1024;
 
 if (isLocal) {
   document.getElementById('local-warning').style.display = 'block';
@@ -498,6 +500,12 @@ function resetFlow() {
     const res = await fetch('/config');
     const cfg = await res.json();
     isLocal = false;
+    if(Number.isInteger(cfg.maxUploadMb) && cfg.maxUploadMb >= 1 && cfg.maxUploadMb <= 10) {
+      maxUploadMb = cfg.maxUploadMb;
+      maxUploadBytes = maxUploadMb * 1024 * 1024;
+    }
+    document.getElementById('max-upload-label').textContent = maxUploadMb + ' MB';
+    document.getElementById('max-upload-help').textContent = maxUploadMb + ' MB';
     document.getElementById('local-warning').style.display = 'none';
     
     // GSI Config
@@ -572,8 +580,8 @@ function onGoogleLogin(resp) {
 function handleFileSelect(input) {
   const f = input.files[0];
   if(!f) return;
-  if(f.size > 20*1024*1024) {
-    document.getElementById('err-form').textContent = 'Dosya çok büyük. Maksimum 20MB yükleyebilirsiniz.';
+  if(f.size > maxUploadBytes) {
+    document.getElementById('err-form').textContent = 'Dosya çok büyük. Maksimum ' + maxUploadMb + ' MB yükleyebilirsiniz.';
     document.getElementById('err-form').style.display = 'block';
     input.value = ''; return;
   }
@@ -601,6 +609,7 @@ async function submitForm() {
   
   if(!fullName || !social || !aiTool || !trackName || !note) { err.textContent='Lütfen tüm alanları doldurun.'; err.style.display='block'; return; }
   if(!mp3) { err.textContent='Müziğini yüklemeyi unuttun! 🎶'; err.style.display='block'; return; }
+  if(mp3.size > maxUploadBytes) { err.textContent='Dosya çok büyük. Maksimum ' + maxUploadMb + ' MB yükleyebilirsiniz.'; err.style.display='block'; return; }
   if(!chk || !kvkk) { err.textContent='Devam edebilmek için onay kutucuklarını işaretlemelisin.'; err.style.display='block'; return; }
   
   const btn = document.getElementById('btn-submit');

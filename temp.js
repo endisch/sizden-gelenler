@@ -134,7 +134,7 @@
     function handleFile(input) {
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 20 * 1024 * 1024) { showErr('err-form', 'Dosya 20 MB sınırını aşıyor.'); input.value = ''; return; }
+      if (file.size > 10 * 1024 * 1024) { showErr('err-form', 'Dosya 10 MB sınırını aşıyor.'); input.value = ''; return; }
       hideErr('err-form');
       document.getElementById('file-name').textContent = '✓ ' + file.name;
       document.getElementById('upload-zone').style.borderColor = 'var(--gold)';
@@ -637,4 +637,3 @@
         if (e.target === overlay && overlay.id !== 'welcome-overlay') overlay.classList.remove('open');
       });
     });
-  

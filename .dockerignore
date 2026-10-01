@@ -1,0 +1,13 @@
+.git
+.github
+node_modules
+.env
+.env.*
+!.env.example
+data
+backups
+uploads
+*.log
+*.zip
+*.tar
+*.tar.gz

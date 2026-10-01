@@ -12,6 +12,23 @@ require('dotenv').config();
 
 const app = express();
 
+// Keep mutable state outside the application directory so deployments can
+// mount a persistent volume and move the app without baking user data into code.
+const defaultDataDir = fs.existsSync('/app/data') ? '/app/data' : path.join(__dirname, 'data');
+const dataDir = path.resolve(process.env.DATA_DIR || defaultDataDir);
+fs.mkdirSync(dataDir, { recursive: true });
+
+const maxUploadMbValue = process.env.MAX_UPLOAD_MB === undefined
+  ? 10
+  : Number(process.env.MAX_UPLOAD_MB);
+const MAX_UPLOAD_MB = Number.isInteger(maxUploadMbValue) && maxUploadMbValue >= 1 && maxUploadMbValue <= 10
+  ? maxUploadMbValue
+  : 10;
+if (process.env.MAX_UPLOAD_MB !== undefined && MAX_UPLOAD_MB !== maxUploadMbValue) {
+  console.warn('MAX_UPLOAD_MB must be a whole number between 1 and 10; using 10 MB.');
+}
+const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+
 // ── Security Middleware ─────────────────────────────────────────────────────
 app.set('trust proxy', 1);
 app.use(helmet({
@@ -31,27 +48,98 @@ app.use(helmet({
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 }));
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static('public'));
+
+const requestDurationBuckets = [0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
+const requestMetrics = new Map();
+function getMetricRoute(req) {
+  if (req.route && req.route.path) return String(req.baseUrl || '') + String(req.route.path);
+  if (/^\/(?:index|admin|privacy|terms|404)\.html$/.test(req.path)) return req.path;
+  if (req.path === '/' || req.path === '/healthz' || req.path === '/readyz') return req.path;
+  if (req.path.startsWith('/assets/')) return '/assets/*';
+  return 'unmatched';
+}
+function escapePrometheusLabel(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/"/g, '\\"');
+}
+app.use((req, res, next) => {
+  if (req.path === '/metrics') return next();
+  const startedAt = process.hrtime.bigint();
+  res.on('finish', () => {
+    const elapsed = Number(process.hrtime.bigint() - startedAt) / 1e9;
+    const labels = {
+      method: req.method,
+      route: getMetricRoute(req),
+      status: `${Math.floor(res.statusCode / 100)}xx`
+    };
+    const key = `${labels.method}|${labels.route}|${labels.status}`;
+    let metric = requestMetrics.get(key);
+    if (!metric) {
+      // Keep metric cardinality bounded even if callers request random paths.
+      if (requestMetrics.size >= 200) return;
+      metric = { ...labels, count: 0, duration: 0, buckets: requestDurationBuckets.map(() => 0) };
+      requestMetrics.set(key, metric);
+    }
+    metric.count += 1;
+    metric.duration += elapsed;
+    requestDurationBuckets.forEach((bound, index) => {
+      if (elapsed <= bound) metric.buckets[index] += 1;
+    });
+  });
+  next();
+});
+
+function cacheStaticFile(res, filePath) {
+  if (/\.(?:avif|css|gif|ico|jpe?g|js|png|svg|webp|woff2?)$/i.test(filePath)) {
+    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=3600');
+  } else if (/\.html?$/i.test(filePath)) {
+    res.setHeader('Cache-Control', 'no-cache');
+  }
+}
+app.use(express.static(path.join(__dirname, 'public'), { etag: true, setHeaders: cacheStaticFile }));
 
 // ── JWT Config ──────────────────────────────────────────────────────────────
-// Fallback secret: generate once and persist so it survives restarts
+// Generate a private persistent secret when one is not supplied by the host.
+// Keep the data volume when migrating or all existing staff sessions will expire.
+const jwtSecretFile = path.join(dataDir, '.jwt_secret');
 function getJwtSecret() {
   if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  return '***REMOVED***';
+  try {
+    const existingSecret = fs.readFileSync(jwtSecretFile, 'utf8').trim();
+    if (existingSecret) return existingSecret;
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+
+  const generatedSecret = crypto.randomBytes(64).toString('hex');
+  try {
+    fs.writeFileSync(jwtSecretFile, generatedSecret, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+    return generatedSecret;
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+    return fs.readFileSync(jwtSecretFile, 'utf8').trim();
+  }
 }
 const JWT_SECRET = getJwtSecret();
 const JWT_EXPIRES = '8h';
 
 // ── Upload dir ──────────────────────────────────────────────────────────────
-const dataDir = fs.existsSync('/app/data') ? '/app/data' : __dirname;
 const uploadDir = path.join(dataDir, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({
   dest: uploadDir,
-  limits: { fileSize: 20 * 1024 * 1024 },
+  limits: {
+    fileSize: MAX_UPLOAD_BYTES,
+    files: 1,
+    fields: 10,
+    parts: 11,
+    fieldNameSize: 100,
+    fieldSize: 16 * 1024,
+    fieldNestingDepth: 0,
+    fieldArrayIndexLimit: 0
+  },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'audio/mpeg' || file.originalname.endsWith('.mp3')) {
+    if (file.mimetype === 'audio/mpeg' || /\.mp3$/i.test(file.originalname)) {
       cb(null, true);
     } else {
       cb(new Error('Sadece MP3 dosyası kabul edilmektedir.'));
@@ -60,84 +148,110 @@ const upload = multer({
 });
 
 // ── Data files ──────────────────────────────────────────────────────────────
-const credFile = path.join(dataDir, 'staff_credentials.json');
-let staffCredentials = [];
-if (fs.existsSync(credFile)) {
-  try { staffCredentials = JSON.parse(fs.readFileSync(credFile, 'utf8')); } catch(e) {}
-}
-function saveCredentials() {
-  fs.writeFileSync(credFile, JSON.stringify(staffCredentials, null, 2), 'utf8');
+function readJsonFile(filePath, fallback) {
+  let content;
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return fallback;
+    throw err;
+  }
+
+  let value;
+  try {
+    value = JSON.parse(content);
+  } catch (err) {
+    throw new Error(`Cannot load persisted data file ${path.basename(filePath)}: invalid JSON.`, { cause: err });
+  }
+  const expectedArray = Array.isArray(fallback);
+  if (expectedArray ? !Array.isArray(value) : !value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`Cannot load persisted data file ${path.basename(filePath)}: unexpected data shape.`);
+  }
+  return value;
 }
 
-// Auto-seed if credentials are empty (e.g. fresh deployment without volume)
+function saveJsonFile(filePath, value) {
+  const temporaryPath = `${filePath}.${process.pid}.${crypto.randomBytes(6).toString('hex')}.tmp`;
+  try {
+    fs.writeFileSync(temporaryPath, JSON.stringify(value, null, 2), {
+      encoding: 'utf8',
+      flag: 'wx',
+      mode: 0o600
+    });
+    fs.renameSync(temporaryPath, filePath);
+  } catch (err) {
+    try { fs.unlinkSync(temporaryPath); } catch (cleanupError) {
+      if (cleanupError.code !== 'ENOENT') console.error('Could not remove temporary state file:', cleanupError.message);
+    }
+    throw err;
+  }
+}
+
+const credFile = path.join(dataDir, 'staff_credentials.json');
+let staffCredentials = readJsonFile(credFile, []);
+function saveCredentials() {
+  saveJsonFile(credFile, staffCredentials);
+}
+
+// Bootstrap only from deployment secrets; never ship default passwords in source.
 if (staffCredentials.length === 0) {
-  const bcrypt = require('bcryptjs');
-  staffCredentials.push({ username: 'thendisch', passwordHash: bcrypt.hashSync('***REMOVED***', 12), role: 'owner' });
-  staffCredentials.push({ username: 'mustafaince', passwordHash: bcrypt.hashSync('***REMOVED***', 12), role: 'owner' });
-  staffCredentials.push({ username: 'maisstudio', passwordHash: bcrypt.hashSync('***REMOVED***', 12), role: 'staff' });
-  saveCredentials();
-  console.log('Admin accounts auto-seeded!');
+  const initialOwnerUsername = (process.env.INITIAL_OWNER_USERNAME || '').trim().toLowerCase();
+  const initialOwnerPassword = process.env.INITIAL_OWNER_PASSWORD || '';
+  if (initialOwnerUsername || initialOwnerPassword) {
+    if (!initialOwnerUsername || initialOwnerPassword.length < 14) {
+      throw new Error('Set both INITIAL_OWNER_USERNAME and an INITIAL_OWNER_PASSWORD of at least 14 characters.');
+    }
+    staffCredentials.push({
+      username: initialOwnerUsername,
+      passwordHash: bcrypt.hashSync(initialOwnerPassword, 12),
+      role: 'owner'
+    });
+    saveCredentials();
+    console.log('Initial owner account created from environment configuration.');
+  }
 }
 
 const submissionsFile = path.join(dataDir, 'submissions_data.json');
-let submissionsData = [];
-if (fs.existsSync(submissionsFile)) {
-  try { submissionsData = JSON.parse(fs.readFileSync(submissionsFile, 'utf8')); } catch(e) {}
-}
+let submissionsData = readJsonFile(submissionsFile, []);
 function saveSubmissionsData() {
-  fs.writeFileSync(submissionsFile, JSON.stringify(submissionsData, null, 2), 'utf8');
+  saveJsonFile(submissionsFile, submissionsData);
 }
 
 // ── IP Rate Limit Storage ────────────────────────────────────────────────────
 const ipLimitsFile = path.join(dataDir, 'ip_limits.json');
-let ipLimits = {}; // { 'ip': lastSubmissionTimestamp }
-if (fs.existsSync(ipLimitsFile)) {
-  try { ipLimits = JSON.parse(fs.readFileSync(ipLimitsFile, 'utf8')); } catch(e) {}
-}
+let ipLimits = readJsonFile(ipLimitsFile, {}); // { 'ip': lastSubmissionTimestamp }
 function saveIpLimits() {
-  fs.writeFileSync(ipLimitsFile, JSON.stringify(ipLimits, null, 2), 'utf8');
+  saveJsonFile(ipLimitsFile, ipLimits);
 }
 
 // ── Quota System Storage ─────────────────────────────────────────────────────
 const statsFile = path.join(dataDir, 'stats.json');
-let systemStats = { maxQuota: 200, usedQuota: 0 };
-if (fs.existsSync(statsFile)) {
-  try { systemStats = JSON.parse(fs.readFileSync(statsFile, 'utf8')); } catch(e) {}
-}
+let systemStats = readJsonFile(statsFile, { maxQuota: 200, usedQuota: 0 });
 function saveStats() {
-  fs.writeFileSync(statsFile, JSON.stringify(systemStats, null, 2), 'utf8');
+  saveJsonFile(statsFile, systemStats);
 }
 
 // ── Special System Storage ───────────────────────────────────────────────────
 const specialConfigFile = path.join(dataDir, 'special_config.json');
-let specialConfig = { active: false, title: 'Özel Konsept', maxQuota: 50, usedQuota: 0 };
-if (fs.existsSync(specialConfigFile)) {
-  try { specialConfig = JSON.parse(fs.readFileSync(specialConfigFile, 'utf8')); } catch(e) {}
-}
+let specialConfig = readJsonFile(specialConfigFile, { active: false, title: 'Özel Konsept', maxQuota: 50, usedQuota: 0 });
 function saveSpecialConfig() {
-  fs.writeFileSync(specialConfigFile, JSON.stringify(specialConfig, null, 2), 'utf8');
+  saveJsonFile(specialConfigFile, specialConfig);
 }
 
 const specialSubmissionsFile = path.join(dataDir, 'special_submissions_data.json');
-let specialSubmissionsData = [];
-if (fs.existsSync(specialSubmissionsFile)) {
-  try { specialSubmissionsData = JSON.parse(fs.readFileSync(specialSubmissionsFile, 'utf8')); } catch(e) {}
-}
+let specialSubmissionsData = readJsonFile(specialSubmissionsFile, []);
 function saveSpecialSubmissionsData() {
-  fs.writeFileSync(specialSubmissionsFile, JSON.stringify(specialSubmissionsData, null, 2), 'utf8');
+  saveJsonFile(specialSubmissionsFile, specialSubmissionsData);
 }
 
 const specialIpLimitsFile = path.join(dataDir, 'special_ip_limits.json');
-let specialIpLimits = {}; // { 'ip': lastSubmissionTimestamp }
-if (fs.existsSync(specialIpLimitsFile)) {
-  try { specialIpLimits = JSON.parse(fs.readFileSync(specialIpLimitsFile, 'utf8')); } catch(e) {}
-}
+let specialIpLimits = readJsonFile(specialIpLimitsFile, {}); // { 'ip': lastSubmissionTimestamp }
 function saveSpecialIpLimits() {
-  fs.writeFileSync(specialIpLimitsFile, JSON.stringify(specialIpLimits, null, 2), 'utf8');
+  saveJsonFile(specialIpLimitsFile, specialIpLimits);
 }
 
 function getClientIp(req) {
-  return (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
+  return req.ip || req.socket.remoteAddress || '';
 }
 
 function checkIpLimit(ip) {
@@ -177,6 +291,14 @@ async function verifyGoogleToken(token) {
     audience: process.env.GOOGLE_CLIENT_ID,
   });
   return ticket.getPayload();
+}
+
+async function makeUploadRequestId(filePath, details) {
+  const fileHash = crypto.createHash('sha256');
+  for await (const chunk of fs.createReadStream(filePath)) fileHash.update(chunk);
+  return crypto.createHash('sha256')
+    .update(JSON.stringify({ ...details, contentHash: fileHash.digest('hex') }))
+    .digest('hex');
 }
 
 // ── Staff JWT middleware ─────────────────────────────────────────────────────
@@ -221,15 +343,65 @@ function getDriveClient() {
   return google.drive({ version: 'v3', auth });
 }
 
-async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', description = '') {
+async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', description = '', requestId = crypto.randomUUID()) {
   const drive = getDriveClient();
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
-  const response = await drive.files.create({
-    requestBody: { name: fileName, parents: [folderId], description },
-    media: { mimeType, body: fs.createReadStream(filePath) },
-    fields: 'id',
-  });
-  const fileId = response.data.id;
+  if (!folderId) throw new Error('GOOGLE_DRIVE_FOLDER_ID is not configured.');
+
+  // The same request ID is attached to each attempt. If Drive stored the file
+  // but the response was lost, find it before retrying to avoid duplicates.
+  const escapedFolderId = folderId.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const escapedRequestId = requestId.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const findPriorAttempt = async () => {
+    const result = await drive.files.list({
+      q: `'${escapedFolderId}' in parents and appProperties has { key='maisUploadRequestId' and value='${escapedRequestId}' } and trashed = false`,
+      pageSize: 1,
+      fields: 'files(id)',
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true
+    });
+    return result.data.files && result.data.files[0] ? result.data.files[0].id : null;
+  };
+  const isRetryable = (err) => {
+    const status = Number(err.response && err.response.status || err.status || 0);
+    return status === 408 || status === 429 || status >= 500 ||
+      ['ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN', 'ECONNREFUSED'].includes(err.code);
+  };
+
+  let fileId;
+  try {
+    fileId = await findPriorAttempt();
+  } catch (lookupError) {
+    console.warn('Drive idempotency lookup failed; proceeding with upload:', lookupError.message);
+  }
+  for (let attempt = 1; !fileId && attempt <= 4; attempt += 1) {
+    try {
+      const response = await drive.files.create({
+        requestBody: {
+          name: fileName,
+          parents: [folderId],
+          description,
+          appProperties: { maisUploadRequestId: requestId }
+        },
+        media: { mimeType, body: fs.createReadStream(filePath) },
+        fields: 'id',
+        supportsAllDrives: true
+      });
+      fileId = response.data.id;
+      if (!fileId) throw new Error('Google Drive did not return a file ID.');
+    } catch (err) {
+      if (!isRetryable(err) || attempt === 4) throw err;
+      try {
+        fileId = await findPriorAttempt();
+        if (fileId) break;
+      } catch (lookupError) {
+        console.warn('Drive retry lookup failed:', lookupError.message);
+      }
+      const delay = Math.min(4000, 250 * (2 ** (attempt - 1))) + Math.floor(Math.random() * 200);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
   const ownerEmail = process.env.DRIVE_OWNER_EMAIL;
   if (ownerEmail) {
     try {
@@ -238,9 +410,39 @@ async function uploadToDrive(filePath, fileName, mimeType = 'audio/mpeg', descri
         transferOwnership: true,
         requestBody: { role: 'owner', type: 'user', emailAddress: ownerEmail },
       });
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Drive owner transfer failed:', e.message);
+    }
   }
   return fileId;
+}
+
+const transientRequestLimits = new Map();
+function limitByClientIp(bucket, maximum, windowMs) {
+  return (req, res, next) => {
+    const key = `${bucket}:${getClientIp(req)}`;
+    const now = Date.now();
+    const current = transientRequestLimits.get(key);
+    if (!current || now >= current.resetAt) {
+      transientRequestLimits.set(key, { count: 1, resetAt: now + windowMs });
+    } else if (current.count >= maximum) {
+      const retryAfter = Math.max(1, Math.ceil((current.resetAt - now) / 1000));
+      res.setHeader('Retry-After', String(retryAfter));
+      return res.status(429).json({ error: 'Çok sık istek gönderildi. Lütfen biraz bekleyin.' });
+    } else {
+      current.count += 1;
+    }
+
+    if (transientRequestLimits.size > 5000) {
+      for (const [storedKey, value] of transientRequestLimits) {
+        if (now >= value.resetAt) transientRequestLimits.delete(storedKey);
+      }
+      while (transientRequestLimits.size > 5000) {
+        transientRequestLimits.delete(transientRequestLimits.keys().next().value);
+      }
+    }
+    next();
+  };
 }
 
 // ── Rate limit helper ────────────────────────────────────────────────────────
@@ -268,9 +470,57 @@ app.get('/config', (req, res) => {
   res.json({
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
     setupRequired: staffCredentials.length === 0,
+    maxUploadMb: MAX_UPLOAD_MB,
     quota: systemStats,
     specialConfig: specialConfig
   });
+});
+
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+app.get('/readyz', async (req, res) => {
+  try {
+    await fs.promises.access(dataDir, fs.constants.R_OK | fs.constants.W_OK);
+    res.status(200).json({ status: 'ready' });
+  } catch (err) {
+    res.status(503).json({ status: 'not-ready' });
+  }
+});
+
+app.get('/metrics', (req, res) => {
+  const configuredToken = process.env.METRICS_TOKEN || '';
+  const presentedToken = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  const configured = Buffer.from(configuredToken);
+  const presented = Buffer.from(presentedToken);
+  if (configured.length < 32 || configured.length !== presented.length || !crypto.timingSafeEqual(configured, presented)) {
+    return res.sendStatus(404);
+  }
+
+  const lines = [
+    '# HELP mais_http_requests_total Completed HTTP requests.',
+    '# TYPE mais_http_requests_total counter',
+    '# HELP mais_http_request_duration_seconds Request duration in seconds.',
+    '# TYPE mais_http_request_duration_seconds histogram',
+    '# HELP mais_process_uptime_seconds Process uptime in seconds.',
+    '# TYPE mais_process_uptime_seconds gauge',
+    '# HELP mais_process_resident_memory_bytes Resident process memory in bytes.',
+    '# TYPE mais_process_resident_memory_bytes gauge'
+  ];
+  for (const metric of requestMetrics.values()) {
+    const label = `method="${escapePrometheusLabel(metric.method)}",route="${escapePrometheusLabel(metric.route)}",status="${metric.status}"`;
+    lines.push(`mais_http_requests_total{${label}} ${metric.count}`);
+    lines.push(`mais_http_request_duration_seconds_sum{${label}} ${metric.duration}`);
+    lines.push(`mais_http_request_duration_seconds_count{${label}} ${metric.count}`);
+    requestDurationBuckets.forEach((bound, index) => {
+      lines.push(`mais_http_request_duration_seconds_bucket{${label},le="${bound}"} ${metric.buckets[index]}`);
+    });
+    lines.push(`mais_http_request_duration_seconds_bucket{${label},le="+Inf"} ${metric.count}`);
+  }
+  lines.push(`mais_process_uptime_seconds ${process.uptime()}`);
+  lines.push(`mais_process_resident_memory_bytes ${process.memoryUsage().rss}`);
+  res.type('text/plain; version=0.0.4; charset=utf-8').send(lines.join('\n') + '\n');
 });
 
 app.get('/api/playlist', verifyStaffToken, (req, res) => {
@@ -301,7 +551,7 @@ app.get('/api/stream-audio', verifyStaffToken, async (req, res) => {
   }
 });
 
-app.post('/check-limit', async (req, res) => {
+app.post('/check-limit', limitByClientIp('google-check', 30, 10 * 60 * 1000), async (req, res) => {
   try {
     const { token } = req.body;
     const clientIp = getClientIp(req);
@@ -317,7 +567,7 @@ app.post('/check-limit', async (req, res) => {
   }
 });
 
-app.post('/check-special-limit', async (req, res) => {
+app.post('/check-special-limit', limitByClientIp('special-google-check', 30, 10 * 60 * 1000), async (req, res) => {
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ error: 'Token eksik.' });
@@ -397,7 +647,10 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
     const fileName = cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
     const description = `Gönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
-    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
+    const uploadRequestId = await makeUploadRequestId(req.file.path, {
+      type: 'standard', fullName, email, social, aiTool, trackName, note, date
+    });
+    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description, uploadRequestId);
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
     submissionsData.push({
@@ -480,7 +733,10 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
     const fileName = 'SPECIAL - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
     const description = `ÖZEL BÖLÜM: ${specialConfig.title}\nGönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
-    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description);
+    const uploadRequestId = await makeUploadRequestId(req.file.path, {
+      type: 'special', fullName, email, social, aiTool, trackName, note, date
+    });
+    const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description, uploadRequestId);
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
     specialSubmissionsData.push({
@@ -510,25 +766,14 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
 // STAFF AUTH ROUTES
 // ════════════════════════════════════════════════════════════════════════════
 
-// First-time setup — only works when no accounts exist
-app.post('/api/staff/setup', async (req, res) => {
-  if (staffCredentials.length > 0) {
-    return res.status(403).json({ error: 'Sistem zaten yapılandırılmış.' });
-  }
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Kullanıcı adı ve şifre gereklidir.' });
-  if (password.length < 6) return res.status(400).json({ error: 'Şifre en az 6 karakter olmalıdır.' });
-
-  const passwordHash = await bcrypt.hash(password, 12);
-  staffCredentials.push({ username: username.toLowerCase().trim(), passwordHash, role: 'owner' });
-  saveCredentials();
-
-  const token = jwt.sign({ username: username.toLowerCase().trim(), role: 'owner' }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
-  res.json({ success: true, token, username: username.toLowerCase().trim(), role: 'owner' });
+// Public self-service owner setup is intentionally disabled. On a new host,
+// create the first owner with INITIAL_OWNER_USERNAME/PASSWORD environment vars.
+app.post('/api/staff/setup', (req, res) => {
+  res.status(403).json({ error: 'İlk yönetici hesabı sunucu ortam değişkenleriyle oluşturulmalıdır.' });
 });
 
 // Login
-app.post('/api/staff/login', async (req, res) => {
+app.post('/api/staff/login', limitByClientIp('staff-login', 10, 15 * 60 * 1000), async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Kullanıcı adı ve şifre gereklidir.' });
 
@@ -551,7 +796,7 @@ app.get('/api/staff/verify', verifyStaffToken, (req, res) => {
 app.post('/api/staff/add-account', verifyStaffToken, requireOwner, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Kullanıcı adı ve şifre gereklidir.' });
-  if (password.length < 6) return res.status(400).json({ error: 'Şifre en az 6 karakter olmalıdır.' });
+  if (password.length < 14) return res.status(400).json({ error: 'Şifre en az 14 karakter olmalıdır.' });
 
   const exists = staffCredentials.find(u => u.username === username.toLowerCase().trim());
   if (exists) return res.status(400).json({ error: 'Bu kullanıcı adı zaten mevcut.' });
@@ -575,7 +820,7 @@ app.post('/api/staff/remove-account', verifyStaffToken, requireOwner, (req, res)
 app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Tüm alanları doldurun.' });
-  if (newPassword.length < 6) return res.status(400).json({ error: 'Yeni şifre en az 6 karakter olmalıdır.' });
+  if (newPassword.length < 14) return res.status(400).json({ error: 'Yeni şifre en az 14 karakter olmalıdır.' });
 
   const user = staffCredentials.find(u => u.username === req.staffUser.username);
   if (!user) return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
@@ -826,7 +1071,7 @@ if (process.env.ENABLE_AUTH_SETUP === 'true') {
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'Dosya boyutu çok büyük. Maksimum 20MB.' });
+      return res.status(400).json({ error: `Dosya boyutu çok büyük. Maksimum ${MAX_UPLOAD_MB} MB.` });
     }
     return res.status(400).json({ error: 'Dosya yükleme hatası.' });
   }
@@ -838,4 +1083,12 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server running on port ' + PORT));
+const server = app.listen(PORT, () => console.log('Server running on port ' + PORT));
+
+function shutdown(signal) {
+  console.log(`${signal} received; closing HTTP server.`);
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 10000).unref();
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

@@ -1,0 +1,38 @@
+name: Verify MAİS service
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm audit --omit=dev
+      - run: npm run check
+      - name: Build container
+        run: docker build --tag mais-service:ci .
+      - name: Smoke-check container health
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --detach --name mais-service-ci --publish 3000:3000 mais-service:ci
+          trap 'docker logs mais-service-ci; docker rm --force mais-service-ci >/dev/null' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/readyz; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'Container did not become ready in 30 seconds.' >&2
+          exit 1

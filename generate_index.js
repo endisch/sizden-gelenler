@@ -565,12 +565,12 @@ tbody tr:hover { background: rgba(255,255,255,0.015); }
           <span class="char-counter"><span id="charNum">0</span> / 210</span>
         </div>
         <div class="field full">
-          <label>MP3 Dosyanı Buraya Bırak 🎶 * <span style="text-transform:none;font-weight:400;">— maks. 20 MB</span></label>
+          <label>MP3 Dosyanı Buraya Bırak 🎶 * <span style="text-transform:none;font-weight:400;">— maks. <span id="max-upload-label">10 MB</span></span></label>
           <div class="dropzone" id="upload-zone">
             <input type="file" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFile(this)">
             <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="1.4"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
             <div class="dz-title">MP3 şaheserini sürükle veya tıkla</div>
-            <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz (en fazla 20 MB)</div>
+            <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz (en fazla <span id="max-upload-help">10 MB</span>)</div>
             <div class="dz-file" id="dz-file-info"><span class="dot"></span><span id="file-name"></span></div>
           </div>
         </div>
@@ -757,7 +757,7 @@ tbody tr:hover { background: rgba(255,255,255,0.015); }
 <audio id="player" style="display:none;"></audio>
 
 <script>
-let googleToken='', staffToken=localStorage.getItem('staff_token')||'', staffUsername=localStorage.getItem('staff_username')||'', staffRole=localStorage.getItem('staff_role')||'', isSpecialMode=false, authenticated=false, siteConfig=null;
+let googleToken='', staffToken=localStorage.getItem('staff_token')||'', staffUsername=localStorage.getItem('staff_username')||'', staffRole=localStorage.getItem('staff_role')||'', isSpecialMode=false, authenticated=false, siteConfig=null, maxUploadMb=10, maxUploadBytes=10*1024*1024;
 
 (async function init(){
   if(!sessionStorage.getItem('welcome_seen')) openModal('welcome-modal');
@@ -765,6 +765,9 @@ let googleToken='', staffToken=localStorage.getItem('staff_token')||'', staffUse
   try{
     const cfg=await fetch('/config').then(r=>r.json());
     siteConfig=cfg;
+    if(Number.isInteger(cfg.maxUploadMb)&&cfg.maxUploadMb>=1&&cfg.maxUploadMb<=10){maxUploadMb=cfg.maxUploadMb;maxUploadBytes=maxUploadMb*1024*1024;}
+    document.getElementById('max-upload-label').textContent=maxUploadMb+' MB';
+    document.getElementById('max-upload-help').textContent=maxUploadMb+' MB';
     const q=cfg.quota;
     if(q) document.getElementById('main-quota').textContent=Math.max(0,(q.maxQuota||50)-(q.usedQuota||0))+' / '+(q.maxQuota||50);
     if(cfg.googleClientId){
@@ -804,7 +807,7 @@ function onGoogleLogin(resp){
 
 function handleFile(input){
   const f=input.files[0]; if(!f)return;
-  if(f.size>20*1024*1024){document.getElementById('err-form').textContent='Dosya 20 MB sınırını aşıyor.';document.getElementById('err-form').style.display='block';input.value='';return;}
+  if(f.size>maxUploadBytes){document.getElementById('err-form').textContent='Dosya '+maxUploadMb+' MB sınırını aşıyor.';document.getElementById('err-form').style.display='block';input.value='';return;}
   document.getElementById('err-form').style.display='none';
   const dz=document.getElementById('upload-zone');
   dz.classList.add('filled');
@@ -837,6 +840,7 @@ async function submitForm(){
   if(note.length<30){ef.textContent='Parça notu en az 30 karakter olmalıdır.';ef.style.display='block';return;}
   if(note.length>210){ef.textContent='Parça notu en fazla 210 karakter olabilir.';ef.style.display='block';return;}
   if(!mp3){ef.textContent='Lütfen bir MP3 dosyası seçin.';ef.style.display='block';return;}
+  if(mp3.size>maxUploadBytes){ef.textContent='Dosya '+maxUploadMb+' MB sınırını aşıyor.';ef.style.display='block';return;}
   if(!consent){ef.textContent='Telif beyanını onaylamanız gerekmektedir.';ef.style.display='block';return;}
   if(!kvkk){ef.textContent='KVKK aydınlatma metnini onaylamanız gerekmektedir.';ef.style.display='block';return;}
   const btn=document.getElementById('btn-submit');

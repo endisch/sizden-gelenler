@@ -90,8 +90,8 @@ const newJS = `
         alert('Sadece MP3 dosyası kabul edilir.');
         return;
       }
-      if(input.files[0].size > 20*1024*1024) {
-        alert('Dosya boyutu 20MB\\'den büyük olamaz.');
+      if(input.files[0].size > 10*1024*1024) {
+        alert('Dosya boyutu 10MB\\'den büyük olamaz.');
         return;
       }
       spFile = input.files[0];

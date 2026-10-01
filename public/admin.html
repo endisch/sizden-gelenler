@@ -93,7 +93,7 @@ tr:hover { background: rgba(255,255,255,0.02); }
 <body>
 
 <aside class="sidebar">
-  <div class="logo"><img src="assets/mais-logo.png" alt="Mustafa İnce" style="filter:drop-shadow(0 0 10px rgba(255,255,255,0.2))"></div>
+  <div class="logo"><img src="assets/mais-logo.webp" alt="MAİS Studio" style="filter:drop-shadow(0 0 10px rgba(255,255,255,0.2))"></div>
   <button class="nav-item active" onclick="switchTab('inbox', this)">📥 Gelen Kutusu <span class="nav-badge" id="badge-inbox">0</span></button>
   <button class="nav-item" onclick="switchTab('reviewed', this)">✅ İncelenenler</button>
   <button class="nav-item" onclick="switchTab('limits', this)">⏳ Bekleme Süreleri</button>
@@ -172,7 +172,7 @@ tr:hover { background: rgba(255,255,255,0.02); }
     <div class="card" style="padding:24px; max-width:400px;" id="add-account-section">
       <h3 style="color:#fff; margin-bottom:16px;">Yeni Yetkili Ekle</h3>
       <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="new-user" placeholder="kullanici.adi"></div>
-      <div class="form-group"><label>Şifre</label><input type="password" id="new-pass" placeholder="••••••••"></div>
+      <div class="form-group"><label>Şifre</label><input type="password" id="new-pass" placeholder="En az 14 karakter" minlength="14" autocomplete="new-password"><small style="color:#888;">Şifre en az 14 karakter olmalıdır.</small></div>
       <button class="btn-save" onclick="addAccount()">Hesabı Oluştur</button>
     </div>
   </div>
