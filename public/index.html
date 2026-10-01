@@ -668,6 +668,7 @@ async function doStaffLogin() {
     if(!res.ok) { err.textContent = data.error || 'Giriş başarısız.'; err.style.display='block'; return; }
     localStorage.setItem('staff_token', data.token);
     localStorage.setItem('staff_username', data.username);
+    localStorage.setItem('staff_role', data.role);
     window.location.href = '/admin.html'; // Redirect to a separate admin page instead of cramming it into index.html
   } catch(e) {
     err.textContent = 'Bağlantı kurulamadı.'; err.style.display='block';

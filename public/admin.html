@@ -314,17 +314,16 @@ let role = localStorage.getItem('staff_role') || '';
 
 if(!token) { window.location.href = '/index.html'; }
 
-document.getElementById('u-name').textContent = username;
-document.getElementById('u-role').textContent = role === 'owner' ? 'Kurucu' : 'Yönetici';
-document.getElementById('u-ava').textContent = username.charAt(0).toUpperCase();
-
-if(role === 'owner') {
-  document.getElementById('nav-special').style.display = 'flex';
-  document.getElementById('nav-settings').style.display = 'flex';
-} else {
-  document.getElementById('add-account-section').style.display = 'none';
+function applyStaffIdentity() {
+  document.getElementById('u-name').textContent = username;
+  document.getElementById('u-role').textContent = role === 'owner' ? 'Kurucu' : 'Yönetici';
+  document.getElementById('u-ava').textContent = username.charAt(0).toUpperCase();
+  document.getElementById('nav-special').style.display = role === 'owner' ? 'flex' : 'none';
+  document.getElementById('nav-settings').style.display = role === 'owner' ? 'flex' : 'none';
+  document.getElementById('add-account-section').style.display = role === 'owner' ? '' : 'none';
+  document.getElementById('profile-username').value = username;
 }
-document.getElementById('profile-username').value = username;
+applyStaffIdentity();
 
 function escapeHtml(str) { return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
@@ -516,6 +515,20 @@ async function changePassword() {
   } catch(e){alert(e.message)}
 }
 
+async function bootstrapStaff() {
+  try {
+    const session = await req('/api/staff/verify');
+    username = session.username;
+    role = session.role;
+    localStorage.setItem('staff_username', username);
+    localStorage.setItem('staff_role', role);
+    applyStaffIdentity();
+    await loadData();
+  } catch(e) {
+    if (e.message !== 'Auth') logout();
+  }
+}
+
 // Audio Player
 const player = document.getElementById('player');
 let currentList = [], currentIndex = -1;
@@ -561,7 +574,7 @@ function fmtTime(s) {
   return m+':'+(sc<10?'0':'')+sc;
 }
 
-loadData();
+bootstrapStaff();
 </script>
 </body>
 </html>
