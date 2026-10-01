@@ -35,7 +35,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com", "https://apis.google.com", "https://static.cloudflareinsights.com", "https://challenges.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com", "https://static.cloudflareinsights.com", "https://challenges.cloudflare.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://accounts.google.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -121,6 +121,20 @@ function getJwtSecret() {
 }
 const JWT_SECRET = getJwtSecret();
 const JWT_EXPIRES = '8h';
+
+function getCredentialVersion(user) {
+  return crypto.createHmac('sha256', JWT_SECRET)
+    .update(`${user.username}:${user.role}:${user.passwordHash}`)
+    .digest('base64url');
+}
+
+function createStaffToken(user) {
+  return jwt.sign({
+    username: user.username,
+    role: user.role,
+    credentialVersion: getCredentialVersion(user)
+  }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+}
 
 // ── Upload dir ──────────────────────────────────────────────────────────────
 const uploadDir = path.join(dataDir, 'uploads');
@@ -310,6 +324,10 @@ function verifyStaffToken(req, res, next) {
   const token = auth.slice(7);
   try {
     const payload = jwt.verify(token, JWT_SECRET);
+    const user = staffCredentials.find(candidate => candidate.username === payload.username);
+    if (!user || user.role !== payload.role || payload.credentialVersion !== getCredentialVersion(user)) {
+      return res.status(401).json({ error: 'Oturum geçersiz. Lütfen tekrar giriş yapın.' });
+    }
     req.staffUser = payload;
     next();
   } catch(e) {
@@ -554,6 +572,7 @@ app.get('/api/stream-audio', verifyStaffToken, async (req, res) => {
 app.post('/check-limit', limitByClientIp('google-check', 30, 10 * 60 * 1000), async (req, res) => {
   try {
     const { token } = req.body;
+    if (typeof token !== 'string' || !token) return res.status(400).json({ error: 'Google oturumu bulunamadı.' });
     const clientIp = getClientIp(req);
     const ipLimit = checkIpLimit(clientIp);
     if (!ipLimit.allowed) return res.json({ allowed: false, days: ipLimit.days, hours: ipLimit.hours });
@@ -563,7 +582,7 @@ app.post('/check-limit', limitByClientIp('google-check', 30, 10 * 60 * 1000), as
     const limit = checkRateLimit(email);
     res.json({ ...limit, email, name: payload.name });
   } catch (err) {
-    res.status(401).json({ error: 'Google kimlik doğrulaması başarısız: ' + err.message });
+    res.status(401).json({ error: 'Google kimlik doğrulaması başarısız. Lütfen tekrar giriş yapın.' });
   }
 });
 
@@ -603,8 +622,9 @@ app.post('/check-special-limit', limitByClientIp('special-google-check', 30, 10 
 
 app.post('/submit', upload.single('mp3'), async (req, res) => {
   try {
-    const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
+    const { token, fullName, social, aiTool, studioProgram = '', trackName, note, consent } = req.body;
     if (!token || !fullName || !social || !aiTool || !trackName || !note || !consent) {
+      removeUploadedFile(req);
       return res.status(400).json({ error: 'Tüm alanlar zorunludur.' });
     }
     if (!req.file) return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
@@ -645,17 +665,17 @@ app.post('/submit', upload.single('mp3'), async (req, res) => {
       .split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 
     const fileName = cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
-    const description = `Gönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
+    const description = `Gönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nStüdyo Programı: ${studioProgram || 'Belirtilmedi'}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
     const uploadRequestId = await makeUploadRequestId(req.file.path, {
-      type: 'standard', fullName, email, social, aiTool, trackName, note, date
+      type: 'standard', fullName, email, social, aiTool, studioProgram, trackName, note, date
     });
     const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description, uploadRequestId);
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
     submissionsData.push({
       id: Date.now().toString(),
-      fullName, email, social, aiTool, trackName, note, fileId,
+      fullName, email, social, aiTool, studioProgram, trackName, note, fileId,
       submittedIp: clientIp,
       timestamp: new Date().toISOString(),
       status: 'pending'
@@ -685,8 +705,9 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
       return res.status(403).json({ error: 'Özel bölüm şu anda aktif değildir.' });
     }
 
-    const { token, fullName, social, aiTool, trackName, note, consent } = req.body;
+    const { token, fullName, social, aiTool, studioProgram = '', trackName, note, consent } = req.body;
     if (!token || !fullName || !social || !aiTool || !trackName || !note || !consent) {
+      removeUploadedFile(req);
       return res.status(400).json({ error: 'Tüm alanlar zorunludur.' });
     }
     if (!req.file) return res.status(400).json({ error: 'MP3 dosyası yüklenmedi.' });
@@ -731,17 +752,17 @@ app.post('/submit-special', upload.single('mp3'), async (req, res) => {
       .split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 
     const fileName = 'SPECIAL - ' + cleanStr(fullName) + ' - ' + cleanStr(trackName) + ' - ' + date + '.mp3';
-    const description = `ÖZEL BÖLÜM: ${specialConfig.title}\nGönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
+    const description = `ÖZEL BÖLÜM: ${specialConfig.title}\nGönderen: ${fullName}\nE-posta: ${email}\nSosyal Medya: ${social}\nYapay Zeka Aracı: ${aiTool}\nStüdyo Programı: ${studioProgram || 'Belirtilmedi'}\nParça Adı: ${trackName}\nTarih: ${date}\n\nParça Notu:\n${note}`;
 
     const uploadRequestId = await makeUploadRequestId(req.file.path, {
-      type: 'special', fullName, email, social, aiTool, trackName, note, date
+      type: 'special', fullName, email, social, aiTool, studioProgram, trackName, note, date
     });
     const fileId = await uploadToDrive(req.file.path, fileName, 'audio/mpeg', description, uploadRequestId);
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
     specialSubmissionsData.push({
       id: Date.now().toString(),
-      fullName, email, social, aiTool, trackName, note, fileId,
+      fullName, email, social, aiTool, studioProgram, trackName, note, fileId,
       submittedIp: clientIp,
       timestamp: new Date().toISOString(),
       status: 'pending'
@@ -783,7 +804,7 @@ app.post('/api/staff/login', limitByClientIp('staff-login', 10, 15 * 60 * 1000),
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) return res.status(401).json({ error: 'Kullanıcı adı veya şifre hatalı.' });
 
-  const token = jwt.sign({ username: user.username, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  const token = createStaffToken(user);
   res.json({ success: true, token, username: user.username, role: user.role });
 });
 
@@ -810,21 +831,23 @@ app.post('/api/staff/update-username', verifyStaffToken, async (req, res) => {
   }
   user.username = newUsername;
   saveCredentials();
-  const token = jwt.sign({ username: user.username, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  const token = createStaffToken(user);
   res.json({ success: true, username: user.username, role: user.role, token });
 });
 
 // Add account (owner only)
 app.post('/api/staff/add-account', verifyStaffToken, requireOwner, async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Kullanıcı adı ve şifre gereklidir.' });
-  if (password.length < 14) return res.status(400).json({ error: 'Şifre en az 14 karakter olmalıdır.' });
+  if (typeof username !== 'string' || typeof password !== 'string' || !username.trim() || !password) return res.status(400).json({ error: 'Kullanıcı adı ve şifre gereklidir.' });
+  const normalizedUsername = username.toLowerCase().trim();
+  if (!/^[a-z0-9._-]{3,32}$/.test(normalizedUsername)) return res.status(400).json({ error: 'Kullanıcı adı 3-32 karakter olmalı; harf, sayı, nokta, tire ve alt çizgi kullanılabilir.' });
+  if (password.length < 14 || Buffer.byteLength(password, 'utf8') > 128) return res.status(400).json({ error: 'Şifre en az 14 karakter olmalıdır.' });
 
-  const exists = staffCredentials.find(u => u.username === username.toLowerCase().trim());
+  const exists = staffCredentials.find(u => u.username === normalizedUsername);
   if (exists) return res.status(400).json({ error: 'Bu kullanıcı adı zaten mevcut.' });
 
   const passwordHash = await bcrypt.hash(password, 12);
-  staffCredentials.push({ username: username.toLowerCase().trim(), passwordHash, role: 'staff' });
+  staffCredentials.push({ username: normalizedUsername, passwordHash, role: 'staff' });
   saveCredentials();
   res.json({ success: true, accounts: staffCredentials.map(u => ({ username: u.username, role: u.role })) });
 });
@@ -832,6 +855,7 @@ app.post('/api/staff/add-account', verifyStaffToken, requireOwner, async (req, r
 // Remove account (owner only)
 app.post('/api/staff/remove-account', verifyStaffToken, requireOwner, (req, res) => {
   const { username } = req.body;
+  if (typeof username !== 'string' || !/^[a-z0-9._-]{3,32}$/.test(username)) return res.status(400).json({ error: 'Kullanıcı adı geçersiz.' });
   if (username === req.staffUser.username) return res.status(400).json({ error: 'Kendi hesabınızı silemezsiniz.' });
   staffCredentials = staffCredentials.filter(u => u.username !== username.toLowerCase().trim());
   saveCredentials();
@@ -842,7 +866,7 @@ app.post('/api/staff/remove-account', verifyStaffToken, requireOwner, (req, res)
 app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Tüm alanları doldurun.' });
-  if (newPassword.length < 14) return res.status(400).json({ error: 'Yeni şifre en az 14 karakter olmalıdır.' });
+  if (newPassword.length < 14 || Buffer.byteLength(newPassword, 'utf8') > 128) return res.status(400).json({ error: 'Yeni şifre 14-128 bayt arasında olmalıdır.' });
 
   const user = staffCredentials.find(u => u.username === req.staffUser.username);
   if (!user) return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
@@ -851,8 +875,9 @@ app.post('/api/staff/change-password', verifyStaffToken, async (req, res) => {
   if (!match) return res.status(401).json({ error: 'Mevcut şifre hatalı.' });
 
   user.passwordHash = await bcrypt.hash(newPassword, 12);
+  const token = createStaffToken(user);
   saveCredentials();
-  res.json({ success: true });
+  res.json({ success: true, token });
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -908,12 +933,22 @@ function getLimitsArray() {
 }
 
 app.get('/api/admin/submissions', verifyStaffToken, (req, res) => {
+  const owner = req.staffUser.role === 'owner';
+  const staffSubmission = s => {
+    const result = { ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId };
+    if (!owner) delete result.submittedIp;
+    return result;
+  };
   res.json({
-    submissions: submissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId })),
+    submissions: submissionsData.map(staffSubmission),
     accounts: staffCredentials.map(c => ({ username: c.username, role: c.role })),
     specialConfig: specialConfig,
-    specialSubmissions: specialSubmissionsData.map(s => ({ ...s, audioUrl: '/api/stream-audio?fileId=' + s.fileId })),
-    limits: getLimitsArray()
+    specialSubmissions: specialSubmissionsData.map(staffSubmission),
+    limits: getLimitsArray().map(limit => {
+      const result = { ...limit };
+      if (!owner) delete result.ip;
+      return result;
+    })
   });
 });
 
@@ -1020,8 +1055,13 @@ app.post('/api/admin/clean-missing-drive-records', verifyStaffToken, requireOwne
   }
 });
 
-app.post('/api/admin/update-special-status', verifyStaffToken, (req, res) => {
+function removeUploadedFile(req) {
+  if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+}
+
+app.post('/api/admin/update-special-status', verifyStaffToken, requireOwner, (req, res) => {
   const { id, status } = req.body;
+  if (!['pending', 'reviewed', 'published'].includes(status)) return res.status(400).json({ error: 'Durum geçersiz.' });
   const sub = specialSubmissionsData.find(s => s.id === id);
   if (!sub) return res.status(404).json({ error: 'Kayıt bulunamadı.' });
   sub.status = status;
@@ -1032,6 +1072,8 @@ app.post('/api/admin/update-special-status', verifyStaffToken, (req, res) => {
 
 app.post('/api/admin/update-status', verifyStaffToken, (req, res) => {
   const { fileId, status } = req.body;
+  if (!['pending', 'reviewed', 'published'].includes(status)) return res.status(400).json({ error: 'Durum geçersiz.' });
+  if (status === 'published' && req.staffUser.role !== 'owner') return res.status(403).json({ error: 'Yayınlama işlemi için kurucu yetkisi gereklidir.' });
   const idx = submissionsData.findIndex(s => s.id === fileId);
   if (idx !== -1) {
     submissionsData[idx].status = status;
@@ -1054,7 +1096,7 @@ app.post('/api/admin/unreview', verifyStaffToken, (req, res) => {
   }
 });
 
-app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
+app.post('/api/admin/reset-user', verifyStaffToken, requireOwner, (req, res) => {
   const { targetEmail, targetIp } = req.body;
   if (targetEmail) {
     const emailLower = targetEmail.toLowerCase();
@@ -1073,7 +1115,7 @@ app.post('/api/admin/reset-user', verifyStaffToken, (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/admin/reset-all-limits', verifyStaffToken, (req, res) => {
+app.post('/api/admin/reset-all-limits', verifyStaffToken, requireOwner, (req, res) => {
   ipLimits = {};
   saveIpLimits();
   specialIpLimits = {};

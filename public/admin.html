@@ -219,6 +219,78 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
  .audio-bar{width:calc(100% - 16px);bottom:8px;min-height:unset;padding:10px;border-radius:13px;gap:8px;display:grid;grid-template-columns:40px 1fr auto;grid-template-rows:auto auto}.ab-art{grid-column:1;grid-row:1;width:38px;height:38px;font-size:16px}.ab-info{grid-column:2;grid-row:1;min-width:0}.ab-title{font-size:10px}.ab-artist{font-size:9px}.ab-controls{grid-column:3;grid-row:1;gap:7px}.ab-ctrl-btn{font-size:12px}.ab-play-big{width:32px;height:32px}.ab-timeline{grid-column:1/4;grid-row:2;width:100%;gap:7px}.ab-time{width:31px;font-size:8px}.audio-bar>div:nth-of-type(5){display:none!important}.ab-close{grid-column:3;grid-row:1;display:none}
  .tab-content [style*="padding:32px"],.tab-content [style*="padding:24px"]{padding:18px!important}.tab-content .card[style*="max-width"]{max-width:none!important}.form-group{max-width:none}.tab-content table:not(.limits-table){width:100%}
 }
+/* Minimal fixed player */
+.audio-bar {
+  left:50%; bottom:18px; width:min(1120px,calc(100% - 40px)); min-height:76px;
+  padding:12px 18px; display:grid; grid-template-columns:minmax(150px,1fr) auto minmax(180px,2fr) auto 30px;
+  align-items:center; gap:clamp(12px,2vw,24px); border:1px solid rgba(255,255,255,.085); border-radius:14px;
+  background:rgba(16,17,18,.97); box-shadow:0 16px 52px rgba(0,0,0,.52); backdrop-filter:blur(16px);
+  transition:transform .28s ease,opacity .22s ease;
+}
+.audio-bar:not(.visible) { pointer-events:none; }
+.ab-info { min-width:0; }
+.ab-kicker { margin-bottom:4px; color:#817f78; font-size:8px; font-weight:700; letter-spacing:.15em; }
+.ab-title { color:#f2f0eb; font:600 13px 'Manrope',var(--font); letter-spacing:-.015em; }
+.ab-artist { margin-top:3px; color:#92918d; font-size:10px; }
+.ab-controls { display:flex; align-items:center; gap:9px; }
+.ab-ctrl-btn { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; color:#a6a49d; font:600 10px var(--font); transition:background .18s,color .18s; }
+.ab-ctrl-btn:hover { background:rgba(255,255,255,.055); color:#f0eee8; }
+.ab-play-big { width:40px; height:40px; display:grid; place-items:center; border-radius:50%; background:#d2b568; color:#17140d; transition:background .18s,transform .18s; }
+.ab-play-big:hover { background:#e2c978; transform:scale(1.04); }
+.ab-play-big svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; }
+.ab-timeline { min-width:0; display:flex; align-items:center; gap:10px; }
+.ab-time { width:32px; color:#898780; font:400 9px var(--mono); text-align:center; }
+.ab-slider { height:4px; margin:0; border-radius:99px; accent-color:#d2b568; cursor:pointer; }
+.ab-timeline .ab-slider { width:100%; min-width:50px; }
+.ab-slider::-webkit-slider-runnable-track { height:3px; border-radius:99px; background:#393a3b; }
+.ab-slider::-webkit-slider-thumb { width:11px; height:11px; margin-top:-4px; border:0; border-radius:50%; background:#d8bd6a; box-shadow:none; appearance:none; }
+.ab-slider::-moz-range-track { height:3px; border-radius:99px; background:#393a3b; }
+.ab-slider::-moz-range-thumb { width:11px; height:11px; border:0; border-radius:50%; background:#d8bd6a; }
+.ab-volume { display:flex; align-items:center; gap:8px; }
+.ab-volume-btn { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; color:#a6a49d; }
+.ab-volume-btn:hover { background:rgba(255,255,255,.055); color:#f0eee8; }
+.ab-volume-btn svg,.ab-close svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.ab-volume .ab-slider { width:64px!important; }
+.ab-close { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; color:#777670; }
+.ab-close:hover { background:rgba(255,255,255,.055); color:#e6e3dc; }
+@media(max-width:760px) {
+  .audio-bar { left:10px; bottom:10px; width:calc(100% - 20px); min-height:unset; padding:11px 12px; grid-template-columns:minmax(0,1fr) auto 28px; grid-template-rows:auto auto; gap:8px 10px; transform:translateY(150px); }
+  .audio-bar.visible { transform:translateY(0); }
+  .ab-info { grid-column:1; grid-row:1; }
+  .ab-kicker { font-size:7px; }
+  .ab-title { font-size:11px; }
+  .ab-artist { font-size:9px; }
+  .ab-controls { grid-column:2; grid-row:1; gap:4px; }
+  .ab-seek-btn { display:none; }
+  .ab-play-big { width:34px; height:34px; }
+  .ab-timeline { grid-column:1/4; grid-row:2; gap:7px; }
+  .ab-time { width:30px; font-size:8px; }
+  .ab-volume { display:none; }
+  .ab-close { grid-column:3; grid-row:1; display:grid; width:28px; height:28px; }
+}
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-direction:row; flex-wrap:wrap; }
+.toolbar-filters { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.day-picker { display:flex; align-items:center; gap:6px; }
+.day-picker > span { color:#8e8d87; font-size:9px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.day-picker input[type="date"] { width:138px; min-width:0; padding:8px 9px; border:1px solid rgba(255,255,255,.09); border-radius:8px; background:#141516; color:#e9e7df; color-scheme:dark; font:500 11px var(--font); }
+.day-step { width:30px; height:30px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.08); border-radius:8px; color:#c9c5b8; background:rgba(255,255,255,.025); font-size:18px; line-height:1; transition:background .18s,border-color .18s,color .18s; }
+.day-step:hover { border-color:rgba(210,181,104,.3); color:#e2c977; background:rgba(210,181,104,.07); }
+.day-reset { padding:7px 8px; border-radius:7px; color:#96948d; font-size:10px; white-space:nowrap; }
+.day-reset:hover { color:#e2c977; background:rgba(210,181,104,.06); }
+.sort-control { display:flex; align-items:center; color:#8e8d87; font-size:9px!important; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.sort-control select { min-width:130px; margin-left:8px!important; }
+@media(max-width:760px) {
+  .toolbar { align-items:stretch; flex-direction:column; gap:10px; }
+  .toolbar-filters { gap:10px; }
+  .day-picker { gap:4px; }
+  .day-picker > span { display:none; }
+  .day-picker input[type="date"] { width:132px; padding:8px 6px; font-size:10px; }
+  .day-step { width:28px; height:30px; }
+  .day-reset { font-size:9px; }
+  .sort-control { font-size:8px!important; }
+  .sort-control select { min-width:110px; font-size:9px; }
+  .toolbar > .toolbar-btn { align-self:flex-start; }
+}
 </style>
 </head>
 <body>
@@ -230,7 +302,7 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
   <button class="nav-item" onclick="switchTab('reviewed', this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg></span> İncelenenler</button>
   <button class="nav-item" onclick="switchTab('limits', this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> Bekleme Süreleri</button>
   <div class="nav-section-label" style="margin-top:24px">Administration</div>
-  <button class="nav-item" onclick="switchTab('accounts', this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M17 11a3 3 0 1 0 0-6M17 14a5 5 0 0 1 3.5 5"/></svg></span> Hesaplar</button>
+  <button class="nav-item" id="nav-accounts" onclick="switchTab('accounts', this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M17 11a3 3 0 1 0 0-6M17 14a5 5 0 0 1 3.5 5"/></svg></span> Hesaplar</button>
   <button class="nav-item" onclick="switchTab('profile', this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span> Hesabım</button>
   <button class="nav-item" id="nav-special" onclick="switchTab('special', this)" style="display:none;"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9z"/></svg></span> Özel Gelenler</button>
   <button class="nav-item" id="nav-settings" onclick="switchTab('settings', this)" style="display:none;"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.9.3l-.1.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.6-1l-.2.1-2.9-1.7.1-.2a1.7 1.7 0 0 0-.3-1.9L7.4 15v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.6l-.1-.2 1.7-2.9.2.1a1.7 1.7 0 0 0 1.9-.3l.1-.1h3.4l.1.2a1.7 1.7 0 0 0 1.6 1l.2-.1 2.9 1.7-.1.2a1.7 1.7 0 0 0 .3 1.9l.1.1V15z"/></svg></span> Sistem Ayarları</button>
@@ -263,7 +335,13 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
   <!-- INBOX -->
   <div class="tab-content active" id="tab-inbox">
     <div class="card">
-      <div class="toolbar"><label>Tarih sıralaması<select id="sort-inbox" onchange="setDateSort('inbox',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('inbox')">Dinlenenleri listeden temizle</button></div>
+      <div class="toolbar">
+        <div class="toolbar-filters">
+          <div class="day-picker"><span>Gün seç</span><button class="day-step" onclick="shiftDateFilter('inbox',-1)" aria-label="Önceki gün">‹</button><input type="date" id="date-inbox" aria-label="Gelen kutusu tarih filtresi" onchange="setDateFilter('inbox',this.value)"><button class="day-step" onclick="shiftDateFilter('inbox',1)" aria-label="Sonraki gün">›</button><button class="day-reset" onclick="setDateFilter('inbox','')">Tüm tarihler</button></div>
+          <label class="sort-control">Sırala<select id="sort-inbox" onchange="setDateSort('inbox',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label>
+        </div>
+        <button class="toolbar-btn" onclick="clearListened('inbox')">Dinlenenleri listeden temizle</button>
+      </div>
       <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
@@ -276,7 +354,13 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
   <!-- REVIEWED -->
   <div class="tab-content" id="tab-reviewed">
     <div class="card">
-      <div class="toolbar"><label>Tarih sıralaması<select id="sort-reviewed" onchange="setDateSort('reviewed',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('reviewed')">Dinlenenleri listeden temizle</button></div>
+      <div class="toolbar">
+        <div class="toolbar-filters">
+          <div class="day-picker"><span>Gün seç</span><button class="day-step" onclick="shiftDateFilter('reviewed',-1)" aria-label="Önceki gün">‹</button><input type="date" id="date-reviewed" aria-label="İncelenenler tarih filtresi" onchange="setDateFilter('reviewed',this.value)"><button class="day-step" onclick="shiftDateFilter('reviewed',1)" aria-label="Sonraki gün">›</button><button class="day-reset" onclick="setDateFilter('reviewed','')">Tüm tarihler</button></div>
+          <label class="sort-control">Sırala<select id="sort-reviewed" onchange="setDateSort('reviewed',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label>
+        </div>
+        <button class="toolbar-btn" onclick="clearListened('reviewed')">Dinlenenleri listeden temizle</button>
+      </div>
       <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
@@ -294,7 +378,7 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
           <h3 style="color:#fff; margin-bottom:4px;">Aktif Kısıtlamalar</h3>
           <p style="color:var(--dim); font-size:12px;">Haftalık 1 parça sınırına takılan kullanıcılar.</p>
         </div>
-        <button class="action-btn danger" onclick="resetAllLimits()">Tüm Sınırları Sıfırla (Herkesi Serbest Bırak)</button>
+        <button class="action-btn danger" id="reset-all-limits" onclick="resetAllLimits()">Tüm Sınırları Sıfırla (Herkesi Serbest Bırak)</button>
       </div>
       <table>
         <thead><tr><th>Google Hesabı</th><th>Kısıtlama Tarihi</th><th style="text-align:right;">İşlem</th></tr></thead>
@@ -322,7 +406,13 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
   <!-- SPECIAL -->
   <div class="tab-content" id="tab-special">
     <div class="card">
-      <div class="toolbar"><label>Tarih sıralaması<select id="sort-special" onchange="setDateSort('special',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('special')">Dinlenenleri listeden temizle</button></div>
+      <div class="toolbar">
+        <div class="toolbar-filters">
+          <div class="day-picker"><span>Gün seç</span><button class="day-step" onclick="shiftDateFilter('special',-1)" aria-label="Önceki gün">‹</button><input type="date" id="date-special" aria-label="Özel gelenler tarih filtresi" onchange="setDateFilter('special',this.value)"><button class="day-step" onclick="shiftDateFilter('special',1)" aria-label="Sonraki gün">›</button><button class="day-reset" onclick="setDateFilter('special','')">Tüm tarihler</button></div>
+          <label class="sort-control">Sırala<select id="sort-special" onchange="setDateSort('special',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label>
+        </div>
+        <button class="toolbar-btn" onclick="clearListened('special')">Dinlenenleri listeden temizle</button>
+      </div>
       <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
@@ -385,26 +475,32 @@ tbody tr:hover { background:rgba(210,181,104,.025); }
 
 <!-- AUDIO PLAYER -->
 <div class="audio-bar" id="audio-bar">
-  <div class="ab-art" aria-hidden="true">♫</div>
   <div class="ab-info">
+    <div class="ab-kicker">ŞU AN ÇALIYOR</div>
     <div class="ab-title" id="ab-title">Parça Adı</div>
     <div class="ab-artist" id="ab-artist">Sanatçı</div>
   </div>
   <div class="ab-controls">
-    <button class="ab-ctrl-btn" onclick="seekBy(-10)">⏪</button>
-    <button class="ab-play-big" id="ab-play" onclick="togglePlay()">⏸</button>
-    <button class="ab-ctrl-btn" onclick="seekBy(10)">⏩</button>
+    <button class="ab-ctrl-btn ab-seek-btn" onclick="seekBy(-10)" aria-label="10 saniye geri sar" title="10 saniye geri">−10</button>
+    <button class="ab-play-big" id="ab-play" onclick="togglePlay()" aria-label="Duraklat">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+    </button>
+    <button class="ab-ctrl-btn ab-seek-btn" onclick="seekBy(10)" aria-label="10 saniye ileri sar" title="10 saniye ileri">+10</button>
   </div>
   <div class="ab-timeline">
     <span class="ab-time" id="ab-cur">0:00</span>
     <input type="range" class="ab-slider" id="ab-seek" min="0" max="100" value="0" oninput="seekTo(this.value)">
     <span class="ab-time" id="ab-dur">0:00</span>
   </div>
-  <div style="display:flex; align-items:center; gap:8px; margin-left:16px;">
-    <button class="ab-ctrl-btn" onclick="toggleMute()" id="ab-mute">🔊</button>
+  <div class="ab-volume">
+    <button class="ab-volume-btn" onclick="toggleMute()" id="ab-mute" aria-label="Sesi kapat" title="Sesi kapat">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path d="M18.5 7a7.5 7.5 0 0 1 0 10"/></svg>
+    </button>
     <input type="range" class="ab-slider" id="ab-vol" min="0" max="100" value="100" oninput="changeVol(this.value)" style="width:60px;">
   </div>
-  <button class="ab-close" onclick="closePlayer()">×</button>
+  <button class="ab-close" onclick="closePlayer()" aria-label="Oynatıcıyı kapat" title="Oynatıcıyı kapat">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+  </button>
   <audio id="player" style="display:none;"></audio>
 </div>
 
@@ -421,6 +517,8 @@ function applyStaffIdentity() {
   document.getElementById('u-ava').textContent = username.charAt(0).toUpperCase();
   document.getElementById('nav-special').style.display = role === 'owner' ? 'flex' : 'none';
   document.getElementById('nav-settings').style.display = role === 'owner' ? 'flex' : 'none';
+  document.getElementById('nav-accounts').style.display = role === 'owner' ? 'flex' : 'none';
+  document.getElementById('reset-all-limits').style.display = role === 'owner' ? '' : 'none';
   document.getElementById('add-account-section').style.display = role === 'owner' ? '' : 'none';
   document.getElementById('profile-username').value = username;
 }
@@ -465,9 +563,30 @@ function markListened(id) { const ids=getListened(); ids.add(id); localStorage.s
 function sortedFor(type) {
   const source=type==='inbox'?inboxData:type==='reviewed'?reviewedData:specialData;
   const dir=document.getElementById('sort-'+type)?.value==='oldest'?1:-1;
-  return [...source].sort((a,b)=>dir*(new Date(a.timestamp||a.publishDate||0)-new Date(b.timestamp||b.publishDate||0)));
+  const selectedDay=document.getElementById('date-'+type)?.value || '';
+  const matchingDay = selectedDay
+    ? source.filter(s=>localDateValue(s.timestamp||s.publishDate)===selectedDay)
+    : [...source];
+  return matchingDay.sort((a,b)=>dir*(new Date(a.timestamp||a.publishDate||0)-new Date(b.timestamp||b.publishDate||0)));
 }
 function setDateSort(type) { renderTable(type+'-list',sortedFor(type),type); }
+function localDateValue(value) {
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return '';
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+function setDateFilter(type, value) {
+  const input=document.getElementById('date-'+type);
+  if(input && typeof value==='string') input.value=value;
+  renderTable(type+'-list',sortedFor(type),type);
+}
+function shiftDateFilter(type, days) {
+  const input=document.getElementById('date-'+type);
+  const [year,month,day]=(input.value||localDateValue(new Date())).split('-').map(Number);
+  const selected=new Date(year,month-1,day,12);
+  selected.setDate(selected.getDate()+days);
+  setDateFilter(type,localDateValue(selected));
+}
 function clearListened(type) {
   const ids=getListened();
   const list=type==='inbox'?inboxData:type==='reviewed'?reviewedData:specialData;
@@ -516,7 +635,7 @@ async function loadData() {
         <tr>
           <td><div class="track-name">${escapeHtml(l.email)}</div><div class="artist-name">${l.type}</div></td>
           <td><div class="date-str">${new Date(l.timestamp).toLocaleString('tr-TR')}</div></td>
-          <td style="text-align:right;"><button class="action-btn danger" onclick="resetUser('${l.ip}','${l.email}')">Sıfırla</button></td>
+          <td style="text-align:right;">${role === 'owner' ? `<button class="action-btn danger" data-reset-ip="${escapeHtml(l.ip)}" data-reset-email="${escapeHtml(l.email)}">Sıfırla</button>` : '—'}</td>
         </tr>
       `).join('');
     }
@@ -526,9 +645,9 @@ async function loadData() {
     if(data.accounts) {
       ab.innerHTML = data.accounts.map(a => `
         <tr>
-          <td><div class="track-name">${a.username}</div></td>
+          <td><div class="track-name">${escapeHtml(a.username)}</div></td>
           <td><div class="artist-name">${a.role==='owner'?'Kurucu':'Yönetici'}</div></td>
-          <td style="text-align:right;">${a.role!=='owner' && role==='owner' ? `<button class="action-btn danger" onclick="delAccount('${a.username}')">Sil</button>` : '-'}</td>
+          <td style="text-align:right;">${a.role!=='owner' && role==='owner' ? `<button class="action-btn danger" data-delete-account="${escapeHtml(a.username)}">Sil</button>` : '-'}</td>
         </tr>
       `).join('');
     }
@@ -540,7 +659,12 @@ function renderTable(id, list, type) {
   const el = document.getElementById(id);
   const listened=getListened();
   const visible=list.filter(s=>!listened.has(s.id));
-  if(!visible.length) { el.innerHTML = `<tr><td colspan="4" class="empty">${list.length?'Dinlenenler temizlendi.':'Veri bulunamadı.'}</td></tr>`; return; }
+  if(!visible.length) {
+    const selectedDay=document.getElementById('date-'+type)?.value;
+    const message=selectedDay?'Bu gün için kayıt bulunamadı.':list.length?'Dinlenenler temizlendi.':'Veri bulunamadı.';
+    el.innerHTML = `<tr><td colspan="4" class="empty">${message}</td></tr>`;
+    return;
+  }
   
   el.innerHTML = visible.map((s, idx) => {
     let actionBtn = '';
@@ -559,6 +683,7 @@ function renderTable(id, list, type) {
         <td>
           <div class="track-name">${escapeHtml(s.trackName)}</div>
           <div class="artist-name">${escapeHtml(s.fullName)} ${s.aiTool && s.aiTool !== 'Bilinmiyor' ? `<span>• ${escapeHtml(s.aiTool)}</span>` : ''}</div>
+          ${s.studioProgram && s.studioProgram !== 'Program kullanmadım' ? `<div class="date-str">Stüdyo: ${escapeHtml(s.studioProgram)}</div>` : ''}
           ${noteHtml}
         </td>
         <td>
@@ -582,6 +707,12 @@ async function addAccount() {
   if(u&&p) { await req('/api/staff/add-account','POST',{username:u, password:p}); document.getElementById('new-user').value=''; document.getElementById('new-pass').value=''; loadData(); }
 }
 async function delAccount(u) { if(confirm('Silinsin mi?')) { await req('/api/staff/remove-account','POST',{username:u}); loadData(); } }
+document.addEventListener('click', event => {
+  const reset = event.target.closest('[data-reset-ip]');
+  if (reset) return resetUser(reset.dataset.resetIp, reset.dataset.resetEmail);
+  const remove = event.target.closest('[data-delete-account]');
+  if (remove) return delAccount(remove.dataset.deleteAccount);
+});
 async function saveSpecialCfg() {
   const active = document.getElementById('cfg-active').value==='true';
   const title = document.getElementById('cfg-title').value;
@@ -611,7 +742,8 @@ async function changePassword() {
   const currentPassword=document.getElementById('password-current').value;
   const newPassword=document.getElementById('password-new').value;
   if(newPassword!==document.getElementById('password-confirm').value) return alert('Yeni şifreler eşleşmiyor.');
-  try { await req('/api/staff/change-password','POST',{currentPassword,newPassword});
+  try { const r=await req('/api/staff/change-password','POST',{currentPassword,newPassword});
+    token=r.token; localStorage.setItem('staff_token',token);
     ['password-current','password-new','password-confirm'].forEach(id=>document.getElementById(id).value=''); alert('Şifren güncellendi.');
   } catch(e){alert(e.message)}
 }
@@ -647,15 +779,32 @@ function playTrack(type, idx) {
       player.src = URL.createObjectURL(blob);
       document.getElementById('audio-bar').classList.add('visible');
       return player.play();
-    }).then(()=>document.getElementById('ab-play').textContent='⏸').catch(e=>alert(e.message));
+    }).catch(e=>alert(e.message));
 }
-function togglePlay() { if(player.paused){player.play();document.getElementById('ab-play').textContent='⏸';}else{player.pause();document.getElementById('ab-play').textContent='▶';} }
+function setPlayerPlayState(playing) {
+  const button = document.getElementById('ab-play');
+  button.setAttribute('aria-label', playing ? 'Duraklat' : 'Oynat');
+  button.innerHTML = playing
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12l9-6z" fill="currentColor" stroke="none"/></svg>';
+}
+function setPlayerMuteState(muted) {
+  const button = document.getElementById('ab-mute');
+  button.setAttribute('aria-label', muted ? 'Sesi aç' : 'Sesi kapat');
+  button.setAttribute('title', muted ? 'Sesi aç' : 'Sesi kapat');
+  button.innerHTML = muted
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="m17 9 5 6m0-6-5 6"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="M16 9.5a4 4 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10"/></svg>';
+}
+function togglePlay() { if(player.paused){player.play().catch(e=>alert(e.message));}else{player.pause();} }
 function closePlayer() { player.pause(); document.getElementById('audio-bar').classList.remove('visible'); }
 function seekBy(s) { player.currentTime += s; }
 function seekTo(v) { if(player.duration) player.currentTime = (v/100)*player.duration; }
-function toggleMute() { player.muted = !player.muted; document.getElementById('ab-mute').textContent = player.muted ? '🔇' : '🔊'; }
-function changeVol(v) { player.volume = v/100; if(v==0){player.muted=true;document.getElementById('ab-mute').textContent='🔇';}else{player.muted=false;document.getElementById('ab-mute').textContent='🔊';} }
+function toggleMute() { player.muted = !player.muted; setPlayerMuteState(player.muted); }
+function changeVol(v) { player.volume = v/100; player.muted = Number(v) === 0; setPlayerMuteState(player.muted); }
 
+player.addEventListener('play',()=>setPlayerPlayState(true));
+player.addEventListener('pause',()=>setPlayerPlayState(false));
 player.addEventListener('timeupdate', () => {
   if(!player.duration) return;
   const pct = (player.currentTime / player.duration) * 100;
@@ -664,7 +813,6 @@ player.addEventListener('timeupdate', () => {
   document.getElementById('ab-dur').textContent = fmtTime(player.duration);
 });
 player.addEventListener('ended',()=>{
-  document.getElementById('ab-play').textContent='▶';
   if(currentList[currentIndex]) markListened(currentList[currentIndex].id);
 });
 

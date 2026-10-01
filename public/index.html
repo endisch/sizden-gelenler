@@ -148,6 +148,7 @@ img { max-width: 100%; display: block; }
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field.full { grid-column: 1 / -1; }
 .field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.field-hint { color: var(--text-muted); font-size: 11px; line-height: 1.45; }
 .field input, .field select, .field textarea {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
   padding: 14px 16px; color: #fff; font-family: inherit; font-size: 14px; transition: all 0.2s; outline: none;
@@ -335,13 +336,48 @@ img { max-width: 100%; display: block; }
             <input type="text" id="social" placeholder="@kullaniciadi">
           </div>
           <div class="field">
-            <label>Hangi Yapay Zeka Aracını Kullandın? *</label>
+            <label for="aiTool">Hangi yapay zeka aracıyla ürettin? *</label>
             <select id="aiTool">
-              <option value="">Araç Seçiniz...</option>
-              <option>Suno</option><option>Udio</option><option>AIVA</option>
-              <option>Boomy</option><option>Mureka</option><option>Stable Audio</option>
-              <option>Diğer</option>
+              <option value="">Üretim aracını seç...</option>
+              <optgroup label="Vokalli şarkı ve tam parça üretimi">
+                <option>Suno</option>
+                <option>Udio</option>
+                <option>Mureka</option>
+                <option>Boomy</option>
+              </optgroup>
+              <optgroup label="Beste, altyapı ve enstrümantal üretim">
+                <option>AIVA</option>
+                <option>Stable Audio</option>
+              </optgroup>
+              <option>Diğer yapay zeka aracı</option>
             </select>
+            <small class="field-hint">Parçanın ana üretiminde kullandığın aracı seç.</small>
+          </div>
+          <div class="field">
+            <label for="studioProgram">Hangi stüdyo programında düzenledin?</label>
+            <select id="studioProgram">
+              <option value="">İsteğe bağlı — program seç...</option>
+              <optgroup label="Müzik prodüksiyonu (DAW)">
+                <option>FL Studio</option>
+                <option>Ableton Live</option>
+                <option>Logic Pro</option>
+                <option>Steinberg Cubase</option>
+                <option>PreSonus Studio One</option>
+                <option>Avid Pro Tools</option>
+                <option>REAPER</option>
+                <option>GarageBand</option>
+                <option>Bitwig Studio</option>
+                <option>Reason</option>
+              </optgroup>
+              <optgroup label="Ses düzenleme ve mastering">
+                <option>Adobe Audition</option>
+                <option>Audacity</option>
+                <option>iZotope RX</option>
+              </optgroup>
+              <option>Diğer stüdyo programı</option>
+              <option>Program kullanmadım</option>
+            </select>
+            <small class="field-hint">Kullandıysan ana düzenleme veya miks programını belirt.</small>
           </div>
           <div class="field">
             <label>Parçanın Adı Ne? *</label>
@@ -485,6 +521,8 @@ function resetFlow() {
   document.getElementById('trackName').value = '';
   document.getElementById('note').value = '';
   document.getElementById('social').value = '';
+  document.getElementById('aiTool').value = '';
+  document.getElementById('studioProgram').value = '';
   document.getElementById('chk').checked = false;
   document.getElementById('kvkk').checked = false;
   document.getElementById('dz-content').style.display = 'block';
@@ -598,6 +636,7 @@ async function submitForm() {
   const fullName = document.getElementById('fullName').value.trim();
   const social = document.getElementById('social').value.trim();
   const aiTool = document.getElementById('aiTool').value;
+  const studioProgram = document.getElementById('studioProgram').value;
   const trackName = document.getElementById('trackName').value.trim();
   const note = document.getElementById('note').value.trim();
   const mp3 = document.getElementById('mp3file').files[0];
@@ -617,7 +656,7 @@ async function submitForm() {
   
   const fd = new FormData();
   fd.append('token', googleToken);
-  fd.append('fullName', fullName); fd.append('social', social); fd.append('aiTool', aiTool);
+  fd.append('fullName', fullName); fd.append('social', social); fd.append('aiTool', aiTool); fd.append('studioProgram', studioProgram);
   fd.append('trackName', trackName); fd.append('note', note); fd.append('consent', 'true');
   fd.append('mp3', mp3);
   
