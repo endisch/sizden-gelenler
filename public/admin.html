@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yönetim Paneli · Mustafa İnce</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>MAİS · Yönetim Paneli</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #050505; --panel: #111111; --surface: #1a1a1a; --border: rgba(255,255,255,0.08);
   --gold: #c8a84b; --gold-dim: rgba(200,168,75,0.15); --text: #f0f0f0; --dim: #888;
-  --ok: #4ade80; --err: #ef4444; --font: 'Montserrat', sans-serif; --mono: 'JetBrains Mono', monospace;
+  --ok: #4ade80; --err: #ef4444; --font: 'DM Sans', sans-serif; --mono: 'JetBrains Mono', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: var(--font); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
@@ -88,6 +88,39 @@ tr:hover { background: rgba(255,255,255,0.02); }
 .ab-time { font-family: var(--mono); font-size: 11px; color: var(--dim); width: 40px; }
 .ab-slider { flex: 1; accent-color: var(--gold); height: 4px; cursor: pointer; }
 .ab-close { color: var(--dim); font-size: 24px; margin-left: 16px; }
+.top-bar { align-items:center; }
+.page-title { font-family:'Manrope',var(--font); letter-spacing:-.04em; font-size:clamp(24px,3vw,32px); }
+.sidebar { box-shadow:14px 0 40px rgba(0,0,0,.18); }
+.nav-item { border:1px solid transparent; }
+.nav-item.active { border-color:rgba(200,168,75,.14); box-shadow:inset 0 0 24px rgba(200,168,75,.04); }
+.card { box-shadow:0 18px 50px rgba(0,0,0,.2); }
+th { background:rgba(255,255,255,.018); }
+tbody tr { transition:background .18s, transform .18s; }
+tbody tr:hover { background:rgba(200,168,75,.035); }
+.top-actions { display:flex; align-items:center; gap:10px; }
+.back-link,.toolbar-btn { border:1px solid var(--border); color:#d7d2c6; background:#111; border-radius:10px; padding:10px 14px; font-weight:700; transition:.2s; }
+.back-link:hover,.toolbar-btn:hover { border-color:rgba(200,168,75,.55); color:var(--gold); background:#181612; }
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border); }
+.toolbar label { color:var(--dim); font-size:12px; font-weight:700; }
+.toolbar select { margin-left:8px; background:#171717; color:#eee; border:1px solid var(--border); border-radius:8px; padding:9px 12px; }
+.table-wrap { overflow-x:auto; }
+.row-actions { display:flex; justify-content:flex-end; gap:8px; align-items:center; }
+.listened-btn { padding:8px 12px; border:1px solid rgba(74,222,128,.2); border-radius:8px; color:#82d99b; background:rgba(74,222,128,.07); font-weight:700; }
+.listened-btn:hover { background:rgba(74,222,128,.15); }
+.audio-bar { width:min(1000px,calc(100% - 40px)); bottom:22px; padding:15px 18px; gap:18px; border-color:rgba(200,168,75,.24); background:rgba(15,15,15,.94); box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 50px rgba(200,168,75,.06); }
+.ab-art { width:54px;height:54px;flex:none;border-radius:12px;display:grid;place-items:center;color:var(--gold);font-size:21px;background:radial-gradient(circle at 50% 120%,rgba(200,168,75,.24),transparent 65%),#1b1914;border:1px solid rgba(200,168,75,.26); }
+.ab-info { min-width:120px; }
+.ab-title { font-family:'Manrope',var(--font); letter-spacing:-.02em; }
+.ab-controls { gap:12px; }
+.ab-play-big { box-shadow:0 5px 20px rgba(200,168,75,.24); transition:transform .18s; }
+.ab-play-big:hover { transform:scale(1.06); }
+.ab-slider { accent-color:var(--gold); }
+.ab-slider::-webkit-slider-thumb { box-shadow:0 0 10px rgba(200,168,75,.6); }
+.ab-close:hover { color:var(--err); }
+.back-nav { display:flex; align-items:center; gap:12px; }
+.clean-note { color:var(--dim); font-size:12px; line-height:1.5; }
+@media(max-width:900px){ body{height:auto;min-height:100vh;overflow:auto;display:block}.sidebar{width:100%;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.logo{grid-column:1/-1;margin:0 0 8px}.user-card{grid-column:1/-1;margin-top:8px}.main{padding:22px 14px 130px;overflow:visible}.top-bar{align-items:flex-start;flex-direction:column;gap:18px}.stats{width:100%;gap:8px}.stat-box{min-width:0;flex:1;padding:12px}.stat-val{font-size:22px}.audio-bar{width:calc(100% - 20px);bottom:10px;padding:12px;gap:10px;flex-wrap:wrap}.ab-art{width:44px;height:44px}.ab-info{flex:1}.ab-controls{order:3}.ab-timeline{flex:1 1 55%;order:4}.audio-bar>div:nth-of-type(4){display:none!important}.ab-close{margin-left:0}.toolbar{align-items:flex-start;flex-direction:column}.toolbar select{margin:8px 0 0;display:block}}
+.is-hidden { display:none!important; }
 </style>
 </head>
 <body>
@@ -98,6 +131,7 @@ tr:hover { background: rgba(255,255,255,0.02); }
   <button class="nav-item" onclick="switchTab('reviewed', this)">✅ İncelenenler</button>
   <button class="nav-item" onclick="switchTab('limits', this)">⏳ Bekleme Süreleri</button>
   <button class="nav-item" onclick="switchTab('accounts', this)">👥 Hesaplar</button>
+  <button class="nav-item" onclick="switchTab('profile', this)">🪪 Hesabım</button>
   <button class="nav-item" id="nav-special" onclick="switchTab('special', this)" style="display:none;">⭐ Özel Gelenler</button>
   <button class="nav-item" id="nav-settings" onclick="switchTab('settings', this)" style="display:none;">⚙️ Sistem Ayarları</button>
   
@@ -112,11 +146,12 @@ tr:hover { background: rgba(255,255,255,0.02); }
 </aside>
 
 <main class="main">
-  <div class="top-bar">
-    <div>
-      <h1 class="page-title" id="page-title">Gelen Kutusu</h1>
+    <div class="top-bar">
+      <div>
+      <div class="back-nav"><button class="back-link" onclick="goBack()" aria-label="Geri dön">← Geri</button><h1 class="page-title" id="page-title">Gelen Kutusu</h1></div>
       <p style="color:var(--dim); margin-top:4px;">Sezon 2 • Sizden Gelenler</p>
-    </div>
+      </div>
+      <div class="top-actions"><a class="back-link" href="/">Ana sayfa ↗</a></div>
     <div class="stats">
       <div class="stat-box"><div class="stat-val" id="stat-pending">-</div><div class="stat-lbl">Bekleyen</div></div>
       <div class="stat-box"><div class="stat-val" id="stat-reviewed">-</div><div class="stat-lbl">İncelendi</div></div>
@@ -127,20 +162,26 @@ tr:hover { background: rgba(255,255,255,0.02); }
   <!-- INBOX -->
   <div class="tab-content active" id="tab-inbox">
     <div class="card">
+      <div class="toolbar"><label>Tarih sıralaması<select id="sort-inbox" onchange="setDateSort('inbox',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('inbox')">Dinlenenleri listeden temizle</button></div>
+      <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
         <tbody id="inbox-list"><tr><td colspan="4" class="empty">Yükleniyor...</td></tr></tbody>
       </table>
+      </div>
     </div>
   </div>
 
   <!-- REVIEWED -->
   <div class="tab-content" id="tab-reviewed">
     <div class="card">
+      <div class="toolbar"><label>Tarih sıralaması<select id="sort-reviewed" onchange="setDateSort('reviewed',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('reviewed')">Dinlenenleri listeden temizle</button></div>
+      <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
         <tbody id="reviewed-list"></tbody>
       </table>
+      </div>
     </div>
   </div>
 
@@ -180,10 +221,28 @@ tr:hover { background: rgba(255,255,255,0.02); }
   <!-- SPECIAL -->
   <div class="tab-content" id="tab-special">
     <div class="card">
+      <div class="toolbar"><label>Tarih sıralaması<select id="sort-special" onchange="setDateSort('special',this.value)"><option value="newest">En yeni önce</option><option value="oldest">En eski önce</option></select></label><button class="toolbar-btn" onclick="clearListened('special')">Dinlenenleri listeden temizle</button></div>
+      <div class="table-wrap">
       <table>
         <thead><tr><th style="width:60px;">Oynat</th><th>Parça Bilgisi</th><th>İletişim / Tarih</th><th style="text-align:right;">İşlem</th></tr></thead>
         <tbody id="special-list"></tbody>
       </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-profile">
+    <div class="card" style="padding:28px;max-width:760px">
+      <h3 style="color:#fff;margin-bottom:8px">Hesap bilgileri</h3><p class="clean-note" style="margin-bottom:24px">Kullanıcı adını ve parolanı güvenli biçimde güncelle.</p>
+      <div class="form-group"><label>Yeni kullanıcı adı</label><input type="text" id="profile-username" autocomplete="username" minlength="3" maxlength="32"></div>
+      <div class="form-group"><label>Mevcut şifreyi doğrula</label><input type="password" id="profile-current-username" autocomplete="current-password"></div>
+      <button class="btn-save" onclick="updateUsername()">Kullanıcı adını güncelle</button>
+      <hr style="border:0;border-top:1px solid var(--border);margin:28px 0">
+      <h3 style="color:#fff;margin-bottom:18px">Şifre değiştir</h3>
+      <div class="form-group"><label>Mevcut şifre</label><input type="password" id="password-current" autocomplete="current-password"></div>
+      <div class="form-group"><label>Yeni şifre (en az 14 karakter)</label><input type="password" id="password-new" minlength="14" autocomplete="new-password"></div>
+      <div class="form-group"><label>Yeni şifreyi tekrar yaz</label><input type="password" id="password-confirm" minlength="14" autocomplete="new-password"></div>
+      <button class="btn-save" onclick="changePassword()">Şifreyi güncelle</button>
     </div>
   </div>
 
@@ -213,6 +272,11 @@ tr:hover { background: rgba(255,255,255,0.02); }
       <h3 style="color:#fff; margin-bottom:16px;">Google Drive Senkronizasyonu</h3>
       <p style="color:var(--dim); margin-bottom:24px; line-height:1.6;">Daha önce Drive klasörüne yüklenmiş ancak panelde görünmeyen eski parçaları sisteme çeker. Kotadan düşülür.</p>
       <button class="btn-save" style="background:var(--surface); color:#fff; border:1px solid var(--border);" onclick="syncDrive()">🔄 Eksik Parçaları Senkronize Et</button>
+      <div style="border-top:1px solid var(--border);margin-top:26px;padding-top:24px;">
+        <h3 style="color:#fff;margin-bottom:8px;">Drive dışındaki eski kayıtlar</h3>
+        <p class="clean-note" style="margin-bottom:18px;">Mevcut klasörde bulunmayan parçaların kayıtlarını panelden ve oynatma listesinden kaldırır. Google Drive dosyaları silinmez.</p>
+        <button class="action-btn danger" style="padding:12px 18px;" onclick="cleanMissingDriveRecords(this)">Drive ile karşılaştır ve eski kayıtları temizle</button>
+      </div>
     </div>
   </div>
 
@@ -220,6 +284,7 @@ tr:hover { background: rgba(255,255,255,0.02); }
 
 <!-- AUDIO PLAYER -->
 <div class="audio-bar" id="audio-bar">
+  <div class="ab-art" aria-hidden="true">♫</div>
   <div class="ab-info">
     <div class="ab-title" id="ab-title">Parça Adı</div>
     <div class="ab-artist" id="ab-artist">Sanatçı</div>
@@ -259,6 +324,7 @@ if(role === 'owner') {
 } else {
   document.getElementById('add-account-section').style.display = 'none';
 }
+document.getElementById('profile-username').value = username;
 
 function escapeHtml(str) { return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
@@ -267,16 +333,24 @@ async function req(path, method='GET', body=null) {
   if(body) { opt.headers['Content-Type']='application/json'; opt.body = JSON.stringify(body); }
   const res = await fetch(path, opt);
   if(res.status===401||res.status===403) { logout(); throw new Error('Auth'); }
-  return res.json();
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || 'İşlem tamamlanamadı.');
+  return data;
 }
 
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  btn.classList.add('active');
-  const titles = {inbox:'Gelen Kutusu', reviewed:'İncelenenler', limits:'Bekleme Süreleri', accounts:'Hesaplar', special:'Özel Gelenler', settings:'Sistem Ayarları'};
+  if(btn) btn.classList.add('active');
+  else document.querySelector(`.nav-item[onclick*="'${tab}'"]`)?.classList.add('active');
+  const titles = {inbox:'Gelen Kutusu', reviewed:'İncelenenler', limits:'Bekleme Süreleri', accounts:'Hesaplar', profile:'Hesabım', special:'Özel Gelenler', settings:'Sistem Ayarları'};
   document.getElementById('page-title').textContent = titles[tab];
+}
+
+function goBack() {
+  if (history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) history.back();
+  else switchTab('inbox');
 }
 
 function logout() {
@@ -285,6 +359,23 @@ function logout() {
 }
 
 let inboxData = [], reviewedData = [], specialData = [];
+const listenedKey = 'mais_listened_' + username;
+function getListened() { try { return new Set(JSON.parse(localStorage.getItem(listenedKey) || '[]')); } catch { return new Set(); } }
+function markListened(id) { const ids=getListened(); ids.add(id); localStorage.setItem(listenedKey,JSON.stringify([...ids])); }
+function sortedFor(type) {
+  const source=type==='inbox'?inboxData:type==='reviewed'?reviewedData:specialData;
+  const dir=document.getElementById('sort-'+type)?.value==='oldest'?1:-1;
+  return [...source].sort((a,b)=>dir*(new Date(a.timestamp||a.publishDate||0)-new Date(b.timestamp||b.publishDate||0)));
+}
+function setDateSort(type) { renderTable(type+'-list',sortedFor(type),type); }
+function clearListened(type) {
+  const ids=getListened();
+  const list=type==='inbox'?inboxData:type==='reviewed'?reviewedData:specialData;
+  const count=list.filter(s=>ids.has(s.id)).length;
+  if(!count) return alert('Temizlenecek dinlenmiş parça yok.');
+  localStorage.setItem(listenedKey,JSON.stringify([...ids].filter(id=>!list.some(s=>s.id===id))));
+  renderTable(type+'-list',sortedFor(type),type);
+}
 
 async function loadData() {
   try {
@@ -300,16 +391,16 @@ async function loadData() {
 
     // Inbox
     inboxData = data.submissions.filter(s=>s.status==='pending');
-    renderTable('inbox-list', inboxData, 'inbox');
+    renderTable('inbox-list', sortedFor('inbox'), 'inbox');
     
     // Reviewed
-    reviewedData = data.submissions.filter(s=>s.status==='reviewed').reverse().slice(0,30); // son 30
-    renderTable('reviewed-list', reviewedData, 'reviewed');
+    reviewedData = data.submissions.filter(s=>s.status==='reviewed');
+    renderTable('reviewed-list', sortedFor('reviewed'), 'reviewed');
 
     // Special
     if(role==='owner' && data.specialSubmissions) {
       specialData = data.specialSubmissions;
-      renderTable('special-list', specialData, 'special');
+      renderTable('special-list', sortedFor('special'), 'special');
       if(data.specialConfig) {
         document.getElementById('cfg-active').value = data.specialConfig.active ? 'true' : 'false';
         document.getElementById('cfg-title').value = data.specialConfig.title || '';
@@ -347,9 +438,11 @@ async function loadData() {
 
 function renderTable(id, list, type) {
   const el = document.getElementById(id);
-  if(!list.length) { el.innerHTML = `<tr><td colspan="4" class="empty">Veri bulunamadı.</td></tr>`; return; }
+  const listened=getListened();
+  const visible=list.filter(s=>!listened.has(s.id));
+  if(!visible.length) { el.innerHTML = `<tr><td colspan="4" class="empty">${list.length?'Dinlenenler temizlendi.':'Veri bulunamadı.'}</td></tr>`; return; }
   
-  el.innerHTML = list.map((s, idx) => {
+  el.innerHTML = visible.map((s, idx) => {
     let actionBtn = '';
     if(type==='inbox') actionBtn = `<button class="action-btn ok" onclick="updStatus('${s.id}','reviewed')">Onayla</button>`;
     if(type==='reviewed') actionBtn = `<button class="action-btn danger" onclick="unreview('${s.id}')">Geri Al</button>`;
@@ -372,7 +465,7 @@ function renderTable(id, list, type) {
           <div class="artist-name" style="color:#fff;">${escapeHtml(s.email)}</div>
           <div class="date-str">${new Date(s.timestamp).toLocaleDateString('tr-TR')}</div>
         </td>
-        <td style="text-align:right;">${actionBtn}</td>
+        <td><div class="row-actions">${actionBtn}<button class="listened-btn" onclick="markListened('${s.id}');renderTable('${id}',sortedFor('${type}'),'${type}')">Dinlendi ✓</button></div></td>
       </tr>
     `;
   }).join('');
@@ -397,24 +490,50 @@ async function saveSpecialCfg() {
 }
 async function resetSpecialQuota() { if(confirm('Sıfırlansın mı?')) { await req('/api/admin/save-special-config','POST',{resetQuota:true}); alert('Sıfırlandı'); loadData(); } }
 async function syncDrive() { if(confirm('Senkronize edilsin mi?')) { const r = await req('/api/admin/sync-drive','POST'); alert(r.count+' eklendi'); loadData(); } }
+async function cleanMissingDriveRecords(button) {
+  if(!confirm('Google Drive klasörü doğrulanır. Klasörde bulunmayan parçaların panel kayıtları ve playlist girdileri kaldırılır; Drive dosyalarının kendisi değişmez. Devam edilsin mi?')) return;
+  button.disabled=true; button.textContent='Drive kontrol ediliyor…';
+  try { const r=await req('/api/admin/clean-missing-drive-records','POST');
+    const names=(r.removedTracks||[]).slice(0,8).map(s=>`${s.title} — ${s.artist}`).join('\n');
+    alert(`${r.removed} eski kayıt temizlendi. Drive dosyası silinmedi.${names?'\n\n'+names:''}`); await loadData(); }
+  catch(e){alert(e.message)} finally {button.disabled=false;button.textContent='Drive ile karşılaştır ve eski kayıtları temizle';}
+}
+async function updateUsername() {
+  const newUsername=document.getElementById('profile-username').value.trim();
+  const currentPassword=document.getElementById('profile-current-username').value;
+  try { const r=await req('/api/staff/update-username','POST',{newUsername,currentPassword});
+    username=r.username; token=r.token; localStorage.setItem('staff_username',username); localStorage.setItem('staff_token',token);
+    document.getElementById('u-name').textContent=username; document.getElementById('u-ava').textContent=username.charAt(0).toUpperCase();
+    document.getElementById('profile-username').value=username; document.getElementById('profile-current-username').value=''; alert('Kullanıcı adı güncellendi.');
+  } catch(e){alert(e.message)}
+}
+async function changePassword() {
+  const currentPassword=document.getElementById('password-current').value;
+  const newPassword=document.getElementById('password-new').value;
+  if(newPassword!==document.getElementById('password-confirm').value) return alert('Yeni şifreler eşleşmiyor.');
+  try { await req('/api/staff/change-password','POST',{currentPassword,newPassword});
+    ['password-current','password-new','password-confirm'].forEach(id=>document.getElementById(id).value=''); alert('Şifren güncellendi.');
+  } catch(e){alert(e.message)}
+}
 
 // Audio Player
 const player = document.getElementById('player');
 let currentList = [], currentIndex = -1;
 
 function playTrack(type, idx) {
-  const list = type==='inbox'?inboxData : type==='reviewed'?reviewedData : specialData;
+  const list = sortedFor(type).filter(s=>!getListened().has(s.id));
   const track = list[idx];
+  if(!track) return;
+  currentList=list; currentIndex=idx;
   document.getElementById('ab-title').textContent = track.trackName;
   document.getElementById('ab-artist').textContent = track.fullName;
   
-  fetch('/api/stream-audio?fileId='+track.fileId, {headers:{'Authorization':'Bearer '+token}})
-    .then(r=>r.blob()).then(blob=>{
+  fetch('/api/stream-audio?fileId='+encodeURIComponent(track.fileId), {headers:{'Authorization':'Bearer '+token}})
+    .then(r=>{if(!r.ok)throw new Error('Parça açılamadı; Drive bağlantısını kontrol et.');return r.blob()}).then(blob=>{
       player.src = URL.createObjectURL(blob);
-      player.play();
-      document.getElementById('ab-play').textContent = '⏸';
       document.getElementById('audio-bar').classList.add('visible');
-    });
+      return player.play();
+    }).then(()=>document.getElementById('ab-play').textContent='⏸').catch(e=>alert(e.message));
 }
 function togglePlay() { if(player.paused){player.play();document.getElementById('ab-play').textContent='⏸';}else{player.pause();document.getElementById('ab-play').textContent='▶';} }
 function closePlayer() { player.pause(); document.getElementById('audio-bar').classList.remove('visible'); }
@@ -429,6 +548,10 @@ player.addEventListener('timeupdate', () => {
   document.getElementById('ab-seek').value = pct;
   document.getElementById('ab-cur').textContent = fmtTime(player.currentTime);
   document.getElementById('ab-dur').textContent = fmtTime(player.duration);
+});
+player.addEventListener('ended',()=>{
+  document.getElementById('ab-play').textContent='▶';
+  if(currentList[currentIndex]) markListened(currentList[currentIndex].id);
 });
 
 function fmtTime(s) {

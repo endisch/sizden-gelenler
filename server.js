@@ -792,6 +792,28 @@ app.get('/api/staff/verify', verifyStaffToken, (req, res) => {
   res.json({ valid: true, username: req.staffUser.username, role: req.staffUser.role });
 });
 
+// Allow each signed-in staff member to update their own login name. The current
+// password is required, and a fresh token is returned with the new username.
+app.post('/api/staff/update-username', verifyStaffToken, async (req, res) => {
+  const currentPassword = String(req.body.currentPassword || '');
+  const newUsername = String(req.body.newUsername || '').trim().toLowerCase();
+  if (!currentPassword || !/^[a-z0-9._-]{3,32}$/.test(newUsername)) {
+    return res.status(400).json({ error: 'Kullanıcı adı 3–32 karakter olmalı; harf, sayı, nokta, tire ve alt çizgi kullanılabilir.' });
+  }
+  const user = staffCredentials.find(u => u.username === req.staffUser.username);
+  if (!user) return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
+  if (!(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    return res.status(401).json({ error: 'Mevcut şifre hatalı.' });
+  }
+  if (staffCredentials.some(u => u.username === newUsername && u !== user)) {
+    return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor.' });
+  }
+  user.username = newUsername;
+  saveCredentials();
+  const token = jwt.sign({ username: user.username, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  res.json({ success: true, username: user.username, role: user.role, token });
+});
+
 // Add account (owner only)
 app.post('/api/staff/add-account', verifyStaffToken, requireOwner, async (req, res) => {
   const { username, password } = req.body;
@@ -954,6 +976,47 @@ app.post('/api/admin/sync-drive', verifyStaffToken, async (req, res) => {
   } catch (err) {
     console.error('Drive sync error:', err);
     res.status(500).json({ error: 'Drive eşitleme hatası.' });
+  }
+});
+
+// Remove only stale app records whose Drive file IDs are absent from the
+// configured folder. This never deletes or modifies files in Google Drive.
+app.post('/api/admin/clean-missing-drive-records', verifyStaffToken, requireOwner, async (req, res) => {
+  try {
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    if (!folderId) return res.status(400).json({ error: 'Google Drive klasörü yapılandırılmamış.' });
+    const drive = getDriveClient();
+    const driveIds = new Set();
+    let pageToken;
+    do {
+      const response = await drive.files.list({
+        q: `'${folderId.replace(/'/g, "\\'")}' in parents and trashed = false`,
+        fields: 'nextPageToken, files(id, mimeType)',
+        pageToken,
+        pageSize: 1000
+      });
+      for (const file of response.data.files || []) {
+        if (file.mimeType !== 'application/vnd.google-apps.folder') driveIds.add(file.id);
+      }
+      pageToken = response.data.nextPageToken;
+    } while (pageToken);
+
+    const beforeRegular = submissionsData.length;
+    const beforeSpecial = specialSubmissionsData.length;
+    const removedTracks = [
+      ...submissionsData.filter(s => !s.fileId || !driveIds.has(s.fileId)),
+      ...specialSubmissionsData.filter(s => !s.fileId || !driveIds.has(s.fileId))
+    ].map(s => ({ title: s.trackName || 'İsimsiz parça', artist: s.fullName || 'Bilinmiyor' }));
+    submissionsData = submissionsData.filter(s => s.fileId && driveIds.has(s.fileId));
+    specialSubmissionsData = specialSubmissionsData.filter(s => s.fileId && driveIds.has(s.fileId));
+    const removedRegular = beforeRegular - submissionsData.length;
+    const removedSpecial = beforeSpecial - specialSubmissionsData.length;
+    if (removedRegular) saveSubmissionsData();
+    if (removedSpecial) saveSpecialSubmissionsData();
+    res.json({ success: true, removed: removedRegular + removedSpecial, removedRegular, removedSpecial, driveFiles: driveIds.size, removedTracks });
+  } catch (err) {
+    console.error('Drive cleanup failed:', err);
+    res.status(502).json({ error: 'Drive doğrulanamadı; hiçbir kayıt silinmedi. Bağlantı ve yetkileri kontrol edin.' });
   }
 });
 
