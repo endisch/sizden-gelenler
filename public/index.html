@@ -3,245 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sizden Gelenler · Mustafa İnce</title>
-<meta name="description" content="Yapay zeka ile ürettiğin parçanı gönder, Mustafa İnce dinlesin.">
-<meta name="theme-color" content="#000000">
+<title>Sizden Gelenler | Thendisch Studio</title>
+<meta name="description" content="Mustafa İnce YouTube kanalının haftalık Sizden Gelenler programına parçanla katıl.">
+<meta name="theme-color" content="#090b0e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<style>
-:root {
-  --bg-dark: #050505;
-  --bg-panel: #0a0a0a;
-  --surface: #121212;
-  --surface-hover: #1a1a1a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(200, 168, 75, 0.5);
-  --gold: #c8a84b;
-  --gold-glow: rgba(200, 168, 75, 0.15);
-  --text-main: #f0f0f0;
-  --text-muted: #888888;
-  --text-dim: #555555;
-  --error: #e06c6c;
-  --success: #6ce08b;
-  --font-sans: 'Montserrat', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius-lg: 24px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; width: 100%; background: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); font-size: 15px; -webkit-font-smoothing: antialiased; overflow: hidden; }
-a { color: var(--gold); text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-img { max-width: 100%; display: block; }
-::selection { background: var(--gold); color: #000; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-
-/* ── LAYOUT ── */
-.app-container { display: flex; height: 100vh; width: 100vw; }
-
-/* ── LEFT PANE (VISUAL) ── */
-.left-pane {
-  flex: 1; position: relative; overflow: hidden;
-  background: #000 url('assets/season-plate-v2.jpg') center/cover no-repeat;
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 40px; border-right: 1px solid var(--border);
-}
-.left-pane::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(5,5,5,0.7) 0%, rgba(5,5,5,0.95) 100%);
-  backdrop-filter: blur(8px);
-}
-.left-content { position: relative; z-index: 10; display: flex; flex-direction: column; height: 100%; }
-.brand-header { display: flex; align-items: center; justify-content: space-between; }
-.logo { display: flex; align-items: center; gap: 12px; }
-/* Logodaki beyaz arka plan kaldırıldı, doğrudan şeffaf PNG kullanılıyor */
-.logo img { height: 48px; filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
-.season-tag {
-  background: var(--gold-glow); border: 1px solid var(--border-focus);
-  color: var(--gold); padding: 6px 14px; border-radius: 99px;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-}
-
-.hero-text { margin: auto 0; }
-.hero-text h1 { font-size: clamp(48px, 6vw, 84px); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px; color: #fff; }
-.hero-text h1 span { color: var(--gold); }
-.hero-text p { font-size: 16px; line-height: 1.8; color: var(--text-muted); max-width: 480px; }
-
-.host-profile { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); }
-.host-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-focus); }
-.host-info h4 { font-size: 15px; font-weight: 700; color: #fff; }
-.host-info p { font-size: 13px; color: var(--text-muted); }
-
-/* ── RIGHT PANE (INTERACTIVE) ── */
-.right-pane {
-  width: 100%; max-width: 680px; background: var(--bg-panel);
-  display: flex; flex-direction: column; position: relative;
-}
-.pane-header {
-  padding: 24px 40px; border-bottom: 1px solid var(--border);
-  display: flex; justify-content: flex-end; align-items: center;
-  background: rgba(10,10,10,0.8); backdrop-filter: blur(20px);
-  position: sticky; top: 0; z-index: 20;
-}
-.staff-trigger {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 600; color: var(--text-muted);
-  padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);
-  transition: all 0.2s;
-}
-.staff-trigger:hover { color: #fff; border-color: var(--gold); background: var(--gold-glow); }
-.staff-trigger svg { width: 14px; height: 14px; }
-
-.scroll-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
-
-/* Warning for local file */
-#local-warning {
-  background: rgba(224, 108, 108, 0.1); border: 1px solid rgba(224, 108, 108, 0.3);
-  color: var(--error); padding: 16px; border-radius: var(--radius-md);
-  font-size: 13px; margin-bottom: 32px; display: none; line-height: 1.6;
-}
-
-/* Steps Progress */
-.step-tracker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; position: relative; }
-.step-tracker::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); z-index: 0; }
-.st-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--bg-panel); padding: 0 10px; }
-.st-circle {
-  width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border);
-  display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--text-dim); transition: all 0.3s;
-}
-.st-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); transition: color 0.3s; }
-.st-item.active .st-circle { background: var(--gold); border-color: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
-.st-item.active .st-label { color: #fff; }
-.st-item.done .st-circle { background: var(--surface-hover); border-color: var(--gold); color: var(--gold); }
-.st-item.done .st-label { color: var(--gold); }
-
-/* Step Panels */
-.panel { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.panel.active { display: block; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.panel-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.panel-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 32px; }
-
-/* Auth Area */
-.auth-box {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px;
-}
-.auth-box p { font-size: 13px; color: var(--text-muted); }
-.gsi-wrapper { min-height: 44px; display: flex; justify-content: center; width: 100%; color-scheme: dark; }
-
-/* Blocked Area */
-.blocked-box { text-align: center; padding: 40px 20px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); }
-.b-icon { font-size: 48px; margin-bottom: 20px; }
-.countdown { display: flex; justify-content: center; gap: 16px; margin: 32px 0; }
-.cd-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; min-width: 100px; }
-.cd-val { font-size: 32px; font-family: var(--font-mono); font-weight: 700; color: var(--gold); }
-.cd-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-top: 8px; }
-
-/* Form Elements */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.field { display: flex; flex-direction: column; gap: 8px; }
-.field.full { grid-column: 1 / -1; }
-.field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-.field-hint { color: var(--text-muted); font-size: 11px; line-height: 1.45; }
-.field input, .field select, .field textarea {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 14px 16px; color: #fff; font-family: inherit; font-size: 14px; transition: all 0.2s; outline: none;
-}
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: var(--surface-hover); }
-.field textarea { resize: vertical; min-height: 100px; }
-.field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
-.char-count { align-self: flex-end; font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }
-
-/* Dropzone */
-.dropzone {
-  border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 40px 24px;
-  text-align: center; cursor: pointer; position: relative; transition: all 0.2s; background: var(--surface);
-}
-.dropzone:hover, .dropzone.drag { border-color: var(--gold); background: var(--gold-glow); }
-.dropzone.filled { border-style: solid; border-color: var(--gold); }
-.dz-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.dz-content svg { width: 40px; height: 40px; color: var(--gold); margin-bottom: 16px; }
-.dz-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; }
-.dz-sub { font-size: 13px; color: var(--text-muted); }
-.dz-file-info { display: none; align-items: center; justify-content: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--gold); }
-
-/* Checkboxes */
-.checkbox-wrap { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: border 0.2s; }
-.checkbox-wrap:hover { border-color: rgba(255,255,255,0.2); }
-.checkbox-wrap input {
-  appearance: none; width: 20px; height: 20px; border: 2px solid var(--text-dim); border-radius: 6px;
-  margin-top: 2px; flex: 0 0 auto; display: grid; place-items: center; cursor: pointer; transition: all 0.2s;
-}
-.checkbox-wrap input::after { content: ''; width: 10px; height: 10px; background: var(--bg-panel); border-radius: 2px; transform: scale(0); transition: transform 0.2s; }
-.checkbox-wrap input:checked { background: var(--gold); border-color: var(--gold); }
-.checkbox-wrap input:checked::after { transform: scale(1); }
-.checkbox-wrap span { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-
-/* Buttons */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 16px 32px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700;
-  transition: all 0.2s; cursor: pointer; text-align: center;
-}
-.btn-primary { background: var(--gold); color: #000; box-shadow: 0 8px 20px rgba(200, 168, 75, 0.25); }
-.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(200, 168, 75, 0.35); }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.btn-secondary { background: var(--surface); color: #fff; border: 1px solid var(--border); }
-.btn-secondary:hover { background: var(--surface-hover); border-color: var(--gold); }
-.action-row { display: flex; gap: 16px; margin-top: 32px; }
-.action-row .btn { flex: 1; }
-
-.error-banner { background: rgba(224, 108, 108, 0.1); border: 1px solid rgba(224, 108, 108, 0.3); color: var(--error); padding: 16px; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 24px; display: none; }
-
-/* ── OVERLAYS & MODALS ── */
-.overlay {
-  position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.overlay.open { opacity: 1; pointer-events: auto; }
-.modal {
-  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  width: 100%; max-width: 440px; padding: 40px; text-align: center;
-  transform: scale(0.95) translateY(20px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.overlay.open .modal { transform: scale(1) translateY(0); }
-.modal-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--gold-glow); border: 1px solid var(--border-focus); display: grid; place-items: center; margin: 0 auto 24px; color: var(--gold); font-size: 24px; }
-.modal h2 { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.modal p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
-
-/* Admin Modal Specific */
-.admin-login-modal { text-align: left; }
-.admin-login-modal h2 { text-align: center; }
-.admin-login-modal p { text-align: center; }
-
-/* 📱 RESPONSIVE 📱 */
-@media (max-width: 992px) {
-  body { overflow-y: auto; }
-  .app-container { flex-direction: column; overflow: visible; height: auto; min-height: 100vh; }
-  .left-pane { flex: none; height: auto; min-height: 300px; padding: 32px 20px; }
-  .hero-text h1 { font-size: 32px; margin-bottom: 16px; }
-  .hero-text p { font-size: 14px; }
-  .right-pane { max-width: 100%; border-left: none; border-top: 1px solid var(--border); flex: none; height: auto; overflow: visible; }
-  .scroll-area { overflow-y: visible; padding: 24px 16px; height: auto; }
-  .form-grid { grid-template-columns: 1fr; gap: 16px; }
-  .action-row { flex-direction: column; gap: 12px; }
-  .btn { width: 100%; justify-content: center; }
-  .stepper { display: none; } /* Hide stepper on mobile to save space */
-  .panel { padding-bottom: 40px; }
-
-}
-
-
-</style>
+<link rel="stylesheet" href="/studio-brand.css?v=20261002">
+<link rel="icon" type="image/svg+xml" href="/studio-icon.svg">
 </head>
-<body>
+<body class="studio-submission">
 
 <div class="app-container">
   
@@ -249,20 +21,18 @@ img { max-width: 100%; display: block; }
   <div class="left-pane">
     <div class="left-content">
       <div class="brand-header">
-        <div class="logo">
-          <img src="assets/mais-logo.webp" alt="MAİS Studio">
-        </div>
-        <div class="season-tag">Sezon 2 • Canlı</div>
+        <a class="studio-logo" href="https://thendisch.com/" aria-label="Thendisch Studio ana sayfa"><svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M8 11h48v5H35v29h8l-3 6H24l-3-6h8V16H8z"/></svg><span class="brand-copy"><span class="brand-name">THENDISCH STUDIO</span><span class="brand-sub">Sizden Gelenler</span></span></a>
+        <div class="season-tag">Sezon 2</div>
       </div>
       
       <div class="hero-text">
-        <h1>Sizden<br><span>Gelenler</span></h1>
-        <p>Selam! Yapay zeka ile müzik mi üretiyorsun? Harika, tam yerine geldin! Mustafa İnce her hafta sizden gelen parçaları tek tek dinliyor ve en iyilerini binlerce kişiyle paylaşıyor. Hadi, vakit kaybetmeden parçanı bize gönder!</p>
+        <p class="studio-kicker">MUSTAFA İNCE / HAFTALIK PROGRAM</p><h1>Sizden<br><span>Gelenler</span></h1>
+        <p>Bir fikri sese dönüştürdün. Şimdi paylaşma zamanı. Mustafa İnce YouTube kanalının haftalık Sizden Gelenler programına katılmak için şarkını gönder.</p>
         <div class="host-profile">
           <img src="assets/host.webp" alt="Mustafa İnce" class="host-avatar">
           <div class="host-info">
             <h4>Mustafa İnce</h4>
-            <p>Müzik Prodüktörü</p>
+            <p>Programın sunucusu</p><a class="host-channel" href="https://www.youtube.com/@mustafaincemuzik" target="_blank" rel="noopener noreferrer"><img src="/assets/brands/youtube.svg" alt="" aria-hidden="true">YouTube kanalını keşfet</a>
           </div>
         </div>
       </div>
@@ -272,8 +42,8 @@ img { max-width: 100%; display: block; }
 
   <!-- INTERACTIVE PANE -->
   <div class="right-pane">
-    <div class="pane-header">
-      <button class="staff-trigger" onclick="openStaffLogin()">
+    <div class="pane-header"><nav class="studio-links" aria-label="Stüdyo bölümleri"><a href="https://thendisch.com/">Stüdyo</a><a href="https://thendisch.com/muzik">Müzik odası</a><a href="https://thendisch.com/top/10">Keşif</a></nav>
+      <button id="btn-staff" class="staff-trigger" onclick="openStaffLogin()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         Yetkili Girişi
       </button>
@@ -282,25 +52,25 @@ img { max-width: 100%; display: block; }
     <div class="scroll-area">
       
       <div id="local-warning">
-        <strong>⚠️ Uyarı:</strong> Bu dosyayı doğrudan bilgisayarınızdan (file://) açtığınız için Google ile Giriş gibi sunucu gerektiren özellikler çalışmayacaktır. Lütfen projeyi Node.js sunucusu (npm start) üzerinden çalıştırın.
+        Bu sayfanın özelliklerini kullanmak için Sizden Gelenler web sitesini aç.
       </div>
 
       <div class="step-tracker">
-        <div class="st-item active" id="st-1"><div class="st-circle">1</div><div class="st-label">Önce Sen 🤝</div></div>
-        <div class="st-item" id="st-2"><div class="st-circle">2</div><div class="st-label">Parçanın Sesi 🎧</div></div>
-        <div class="st-item" id="st-3"><div class="st-circle">3</div><div class="st-label">İşte Bu! 🎉</div></div>
+        <div class="st-item active" id="st-1"><div class="st-circle">1</div><div class="st-label">Giriş</div></div>
+        <div class="st-item" id="st-2"><div class="st-circle">2</div><div class="st-label">Parçan</div></div>
+        <div class="st-item" id="st-3"><div class="st-circle">3</div><div class="st-label">Tamamlandı</div></div>
       </div>
 
       <!-- STEP 1: AUTH -->
       <div class="panel active" id="panel-auth">
-        <h2 class="panel-title">Önce Seni Tanıyalım</h2>
-        <p class="panel-desc">Haftalık kontenjanları adil bir şekilde dağıtabilmemiz için ufak bir güvenlik adımımız var. Google hesabınla güvenli bir şekilde giriş yap ve hemen başvuruna başlayalım!</p>
+        <h2 class="panel-title">Sesin burada yer bulsun.</h2>
+        <p class="panel-desc">Google hesabınla giriş yap. Ardından parçanı yükleyip haftalık programa başvurabilirsin.</p>
         
         <div class="auth-box">
           <div class="gsi-wrapper" id="gsi-btn">
             <!-- Google Button renders here -->
           </div>
-          <p>Not: Herkese şans verebilmek için haftada sadece 1 başvuru kabul ediyoruz.</p>
+          <p>Her Google hesabı için haftada bir başvuru kabul edilir.</p>
           <div class="error-banner" id="err-auth" style="margin:0; width:100%;"></div>
         </div>
       </div>
@@ -308,9 +78,9 @@ img { max-width: 100%; display: block; }
       <!-- STEP 1B: BLOCKED -->
       <div class="panel" id="panel-blocked">
         <div class="blocked-box">
-          <div class="b-icon">⏳</div>
-          <h2 class="panel-title">Eyvah, Hakkını Doldurdun!</h2>
-          <p class="panel-desc" style="margin-bottom:0;">Harika parçalar ürettiğini biliyoruz ama herkese şans verebilmek için haftada sadece 1 başvuru kabul edebiliyoruz. Süren dolduğunda seni burada bekliyor olacağız!</p>
+          <div class="b-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h2 class="panel-title">Bu haftaki başvurunu aldık.</h2>
+          <p class="panel-desc" style="margin-bottom:0;">Haftada bir parça gönderebilirsin. Yeni başvurun için kalan süreyi aşağıda görebilirsin.</p>
           <div class="countdown">
             <div class="cd-item"><div class="cd-val" id="cd-days">00</div><div class="cd-lbl">Gün</div></div>
             <div class="cd-item"><div class="cd-val" id="cd-hours">00</div><div class="cd-lbl">Saat</div></div>
@@ -321,24 +91,24 @@ img { max-width: 100%; display: block; }
 
       <!-- STEP 2: FORM -->
       <div class="panel" id="panel-form">
-        <h2 class="panel-title">Parçanın Detayları Neler?</h2>
-        <p class="panel-desc">Müziğini dinlemek için sabırsızlanıyoruz! Bize biraz parçandan ve kendinden bahset.</p>
+        <h2 class="panel-title">Hikâyeni parçanla anlat.</h2>
+        <p class="panel-desc">Kendini tanıt, parçanın hikâyesini paylaş ve MP3 dosyanı ekle.</p>
         
         <div class="error-banner" id="err-form"></div>
         
         <div class="form-grid">
           <div class="field">
-            <label>Adın Soyadın (Nasıl hitap edelim?) *</label>
+            <label for="fullName">Adın ve soyadın *</label>
             <input type="text" id="fullName" placeholder="Adın Soyadın">
           </div>
           <div class="field">
-            <label>Sosyal Medya (Seni nerede bulabiliriz?) *</label>
+            <label for="social">Sosyal medya hesabın *</label>
             <input type="text" id="social" placeholder="@kullaniciadi">
           </div>
           <div class="field">
             <label for="aiTool">Hangi yapay zeka aracıyla ürettin? *</label>
             <select id="aiTool">
-              <option value="">Üretim aracını seç...</option>
+              <option value="">Üretim aracını seç</option>
               <optgroup label="Vokalli şarkı ve tam parça üretimi">
                 <option>Suno</option>
                 <option>Udio</option>
@@ -356,7 +126,7 @@ img { max-width: 100%; display: block; }
           <div class="field">
             <label for="studioProgram">Hangi stüdyo programında düzenledin?</label>
             <select id="studioProgram">
-              <option value="">İsteğe bağlı — program seç...</option>
+              <option value="">İsteğe bağlı: program seç</option>
               <optgroup label="Müzik prodüksiyonu (DAW)">
                 <option>FL Studio</option>
                 <option>Ableton Live</option>
@@ -380,23 +150,23 @@ img { max-width: 100%; display: block; }
             <small class="field-hint">Kullandıysan ana düzenleme veya miks programını belirt.</small>
           </div>
           <div class="field">
-            <label>Parçanın Adı Ne? *</label>
+            <label for="trackName">Parçanın adı *</label>
             <input type="text" id="trackName" placeholder="Eserin adı">
           </div>
           <div class="field full">
-            <label>Bize Biraz Parçandan Bahset * (maks 210 karakter)</label>
-            <textarea id="note" maxlength="210" placeholder="Bu parça nasıl ortaya çıktı? Hissi, hikayesi nedir?..." oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
+            <label for="note">Parçanın hikâyesi * (en fazla 210 karakter)</label>
+            <textarea id="note" maxlength="210" placeholder="Bu parçanın hikâyesi ne? Hangi duyguyu anlatıyor?" oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
             <div class="char-count"><span id="charCount">0</span> / 210</div>
           </div>
           
           <div class="field full" style="margin-top: 10px;">
-            <label>MP3 Şaheserini Buraya Bırak 🎶 * (maks <span id="max-upload-label">10 MB</span>)</label>
+            <label>MP3 dosyan * (en fazla <span id="max-upload-label">10 MB</span>)</label>
             <label class="dropzone" id="dz-area">
               <input type="file" class="dz-input" id="mp3file" accept=".mp3,audio/mpeg" onchange="handleFileSelect(this)">
               <div class="dz-content" id="dz-content">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 <div class="dz-title">Tıkla veya sürükleyip bırak</div>
-                <div class="dz-sub">Sadece .mp3 formatı kabul ediyoruz (en fazla <span id="max-upload-help">10 MB</span>)</div>
+                <div class="dz-sub">MP3 formatı (en fazla <span id="max-upload-help">10 MB</span>)</div>
               </div>
               <div class="dz-file-info" id="dz-file-info">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
@@ -408,25 +178,25 @@ img { max-width: 100%; display: block; }
           <div class="field full" style="margin-top: 10px;">
             <label class="checkbox-wrap">
               <input type="checkbox" id="chk">
-              <span>Gönderdiğim bu şaheserin tüm telif haklarının bana ait olduğunu onaylıyorum. Parçam seçilirse, Mustafa İnce kanallarında gururla yayınlanmasına izin veriyorum! 🚀</span>
+              <span>Gönderdiğim parçanın tüm telif haklarının bana ait olduğunu onaylıyorum. Parçam seçilirse Mustafa İnce kanallarında yayınlanmasına izin veriyorum.</span>
             </label>
           </div>
           <div class="field full">
             <label class="checkbox-wrap">
               <input type="checkbox" id="kvkk">
-              <span><a href="privacy.html" target="_blank" onclick="event.stopPropagation()">Aydınlatma Metni</a>'ni okudum, anladım ve kişisel verilerimin işlenmesine gönül rahatlığıyla onay veriyorum.</span>
+              <span><a href="privacy.html" target="_blank" onclick="event.stopPropagation()">Aydınlatma Metni</a>'ni okudum, anladım ve kişisel verilerimin işlenmesine onay veriyorum.</span>
             </label>
           </div>
         </div>
 
         <div class="action-row">
           <button class="btn btn-secondary" onclick="resetFlow()">Geri Dön</button>
-          <button class="btn btn-primary" id="btn-submit" onclick="submitForm()">Parçamı Gönder! 🚀</button>
+          <button class="btn btn-primary" id="btn-submit" onclick="submitForm()">Parçamı gönder</button>
         </div>
       </div>
       
       <!-- Footer links inside scroll area -->
-      <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-dim);">
+      <div class="brand-footer">
         <div>© 2026 Mustafa İnce</div>
         <div style="display:flex;gap:16px;">
           <a href="privacy.html" style="color:var(--text-dim);">Gizlilik</a>
@@ -443,14 +213,13 @@ img { max-width: 100%; display: block; }
 <!-- Welcome Splash Modal -->
 <div class="modal-overlay" id="modal-welcome">
   <div class="modal-box" style="max-width:500px; padding:0; overflow:hidden;">
-    <div style="height:200px; background:linear-gradient(to bottom, transparent, var(--panel)), url('assets/season-plate-v2.jpg') center/cover;"></div>
+    <div style="height:180px; background:url('assets/season-plate-v2.jpg') center/cover;"></div>
     <div style="padding:32px; text-align:center;">
-      <h2 style="font-size:24px; font-weight:800; color:#fff; margin-bottom:12px;">Sezon 2'ye Hoş Geldin! 🚀</h2>
+      <h2 style="font:500 36px/1.1 var(--display); color:var(--text); margin-bottom:16px;">Yeni sezonda sıra sende.</h2>
       <p style="color:var(--dim); line-height:1.6; margin-bottom:24px;">
-        Yeni sezonda Mustafa İnce ailesi olarak daha büyük hedeflerle karşınızdayız. Parçanızı gönderin, değerlendirmeye alalım ve müziğinizi milyonlara duyuralım. <br><br>
-        <span style="color:var(--gold); font-weight:600;">Kurallar basit:</span> Özgün ol, yaratıcı ol, ve en önemlisi kendin ol!
+        Mustafa İnce’nin haftalık programına kendi parçanla katıl. Google hesabınla giriş yap, parçanı tanıt ve MP3 dosyanı gönder.
       </p>
-      <button class="btn primary" style="width:100%; margin-top:0;" onclick="closeModal('modal-welcome')">Hemen Başvur!</button>
+      <button class="btn primary" style="width:100%; margin-top:0;" onclick="closeModal('modal-welcome')">Başvuruma başla</button>
     </div>
   </div>
 </div>
@@ -459,9 +228,9 @@ img { max-width: 100%; display: block; }
 <div class="overlay" id="modal-success">
   <div class="modal">
     <div class="modal-icon">✓</div>
-    <h2>İşte Bu Kadar! 🎉</h2>
-    <p>Harika, parçanı teslim aldık! Şaheserin güvenli ellerde ve değerlendirme listemizde yerini aldı bile. Stüdyoda hep birlikte dinlemek için sabırsızlanıyoruz. Haftaya yepyeni bir parçayla tekrar görüşmek üzere!</p>
-    <button class="btn btn-primary" style="width:100%;" onclick="closeModal('modal-success');resetFlow()">Harika, Görüşürüz! 👋</button>
+    <h2>Parçanı aldık.</h2>
+    <p>Parçan değerlendirme listesine eklendi. Yeni bir başvuru için kalan süreyi hesabınla giriş yaptığında görebilirsin.</p>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeModal('modal-success');resetFlow()">Başvuru sayfasına dön</button>
   </div>
 </div>
 
@@ -469,7 +238,7 @@ img { max-width: 100%; display: block; }
 <div class="overlay" id="modal-login">
   <div class="modal admin-login-modal">
     <h2>Yetkili Girişi</h2>
-    <p>Mustafa İnce yönetim paneline erişin.</p>
+    <p>Sizden Gelenler yönetim paneline giriş yap.</p>
     <div class="error-banner" id="login-err"></div>
     <div class="field" style="margin-bottom:16px;">
       <label>Kullanıcı Adı</label>
@@ -569,7 +338,7 @@ function resetFlow() {
       const res = await fetch('/api/staff/verify', { headers: {'Authorization': 'Bearer '+staffToken} });
       const data = await res.json();
       if(data.valid) {
-        document.getElementById('btn-staff').textContent = '⚙️ ' + data.username;
+        document.getElementById('btn-staff').textContent = data.username;
         document.getElementById('btn-staff').classList.add('active');
       } else {
         localStorage.removeItem('staff_token');
@@ -647,7 +416,7 @@ async function submitForm() {
   err.style.display = 'none';
   
   if(!fullName || !social || !aiTool || !trackName || !note) { err.textContent='Lütfen tüm alanları doldurun.'; err.style.display='block'; return; }
-  if(!mp3) { err.textContent='Müziğini yüklemeyi unuttun! 🎶'; err.style.display='block'; return; }
+  if(!mp3) { err.textContent='Devam etmek için MP3 dosyanı ekle.'; err.style.display='block'; return; }
   if(mp3.size > maxUploadBytes) { err.textContent='Dosya çok büyük. Maksimum ' + maxUploadMb + ' MB yükleyebilirsiniz.'; err.style.display='block'; return; }
   if(!chk || !kvkk) { err.textContent='Devam edebilmek için onay kutucuklarını işaretlemelisin.'; err.style.display='block'; return; }
   
@@ -676,7 +445,7 @@ async function submitForm() {
     err.textContent = 'Bağlantı hatası yaşandı. Lütfen tekrar dene.';
     err.style.display = 'block';
   } finally {
-    btn.disabled = false; btn.textContent = 'Parçamı Gönder! 🚀';
+    btn.disabled = false; btn.textContent = 'Parçamı gönder';
   }
 }
 
