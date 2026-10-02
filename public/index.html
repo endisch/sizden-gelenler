@@ -321,7 +321,7 @@ function resetFlow() {
         if(typeof google !== 'undefined' && google.accounts) {
           clearInterval(initGSI);
           google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: onGoogleLogin });
-          google.accounts.id.renderButton(document.getElementById('gsi-btn'), { theme: 'filled_black', size: 'large', width: 300, shape: 'pill' });
+          google.accounts.id.renderButton(document.getElementById('gsi-btn'), { theme: 'filled_black', size: 'large', width: 300, shape: 'rectangular' });
         }
       }, 100);
       // Timeout after 10s
