@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<link rel="stylesheet" href="/studio-brand.css?v=20261002">
+<link rel="stylesheet" href="/studio-brand.css?v=20261003">
 <link rel="icon" type="image/svg+xml" href="/studio-icon.svg">
 </head>
 <body class="studio-submission">
@@ -241,11 +241,11 @@
     <p>Sizden Gelenler yönetim paneline giriş yap.</p>
     <div class="error-banner" id="login-err"></div>
     <div class="field" style="margin-bottom:16px;">
-      <label>Kullanıcı Adı</label>
+      <label for="login-user">Kullanıcı adı</label>
       <input type="text" id="login-user" placeholder="kullanici.adi" onkeydown="if(event.key==='Enter')doStaffLogin()">
     </div>
     <div class="field" style="margin-bottom:24px;">
-      <label>Şifre</label>
+      <label for="login-pass">Şifre</label>
       <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doStaffLogin()">
     </div>
     <button class="btn btn-primary" id="btn-login" style="width:100%;" onclick="doStaffLogin()">Giriş Yap</button>
